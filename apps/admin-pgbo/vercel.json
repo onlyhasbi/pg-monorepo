@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd ../.. && NITRO_PRESET=vercel turbo run build --filter=admin-pgbo",
-  "installCommand": "cd ../.. && bun install",
+  "buildCommand": "NITRO_PRESET=vercel turbo run build --filter=admin-pgbo",
   "framework": null,
   "trailingSlash": false,
   "cleanUrls": true,
