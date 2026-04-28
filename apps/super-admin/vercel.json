@@ -1,6 +1,7 @@
 {
   "version": 2,
   "buildCommand": "NITRO_PRESET=vercel turbo run build --filter=super-admin",
+  "installCommand": "bun install",
   "framework": null,
   "cleanUrls": true,
   "regions": ["sin1"],
