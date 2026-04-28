@@ -1,0 +1,21 @@
+{
+  "name": "super-admin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite start"
+  },
+  "dependencies": {
+    "@repo/ui": "workspace:*",
+    "@repo/config": "workspace:*",
+    "@repo/lib": "workspace:*",
+    "@repo/hooks": "workspace:*",
+    "@repo/schemas": "workspace:*",
+    "@repo/constant": "workspace:*",
+    "@repo/services": "workspace:*",
+    "@repo/types": "workspace:*"
+  }
+}

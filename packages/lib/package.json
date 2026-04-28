@@ -1,0 +1,9 @@
+{
+  "name": "@repo/lib",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./*": "./src/*.ts",
+    "./router-wrappers": "./src/router-wrappers.tsx"
+  }
+}
