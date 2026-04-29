@@ -12,7 +12,7 @@ export default defineConfig({
         enabled: false,
       },
     }),
-    nitro({ preset: "vercel" }),
+    nitro({ preset: "cloudflare-pages" }),
     viteReact(),
     tailwindcss(),
   ],
