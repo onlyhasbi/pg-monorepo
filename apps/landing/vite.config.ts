@@ -12,7 +12,13 @@ export default defineConfig({
         enabled: false,
       },
     }),
-    nitro({ preset: "cloudflare-pages" }),
+    nitro({
+      preset: "cloudflare-pages",
+      routeRules: {
+        "/api-proxy/**": { proxy: "https://publicgold.co.id/**" },
+        "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" }
+      }
+    }),
     viteReact(),
     tailwindcss(),
   ],
