@@ -31,6 +31,17 @@ export default defineConfig({
       },
     },
     modulePreload: false,
+    rollupOptions: {
+      onwarn(warning, warn) {
+        if (
+          (warning.code === "MODULE_LEVEL_DIRECTIVE" && warning.message.includes("use client")) ||
+          (warning.code === "UNKNOWN_OPTION" && warning.message.includes("platform"))
+        ) {
+          return;
+        }
+        warn(warning);
+      },
+    },
   },
 
   server: {
