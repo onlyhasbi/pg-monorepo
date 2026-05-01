@@ -28,10 +28,10 @@ function LandingHomePage() {
             <OptimizedImage
               src="https://mypublicgold.com/5g/logo/logo_gold.png"
               alt="5G Associates"
-              width={72}
-              height={72}
+              width={50}
+              height={50}
               priority
-              className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+              className="w-16 h-16 sm:w-18 sm:h-18 object-contain"
             />
           </div>
         </a>

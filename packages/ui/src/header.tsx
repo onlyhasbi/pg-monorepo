@@ -14,6 +14,8 @@ import {
   Share2,
 } from "lucide-react";
 
+import { useDeferredAnimation } from "@repo/hooks/useDeferredAnimation";
+
 interface PgboData {
   foto_profil_url?: string | null;
   nama_lengkap?: string | null;
@@ -66,6 +68,7 @@ const formatSocialUrl = (
 
 function Header({ pgbo }: { pgbo?: PgboData }) {
   const { t } = useTranslation();
+  const showAnimations = useDeferredAnimation();
 
   const handleWhatsAppClick = () => {
     trackEvent(pgbo?.pageid, "whatsapp_click");
@@ -111,9 +114,13 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
 
       {/* Hero Image Container */}
       <div className="pg-profile-skeleton relative w-64 h-64 md:w-80 md:h-80 z-10 shrink-0">
-        {/* Pulse ripple rings */}
-        <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-40 animate-[pg-ripple_2s_ease-out_infinite]" />
-        <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-30 animate-[pg-ripple_2s_ease-out_0.8s_infinite]" />
+        {/* Pulse ripple rings - Deferred Mounting */}
+        {showAnimations && (
+          <>
+            <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-40 animate-[pg-ripple_2s_ease-out_infinite]" />
+            <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-30 animate-[pg-ripple_2s_ease-out_0.8s_infinite]" />
+          </>
+        )}
 
         {/* Profile Image with Card-like shadow */}
         <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl shadow-slate-200 border border-slate-100 bg-white">
@@ -136,8 +143,11 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
           )}
         </div>
 
-        {/* Floating Badge (5G Team) */}
-        <span className="w-20 h-20 md:w-24 md:h-24 absolute bottom-0 right-0 z-20 animate-[pg-float_4s_ease-in-out_infinite]">
+        {/* Badge (5G Team) - Deferred Float Animation */}
+        <span className={cn(
+          "w-20 h-20 md:w-24 md:h-24 absolute bottom-0 right-0 z-20",
+          showAnimations ? "animate-[pg-float_4s_ease-in-out_infinite]" : ""
+        )}>
           <OptimizedImage
             className="rounded-full overflow-hidden w-full h-full border-4 border-white shadow-xl"
             src="/5g.webp"
