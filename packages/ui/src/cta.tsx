@@ -10,7 +10,6 @@ import { buttonVariants } from "@repo/ui/ui/button";
 import { getWhatsAppLink } from "@repo/lib/contact";
 import { Card, CardContent } from "@repo/ui/ui/card";
 import { OptimizedImage } from "./ui/optimized-image";
-import { useDeferredAnimation } from "@repo/hooks/useDeferredAnimation";
 
 interface PgboData {
   foto_profil_url?: string | null;
@@ -23,7 +22,6 @@ interface PgboData {
 
 export default function CallToAction({ pgbo: propsPgbo }: { pgbo?: PgboData }) {
   const { t } = useTranslation();
-  const showAnimations = useDeferredAnimation();
   const { pgcode } = useParams({ strict: false }) as { pgcode?: string };
 
   const { data: qPgbo } = useQuery({
@@ -60,13 +58,9 @@ export default function CallToAction({ pgbo: propsPgbo }: { pgbo?: PgboData }) {
               {/* Photo Section */}
               <div className="lg:w-1/3 flex justify-center">
                 <div className="relative w-40 h-40 md:w-48 md:h-48">
-                  {/* Pulse ripple rings — reuse pg-ripple from CriticalCss, deferred mounting */}
-                  {showAnimations && (
-                    <>
-                      <span className="absolute inset-0 rounded-full border-[3px] border-white/60 opacity-40 animate-[pg-ripple_2s_ease-out_infinite]" />
-                      <span className="absolute inset-0 rounded-full border-[3px] border-white/40 opacity-30 animate-[pg-ripple_2s_ease-out_0.8s_infinite]" />
-                    </>
-                  )}
+                  {/* Pulse ripple rings (Pure CSS Deferred Animation) */}
+                  <span className="absolute inset-0 rounded-full border-[3px] border-white/60 opacity-0 animate-[pg-ripple_2s_ease-out_2s_infinite]" />
+                  <span className="absolute inset-0 rounded-full border-[3px] border-white/40 opacity-0 animate-[pg-ripple_2s_ease-out_2.8s_infinite]" />
 
                   {/* Photo */}
                   {hasPhoto ? (

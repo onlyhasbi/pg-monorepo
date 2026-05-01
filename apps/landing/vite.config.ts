@@ -55,35 +55,20 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            // 1. Core Framework (Wajib dimuat di awal)
             if (
-              id.includes("/react/") ||
-              id.includes("/react-dom/") ||
-              id.includes("@tanstack/")
-            ) {
-              return "framework";
-            }
-            // 2. UI Libraries (Besar tapi sering di-lazy load)
-            if (
+              id.includes("@tanstack/react-router") ||
+              id.includes("@tanstack/router") ||
+              id.includes("react-dom") ||
               id.includes("@radix-ui") ||
               id.includes("@base-ui") ||
-              id.includes("lucide-react")
+              id.includes("i18next") ||
+              id.includes("react-i18next")
             ) {
-              return "ui-vendor";
+              return "vendor-core";
             }
-            // 3. Animasi & Slider (Hanya dimuat saat dibutuhkan)
-            if (
-              id.includes("framer-motion") ||
-              id.includes("motion") ||
-              id.includes("embla-carousel")
-            ) {
-              return "motion-vendor";
-            }
-            // 4. Locales & i18n
-            if (id.includes("i18next") || id.includes("react-i18next")) {
-              return "i18n-vendor";
-            }
-            // Sisanya biarkan Rollup yang memecah secara otomatis (HTTP/2 Multiplexing)
+            if (id.includes("@tanstack/react-query") || id.includes("@tanstack/query")) return "vendor-query";
+            if (id.includes("motion") || id.includes("framer-motion")) return "vendor-motion";
+            if (id.includes("embla-carousel")) return "vendor-carousel";
           }
         },
       },
