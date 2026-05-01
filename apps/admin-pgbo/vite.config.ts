@@ -56,6 +56,14 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@repo/ui": path.resolve(__dirname, "../../packages/ui/src"),
+      "@repo/lib": path.resolve(__dirname, "../../packages/lib/src"),
+      "@repo/hooks": path.resolve(__dirname, "../../packages/hooks/src"),
+      "@repo/schemas": path.resolve(__dirname, "../../packages/schemas/src"),
+      "@repo/constant": path.resolve(__dirname, "../../packages/constant/src"),
+      "@repo/services": path.resolve(__dirname, "../../packages/services/src"),
+      "@repo/types": path.resolve(__dirname, "../../packages/types/src/index.ts"),
+      "@repo/config": path.resolve(__dirname, "../../packages/config/src"),
       "@/components": path.resolve(__dirname, "../../packages/ui/src"),
       "@/lib": path.resolve(__dirname, "../../packages/lib/src"),
       "@/hooks": path.resolve(__dirname, "../../packages/hooks/src"),
