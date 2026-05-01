@@ -4,6 +4,7 @@
     "API_URL",
     "VITE_SITE_URL",
     "CLOUDINARY_CLOUD_NAME",
+    "VITE_CLOUDINARY_CLOUD_NAME",
     "BUN_VERSION"
   ],
   "tasks": {
