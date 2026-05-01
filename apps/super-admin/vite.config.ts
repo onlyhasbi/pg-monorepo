@@ -13,7 +13,7 @@ export default defineConfig({
       },
     }),
     nitro({
-      preset: "cloudflare-pages",
+      preset: "vercel",
       routeRules: {
         "/api-proxy/**": { proxy: "https://publicgold.co.id/**" },
         "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" }

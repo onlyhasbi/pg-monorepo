@@ -1,9 +1,15 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": [
+    "API_URL",
+    "VITE_SITE_URL",
+    "CLOUDINARY_CLOUD_NAME",
+    "BUN_VERSION"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".output/**", "dist/**"]
+      "outputs": [".output/**", "dist/**", ".vercel/**"]
     },
     "dev": {
       "cache": false,
