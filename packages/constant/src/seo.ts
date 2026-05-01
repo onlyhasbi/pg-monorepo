@@ -75,20 +75,6 @@ export const rootHeadConfig = (appCss: string) => {
         type: "font/woff2",
         crossOrigin: "anonymous" as const,
       },
-      {
-        rel: "preload" as const,
-        href: "/fonts/caveat-regular.woff2",
-        as: "font" as const,
-        type: "font/woff2",
-        crossOrigin: "anonymous" as const,
-      },
-      {
-        rel: "preload" as const,
-        href: "/fonts/caveat-bold.woff2",
-        as: "font" as const,
-        type: "font/woff2",
-        crossOrigin: "anonymous" as const,
-      },
       { rel: "dns-prefetch" as const, href: "https://res.cloudinary.com" },
     ],
   };

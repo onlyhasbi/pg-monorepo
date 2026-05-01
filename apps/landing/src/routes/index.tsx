@@ -283,7 +283,6 @@ function FloatingOrbs({ agents }: { agents: Agent[] }) {
                   alt={agent.nama_panggilan || agent.pageid}
                   width={80}
                   height={80}
-                  priority
                   className="w-full h-full object-cover pointer-events-none"
                 />
               ) : (

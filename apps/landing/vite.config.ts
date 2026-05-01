@@ -52,6 +52,19 @@ export default defineConfig({
         }
         warn(warning);
       },
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("@tanstack/react-query") || id.includes("@tanstack/query")) return "vendor-query";
+            if (id.includes("@tanstack/react-router") || id.includes("@tanstack/router")) return "vendor-router";
+            if (id.includes("react-dom")) return "vendor-react-dom";
+            if (id.includes("i18next") || id.includes("react-i18next")) return "vendor-i18n";
+            if (id.includes("motion") || id.includes("framer-motion")) return "vendor-motion";
+            if (id.includes("@radix-ui") || id.includes("@base-ui")) return "vendor-ui";
+            if (id.includes("embla-carousel")) return "vendor-carousel";
+          }
+        },
+      },
     },
   },
 
