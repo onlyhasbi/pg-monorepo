@@ -4,5 +4,13 @@
   "private": true,
   "exports": {
     "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@repo/lib": "workspace:*",
+    "@tanstack/react-start": "latest",
+    "cookie": "latest"
+  },
+  "devDependencies": {
+    "@types/cookie": "latest"
   }
 }

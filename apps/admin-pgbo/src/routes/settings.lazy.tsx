@@ -1,22 +1,15 @@
+import { dialCodeOptions } from "@repo/constant/countries";
+import { useSEO } from "@repo/hooks/useSEO";
+import { formatPhoneForAPI } from "@repo/lib/phone";
 import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+  authDealerQueryOptions,
+  settingsQueryOptions,
+} from "@repo/lib/queryOptions";
+import { cn } from "@repo/lib/utils";
 import {
-  ArrowLeft,
-  Globe,
-  Link2,
-  Mail,
-  Phone,
-  Save,
-  Share2,
-  ShieldCheck,
-  User,
-} from "lucide-react";
-import { Suspense, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+  updatePasswordFn,
+  updateSettingsFn,
+} from "@repo/services/api.functions";
 import { PasswordCard } from "@repo/ui/settings/PasswordCard";
 import { ProfilePhotoCard } from "@repo/ui/settings/ProfilePhotoCard";
 import { SocialMediaCard } from "@repo/ui/settings/SocialMediaCard";
@@ -36,15 +29,25 @@ import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
 import { Spinner } from "@repo/ui/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/ui/tabs";
-import { dialCodeOptions } from "@repo/constant/countries";
-import { useSEO } from "@repo/hooks/useSEO";
-import { api } from "@repo/lib/api";
-import { formatPhoneForAPI } from "@repo/lib/phone";
 import {
-  authDealerQueryOptions,
-  settingsQueryOptions,
-} from "@repo/lib/queryOptions";
-import { cn } from "@repo/lib/utils";
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  Globe,
+  Link2,
+  Mail,
+  Phone,
+  Save,
+  Share2,
+  ShieldCheck,
+  User,
+} from "lucide-react";
+import { Suspense, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 
 export interface SettingsFormValues {
   nama_lengkap: string;
@@ -150,9 +153,9 @@ function SettingsPage() {
         }
       });
 
-      const res = await api.put("/settings", data);
+      const res = await updateSettingsFn({ data: data });
       return {
-        profile: res.data,
+        profile: res,
         passwordFields: { katasandi_lama, katasandi_baru },
       };
     },
@@ -182,11 +185,11 @@ function SettingsPage() {
           data.passwordFields.katasandi_lama
         ) {
           try {
-            const pwdRes = await api.patch("/settings/password", {
+            const pwdRes = await updatePasswordFn({ data: {
               katasandi_lama: data.passwordFields.katasandi_lama,
               katasandi_baru: data.passwordFields.katasandi_baru,
-            });
-            if (pwdRes.data.success) {
+            } });
+            if (pwdRes.success) {
               passwordUpdated = true;
               // Reset password fields only after confirmed success
               setValue("katasandi_lama", "");
@@ -194,13 +197,13 @@ function SettingsPage() {
               setValue("konfirmasi_katasandi", "");
             } else {
               showToast(
-                pwdRes.data.message || "Gagal memperbarui kata sandi",
+                pwdRes.message || "Gagal memperbarui kata sandi",
                 "error",
               );
             }
           } catch (err: any) {
             showToast(
-              err.response?.data?.message || "Gagal memperbarui kata sandi",
+              err.message || "Gagal memperbarui kata sandi",
               "error",
             );
           }
@@ -221,7 +224,7 @@ function SettingsPage() {
     },
     onError: (error: any) =>
       showToast(
-        error.response?.data?.message ||
+        error.message ||
           "Terjadi kesalahan saat menyimpan pengaturan.",
         "error",
       ),

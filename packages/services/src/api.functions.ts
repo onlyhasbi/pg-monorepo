@@ -178,3 +178,22 @@ export const updateAdminSecretFn = createServerFn({ method: "POST" })
       true,
     );
   });
+
+export const updateSettingsFn = createServerFn({ method: "POST" })
+  .inputValidator((formData: any) => formData) // FormData is handled natively
+  .handler(async ({ data: formData }) => {
+    return baseFetch("/settings", {
+      method: "PUT",
+      body: formData,
+    });
+  });
+
+export const updatePasswordFn = createServerFn({ method: "POST" })
+  .inputValidator((d: { katasandi_lama: string; katasandi_baru: string }) => d)
+  .handler(async ({ data }) => {
+    return baseFetch("/settings/password", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  });
+
