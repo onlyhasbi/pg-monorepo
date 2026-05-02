@@ -59,7 +59,7 @@ const RightBanner = React.memo(({ referralData }: { referralData: any }) => {
       />
       <div className="absolute top-[15%] inset-x-0 z-[15] flex justify-center pointer-events-none">
         <OptimizedImage
-          src="/logo.avif"
+          src="/logo.webp"
           alt="Public Gold Logo"
           className="w-64 sm:w-80 md:w-96 h-auto drop-shadow-2xl transition-transform duration-1000 group-hover:scale-105"
           width={400}
@@ -501,7 +501,7 @@ function RegisterPage() {
                   className="flex-1 flex items-center justify-center gap-2 pt-5 pb-4 rounded-none border-none data-[active]:bg-transparent data-[active]:text-slate-900 data-[active]:shadow-none transition-all"
                 >
                   <OptimizedImage
-                    src="/dewasa.avif"
+                    src="/dewasa.webp"
                     alt=""
                     className="w-7 h-7 rounded-full object-cover shrink-0 aspect-square object-top"
                     width={28}
@@ -514,7 +514,7 @@ function RegisterPage() {
                   className="flex-1 flex items-center justify-center gap-2 pt-5 pb-4 rounded-none border-none data-[active]:bg-transparent data-[active]:text-slate-900 data-[active]:shadow-none transition-all"
                 >
                   <OptimizedImage
-                    src="/anak.avif"
+                    src="/anak.webp"
                     alt=""
                     className="w-7 h-7 rounded-full object-cover shrink-0 aspect-square object-top"
                     width={28}

@@ -80,7 +80,7 @@ function LoginPage() {
                 className="p-3 bg-[#000856] rounded-2xl shadow-sm border border-slate-100"
               >
                 <OptimizedImage
-                  src="/5g.avif"
+                  src="/5g.webp"
                   alt="Logo"
                   width={48}
                   height={48}

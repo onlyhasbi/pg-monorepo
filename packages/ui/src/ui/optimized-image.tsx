@@ -22,7 +22,6 @@ export function OptimizedImage(props: OptimizedImageProps) {
   if (!src) return null;
 
   const isSvg = src.toLowerCase().endsWith(".svg");
-  const isAvif = src.toLowerCase().endsWith(".avif");
   const isLocal = src.startsWith("/") && !src.startsWith("//");
 
   const BLOCKED_DOMAINS = ["chinapress.com.my"];
@@ -31,9 +30,9 @@ export function OptimizedImage(props: OptimizedImageProps) {
     BLOCKED_DOMAINS.some((domain) => src.includes(domain));
 
   const defaultWidth = width || 800;
-  const canOptimizeLocal = isLocal && !isSvg && !isAvif && !import.meta.env.DEV;
+  const canOptimizeLocal = isLocal && !isSvg && !import.meta.env.DEV;
   const canUseCloudinary =
-    !isBlockedDomain && !isSvg && !isAvif && (!isLocal || canOptimizeLocal);
+    !isBlockedDomain && !isSvg && (!isLocal || canOptimizeLocal);
 
   const srcset = canUseCloudinary
     ? getCloudinarySrcSet(src, { priority, maxWidth: width })
@@ -87,7 +86,6 @@ function LazyImage(props: OptimizedImageProps) {
   }, [src]);
 
   const isSvg = src.toLowerCase().endsWith(".svg");
-  const isAvif = src.toLowerCase().endsWith(".avif");
   const isLocal = src.startsWith("/") && !src.startsWith("//");
 
   const BLOCKED_DOMAINS = ["chinapress.com.my"];
@@ -96,9 +94,9 @@ function LazyImage(props: OptimizedImageProps) {
     BLOCKED_DOMAINS.some((domain) => src.includes(domain));
 
   const defaultWidth = width || 800;
-  const canOptimizeLocal = isLocal && !isSvg && !isAvif && !import.meta.env.DEV;
+  const canOptimizeLocal = isLocal && !isSvg && !import.meta.env.DEV;
   const useCloudinary =
-    !hasError && !isBlockedDomain && !isSvg && !isAvif && (!isLocal || canOptimizeLocal);
+    !hasError && !isBlockedDomain && !isSvg && (!isLocal || canOptimizeLocal);
 
   const srcset = useCloudinary
     ? getCloudinarySrcSet(src, { maxWidth: width })
