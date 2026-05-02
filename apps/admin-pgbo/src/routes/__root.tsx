@@ -24,9 +24,8 @@ const TanStackRouterDevtools = import.meta.env.PROD
 
 import { getAuthToken } from "@repo/lib/auth";
 
-import { rootHeadConfig } from "@repo/constant/seo";
-import { CriticalCss } from "@repo/ui/CriticalCss";
 import { RootError } from "@repo/ui/root_error";
+import { CriticalCss } from "@repo/ui/CriticalCss";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -44,7 +43,18 @@ export const Route = createRootRouteWithContext<{
   component: RootComponent,
   notFoundComponent: NotFound,
   errorComponent: RootError,
-  head: () => rootHeadConfig(appCss),
+  head: () => ({
+    meta: [
+      { charSet: "UTF-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1.0" },
+      { title: "Admin PGBO - Public Gold" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/svg+xml", href: "/logo.svg" },
+    ],
+  }),
 });
 
 function RootDocument({
