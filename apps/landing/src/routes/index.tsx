@@ -3,7 +3,7 @@ import { OptimizedImage } from "@repo/ui/ui/optimized-image";
 
 const ADMIN_PGBO_URL = import.meta.env.DEV
   ? "http://localhost:3003/signin"
-  : "https://admin.mypublicgold.id/signin";
+  : "https://pgbo.mypublicgold.id/signin";
 
 export const Route = createFileRoute("/")({
   component: LandingHomePage,
