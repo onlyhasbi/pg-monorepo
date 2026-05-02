@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { getAgentData } from "@repo/services/api.functions";
+import { agentQueryOptions } from "@repo/lib/queryOptions";
 
 export type RegisterSearch = {
   type?: "dewasa" | "anak";
@@ -16,20 +16,13 @@ export const Route = createFileRoute("/register")({
   loaderDeps: ({ search }) => ({ ref: search.ref }),
   loader: async ({ context: { queryClient }, deps: { ref } }) => {
     if (!ref) return null;
-    return queryClient.ensureQueryData({
-      queryKey: ["referral", ref],
-      queryFn: async () => {
-        try {
-          const res = await getAgentData({ data: ref });
-          return res.data;
-        } catch (err: any) {
-          // USER REQUIREMENT: Server-side redirect for 404
-          if (err.message?.includes("404")) {
-            throw notFound();
-          }
-          throw err;
-        }
-      },
-    });
+    try {
+      return await queryClient.ensureQueryData(agentQueryOptions(ref));
+    } catch (err: any) {
+      if (err.message?.includes("404")) {
+        throw notFound();
+      }
+      throw err;
+    }
   },
 });

@@ -15,7 +15,7 @@ import {
 import { PhoneMockup } from "@repo/ui/ui/PhoneMockup";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { getAgentData } from "@repo/services/api.functions";
+import { agentQueryOptions } from "@repo/lib/queryOptions";
 import { getWhatsAppLink } from "@repo/lib/contact";
 import NotFound from "@repo/ui/not_found";
 import type { PetunjukSearch } from "./petunjuk";
@@ -84,11 +84,7 @@ function PetunjukPage() {
   }, [ref]);
 
   const { data: agentData, isError } = useQuery({
-    queryKey: ["agent-petunjuk", pageId],
-    queryFn: async () => {
-      const res = await getAgentData({ data: pageId! });
-      return res.data;
-    },
+    ...agentQueryOptions(pageId!),
     enabled: !!pageId,
   });
 
