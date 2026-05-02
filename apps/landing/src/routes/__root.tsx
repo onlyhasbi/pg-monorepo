@@ -2,6 +2,8 @@ import {
   Outlet,
   useLocation,
   useMatches,
+  useNavigate,
+  useRouter,
   useRouterState,
   HeadContent,
   Scripts,
@@ -77,6 +79,8 @@ function RootComponent() {
   const location = useLocation();
   const matches = useMatches();
   const routerState = useRouterState();
+  const navigate = useNavigate();
+  const router = useRouter();
 
   const lang = i18n.language || "id";
 
@@ -101,7 +105,22 @@ function RootComponent() {
       <RootDocument lang={lang}>
         <ToastProvider>
           <ScrollUnlocker />
-          {!hideTopbar && <Topbar pgbo={pgbo} />}
+          {!hideTopbar && (
+            <Topbar
+              pgbo={pgbo}
+              onNavigateLogo={() => {
+                navigate({ to: "/$pgcode", params: { pgcode: pgbo?.pageid || pgcode || "" } });
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              onNavigateRegister={(type) => {
+                navigate({ to: "/register", search: { type, ref: pgbo?.pageid } });
+              }}
+              onHoverRegister={() => {
+                router.preloadRoute({ to: "/register", search: { type: "dewasa", ref: pgbo?.pageid } });
+                router.preloadRoute({ to: "/register", search: { type: "anak", ref: pgbo?.pageid } });
+              }}
+            />
+          )}
           <main>
             <Outlet />
           </main>

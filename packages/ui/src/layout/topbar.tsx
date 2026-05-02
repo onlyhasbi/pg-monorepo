@@ -6,29 +6,30 @@ import {
   DropdownMenuTrigger,
 } from "@repo/ui/ui/dropdown-menu";
 import { cn } from "@repo/lib/utils";
-import { AppLink as Link } from "@repo/lib/router-wrappers";
 import { ChevronDown, Languages, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
-import { agentQueryOptions } from "@repo/lib/queryOptions";
 import { OptimizedImage } from "@repo/ui/ui/optimized-image";
 import { useIsMounted } from "@repo/hooks/useIsMounted";
 
-function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
+interface TopbarProps {
+  pgbo?: any;
+  onNavigateLogo?: () => void;
+  onNavigateRegister?: (type: "dewasa" | "anak") => void;
+  onHoverRegister?: () => void;
+}
+
+function Topbar({
+  pgbo: propsPgbo,
+  onNavigateLogo,
+  onNavigateRegister,
+  onHoverRegister,
+}: TopbarProps) {
   const isMounted = useIsMounted();
   const [isOpen, setIsOpen] = useState(false);
   const { t, i18n } = useTranslation();
-  const { pgcode } = useParams({ strict: false }) as { pgcode?: string };
 
-  // Only fetch if we have a pgcode and no props were passed from the root
-  const { data: agentData } = useQuery({
-    ...agentQueryOptions(pgcode || ""),
-    enabled: !!pgcode && !propsPgbo,
-  });
-
-  const pgbo = propsPgbo || agentData;
+  const pgbo = propsPgbo;
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -84,12 +85,16 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
       >
         <div className="flex h-full w-full max-w-7xl items-center justify-between mx-auto px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link
-            to="/$pgcode"
-            params={{ pgcode: pgbo?.pageid || "" }}
-            onClick={() => {
-              if (window.location.pathname.startsWith("/")) {
-                window.scrollTo({ top: 0, behavior: "smooth" });
+          <a
+            href={`/${pgbo?.pageid || ""}`}
+            onClick={(e) => {
+              if (onNavigateLogo) {
+                e.preventDefault();
+                onNavigateLogo();
+              } else {
+                if (window.location.pathname.startsWith("/")) {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
               }
             }}
             className="group flex items-center gap-2 cursor-pointer"
@@ -102,7 +107,7 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
               width={200}
               height={56}
             />
-          </Link>
+          </a>
 
           <div className="flex items-center gap-4">
             {/* Language Selector (Desktop) */}
@@ -160,6 +165,7 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
                 render={
                   <Button
                     rounded="xl"
+                    onMouseEnter={onHoverRegister}
                     className="font-bold shadow-lg shadow-red-600/20 active:scale-95 transition-all h-11"
                   >
                     {t("nav.register")}
@@ -173,10 +179,14 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
               >
                 <DropdownMenuItem
                   render={
-                    <Link
-                      to="/register"
-                      search={{ type: "dewasa", ref: pgbo?.pageid }}
-                      preload="intent"
+                    <a
+                      href={`/register?type=dewasa&ref=${pgbo?.pageid || ""}`}
+                      onClick={(e) => {
+                        if (onNavigateRegister) {
+                          e.preventDefault();
+                          onNavigateRegister("dewasa");
+                        }
+                      }}
                       className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 rounded-xl cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
                     >
                       <OptimizedImage
@@ -187,15 +197,19 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
                         height={28}
                       />
                       {t("nav.accountAdult")}
-                    </Link>
+                    </a>
                   }
                 />
                 <DropdownMenuItem
                   render={
-                    <Link
-                      to="/register"
-                      search={{ type: "anak", ref: pgbo?.pageid }}
-                      preload="intent"
+                    <a
+                      href={`/register?type=anak&ref=${pgbo?.pageid || ""}`}
+                      onClick={(e) => {
+                        if (onNavigateRegister) {
+                          e.preventDefault();
+                          onNavigateRegister("anak");
+                        }
+                      }}
                       className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 rounded-xl cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
                     >
                       <OptimizedImage
@@ -206,7 +220,7 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
                         height={28}
                       />
                       {t("nav.accountChild")}
-                    </Link>
+                    </a>
                   }
                 />
               </DropdownMenuContent>
@@ -237,10 +251,14 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
         )}
       >
         <div className="flex h-20 items-center justify-between border-b border-slate-100 px-6">
-          <Link
-            to="/"
-            onClick={() => setIsOpen(false)}
-            className="inline-flex shrink-0 items-center"
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              setIsOpen(false);
+              if (onNavigateLogo) onNavigateLogo();
+            }}
+            className="inline-flex shrink-0 items-center cursor-pointer"
           >
             <OptimizedImage
               src="/logo.webp"
@@ -250,7 +268,7 @@ function Topbar({ pgbo: propsPgbo }: { pgbo?: any }) {
               width={200}
               height={56}
             />
-          </Link>
+          </a>
           <button
             onClick={() => setIsOpen(false)}
             className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
