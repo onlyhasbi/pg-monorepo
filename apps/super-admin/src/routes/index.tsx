@@ -4,6 +4,14 @@ import {
   getAdminPgboFn,
   getAdminSecretFn,
   updateAdminSecretFn,
+  exportAdminPgboFn,
+  deleteAdminPgboFn,
+  toggleAdminPgboFn,
+  bulkDeleteAdminPgboFn,
+  bulkToggleAdminPgboFn,
+  createAdminPgboFn,
+  updateAdminPgboFn,
+  checkAdminPageIdFn,
 } from "@repo/services/api.functions";
 import {
   useQuery,
@@ -219,10 +227,8 @@ function AdminDashboard() {
   ): Promise<boolean> => {
     if (!pageid || pageid.length < 3) return true;
     try {
-      const res = await api.get(
-        `/admin/pgbo/check-pageid?pageid=${pageid}${excludeId ? `&excludeId=${excludeId}` : ""}`,
-      );
-      return res.data.isAvailable;
+      const res = await checkAdminPageIdFn({ data: { pageid, excludeId } });
+      return res.isAvailable;
     } catch {
       return true;
     }
@@ -273,8 +279,8 @@ function AdminDashboard() {
   // --- DELETE MUTATION ---
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.delete(`/admin/pgbo/${id}`);
-      return res.data;
+      const res = await deleteAdminPgboFn({ data: id });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");
@@ -293,8 +299,8 @@ function AdminDashboard() {
   // --- TOGGLE ACTIVE MUTATION ---
   const toggleMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.patch(`/admin/pgbo/${id}/toggle`, null);
-      return res.data;
+      const res = await toggleAdminPgboFn({ data: id });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");
@@ -311,8 +317,8 @@ function AdminDashboard() {
   // --- BULK DELETE MUTATION ---
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const res = await api.post("/admin/pgbo/bulk-delete", { ids });
-      return res.data;
+      const res = await bulkDeleteAdminPgboFn({ data: { ids } });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");
@@ -331,8 +337,8 @@ function AdminDashboard() {
   // --- BULK TOGGLE MUTATION ---
   const bulkToggleMutation = useMutation({
     mutationFn: async ({ ids, active }: { ids: string[]; active: boolean }) => {
-      const res = await api.patch("/admin/pgbo/bulk-toggle", { ids, active });
-      return res.data;
+      const res = await bulkToggleAdminPgboFn({ data: { ids, active } });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");
@@ -369,8 +375,8 @@ function AdminDashboard() {
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
-      const res = await api.post("/admin/pgbo", data);
-      return res.data;
+      const res = await createAdminPgboFn({ data });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");
@@ -419,8 +425,8 @@ function AdminDashboard() {
 
   const editMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await api.put(`/admin/pgbo/${id}`, data);
-      return res.data;
+      const res = await updateAdminPgboFn({ data: { id, data } });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");

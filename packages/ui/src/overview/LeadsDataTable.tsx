@@ -5,6 +5,7 @@ import { Check, Download, Loader2, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { api } from "@repo/lib/api";
 import { cn } from "@repo/lib/utils";
+import { deleteLeadFn, bulkDeleteLeadsFn, exportLeadsFn } from "@repo/services/api.functions";
 import { useToast } from "@repo/ui/toast";
 import { Button } from "@repo/ui/ui/button";
 import { DataTable } from "@repo/ui/ui/data-table";
@@ -36,17 +37,11 @@ export function LeadsDataTable({
 
   const exportVcfMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const res = await api.post(
-        "/overview/leads/export-vcf",
-        { ids },
-        {
-          responseType: "blob",
-        },
-      );
-      return res.data;
+      const resText = await exportLeadsFn({ data: { ids } });
+      return resText;
     },
     onSuccess: (blob) => {
-      const url = window.URL.createObjectURL(new Blob([blob]));
+      const url = window.URL.createObjectURL(new Blob([blob], { type: "text/vcard" }));
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", "kontak-pendaftar.vcf");
@@ -70,8 +65,8 @@ export function LeadsDataTable({
 
   const deleteLeadMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api.delete(`/overview/leads/${id}`);
-      return res.data;
+      const res = await deleteLeadFn({ data: id });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");
@@ -89,8 +84,8 @@ export function LeadsDataTable({
 
   const bulkDeleteLeadMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const res = await api.post("/overview/leads/bulk-delete", { ids });
-      return res.data;
+      const res = await bulkDeleteLeadsFn({ data: { ids } });
+      return res;
     },
     onSuccess: (data) => {
       showToast(data.message, "success");

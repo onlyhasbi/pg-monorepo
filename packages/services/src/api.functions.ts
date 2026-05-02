@@ -54,6 +54,11 @@ async function baseFetch(
     throw error;
   }
 
+  const contentType = response.headers.get("content-type");
+  if (contentType && (contentType.includes("text/") || contentType.includes("application/octet-stream"))) {
+    return response.text();
+  }
+
   return response.json();
 }
 
@@ -197,3 +202,91 @@ export const updatePasswordFn = createServerFn({ method: "POST" })
     });
   });
 
+// Leads
+export const exportLeadsFn = createServerFn({ method: "POST" })
+  .inputValidator((d: { ids: string[] }) => d)
+  .handler(async ({ data }) => {
+    return baseFetch("/overview/leads/export-vcf", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  });
+
+export const deleteLeadFn = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    return baseFetch(`/overview/leads/${id}`, { method: "DELETE" });
+  });
+
+export const bulkDeleteLeadsFn = createServerFn({ method: "POST" })
+  .inputValidator((d: { ids: string[] }) => d)
+  .handler(async ({ data }) => {
+    return baseFetch("/overview/leads/bulk-delete", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  });
+
+// Admin PGBO Operations
+export const exportAdminPgboFn = createServerFn({ method: "GET" })
+  .handler(async () => {
+    return baseFetch("/admin/pgbo/export", {}, true);
+  });
+
+export const createAdminPgboFn = createServerFn({ method: "POST" })
+  .inputValidator((data: any) => data)
+  .handler(async ({ data }) => {
+    return baseFetch("/admin/pgbo", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }, true);
+  });
+
+export const updateAdminPgboFn = createServerFn({ method: "POST" })
+  .inputValidator((d: { id: string; data: any }) => d)
+  .handler(async ({ data: { id, data } }) => {
+    return baseFetch(`/admin/pgbo/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }, true);
+  });
+
+export const deleteAdminPgboFn = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    return baseFetch(`/admin/pgbo/${id}`, { method: "DELETE" }, true);
+  });
+
+export const toggleAdminPgboFn = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    return baseFetch(`/admin/pgbo/${id}/toggle`, { method: "PATCH" }, true);
+  });
+
+export const bulkDeleteAdminPgboFn = createServerFn({ method: "POST" })
+  .inputValidator((d: { ids: string[] }) => d)
+  .handler(async ({ data }) => {
+    return baseFetch("/admin/pgbo/bulk-delete", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }, true);
+  });
+
+export const bulkToggleAdminPgboFn = createServerFn({ method: "POST" })
+  .inputValidator((d: { ids: string[]; active: boolean }) => d)
+  .handler(async ({ data }) => {
+    return baseFetch("/admin/pgbo/bulk-toggle", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }, true);
+  });
+
+export const checkAdminPageIdFn = createServerFn({ method: "GET" })
+  .inputValidator((d: { pageid: string; excludeId?: string }) => d)
+  .handler(async ({ data: { pageid, excludeId } }) => {
+    return baseFetch(
+      `/admin/pgbo/check-pageid?pageid=${pageid}${excludeId ? `&excludeId=${excludeId}` : ""}`,
+      {},
+      true,
+    );
+  });
