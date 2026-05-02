@@ -84,7 +84,7 @@ function PublicGold() {
           {/* Left: HQ Image */}
           <div className="lg:w-[42%] shrink-0">
             <OptimizedImage
-              src="/public_gold_hero.webp"
+              src="/public_gold_hero.avif"
               alt="Public Gold Office"
               width={750}
               height={500}

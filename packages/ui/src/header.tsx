@@ -140,7 +140,7 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
         <span className="w-20 h-20 md:w-24 md:h-24 absolute bottom-0 right-0 z-20 animate-[pg-float_4s_ease-in-out_2s_infinite]">
           <OptimizedImage
             className="rounded-full overflow-hidden w-full h-full border-4 border-white shadow-xl"
-            src="/5g.webp"
+            src="/5g.avif"
             alt="Public Gold 5G Associates Team - Success Together"
             width={96}
             height={96}

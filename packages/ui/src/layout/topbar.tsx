@@ -100,7 +100,7 @@ function Topbar({
             className="group flex items-center gap-2 cursor-pointer"
           >
             <OptimizedImage
-              src="/logo.webp"
+              src="/logo.avif"
               alt="Public Gold"
               priority
               className="h-11 w-auto shrink-0 object-contain object-left transition-transform group-hover:scale-105 md:h-12 ml-3 lg:ml-0"
@@ -190,7 +190,7 @@ function Topbar({
                       className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 rounded-xl cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
                     >
                       <OptimizedImage
-                        src="/dewasa.webp"
+                        src="/dewasa.avif"
                         alt={t("nav.accountAdult")}
                         className="w-7 h-7 rounded-full object-cover shrink-0 aspect-square object-top"
                         width={28}
@@ -213,7 +213,7 @@ function Topbar({
                       className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 rounded-xl cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
                     >
                       <OptimizedImage
-                        src="/anak.webp"
+                        src="/anak.avif"
                         alt={t("nav.accountChild")}
                         className="w-7 h-7 rounded-full object-cover shrink-0 aspect-square object-top"
                         width={28}
@@ -261,7 +261,7 @@ function Topbar({
             className="inline-flex shrink-0 items-center cursor-pointer"
           >
             <OptimizedImage
-              src="/logo.webp"
+              src="/logo.avif"
               alt="Public Gold"
               priority
               className="h-10 w-auto shrink-0 object-contain object-left sm:h-11"
