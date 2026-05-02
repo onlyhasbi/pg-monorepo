@@ -5,7 +5,6 @@ import {
   authDealerQueryOptions,
   settingsQueryOptions,
 } from "@repo/lib/queryOptions";
-import { cn } from "@repo/lib/utils";
 import {
   updatePasswordFn,
   updateSettingsFn,
@@ -360,19 +359,11 @@ function SettingsPage() {
                       </Label>
                       <Input
                         id="nama_lengkap"
-                        {...register("nama_lengkap", {
-                          required: "Nama lengkap wajib diisi",
-                        })}
+                        {...register("nama_lengkap")}
+                        disabled
                         type="text"
-                        className={cn(
-                          errors.nama_lengkap && "border-red-400 bg-red-50/50",
-                        )}
+                        className="bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed"
                       />
-                      {errors.nama_lengkap && (
-                        <p className="mt-1.5 text-xs text-red-500 font-medium">
-                          {errors.nama_lengkap.message as string}
-                        </p>
-                      )}
                     </div>
 
                     <div className="space-y-2">
