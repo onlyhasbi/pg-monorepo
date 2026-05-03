@@ -37,6 +37,16 @@ func initApp() {
 		log.Fatalf("Error connecting to database: %v", err)
 	}
 
+	// Connection Pool Settings
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(5 * time.Minute)
+
+	// Run Database Migrations (PENTING untuk Vercel)
+	if err := database.SetupDatabase(db); err != nil {
+		log.Printf("Database setup warning: %v", err)
+	}
+
 	cld, err = cloudinary.NewFromURL(os.Getenv("CLOUDINARY_URL"))
 	if err != nil {
 		log.Fatalf("Error connecting to Cloudinary: %v", err)
