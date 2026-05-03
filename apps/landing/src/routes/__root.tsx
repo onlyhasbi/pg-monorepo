@@ -33,6 +33,7 @@ import { getAuthToken } from "@repo/lib/auth";
 import { RootError } from "@repo/ui/root_error";
 import { rootHeadConfig } from "@repo/constant/seo";
 import { CriticalCss } from "@repo/ui/CriticalCss";
+import { getCloudinaryUrl } from "@repo/lib/images";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -50,7 +51,7 @@ export const Route = createRootRouteWithContext<{
   component: RootComponent,
   notFoundComponent: NotFound,
   errorComponent: RootError,
-  head: () => rootHeadConfig(appCss),
+  head: () => rootHeadConfig(appCss, getCloudinaryUrl),
 });
 
 function RootDocument({

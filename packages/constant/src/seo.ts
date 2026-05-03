@@ -1,10 +1,11 @@
-import { getCloudinaryUrl } from "@repo/lib/images";
-
 /**
  * Meta and Link configuration for the root route.
  * Extracted to keep __root.tsx clean while maintaining SSR performance.
  */
-export const rootHeadConfig = (appCss: string) => {
+export const rootHeadConfig = (
+  appCss: string,
+  getCloudinaryUrl: (src: string, options: { width: number; format: string }) => string,
+) => {
   const siteUrl = "https://mypublicgold.id";
 
   return {
@@ -46,8 +47,8 @@ export const rootHeadConfig = (appCss: string) => {
       { rel: "stylesheet" as const, href: appCss },
       {
         rel: "icon" as const,
-        type: "image/svg+xml",
-        href: "/logo.svg",
+        type: "image/png",
+        href: getCloudinaryUrl("/logo.webp", { width: 32, format: "png" }),
       },
       {
         rel: "apple-touch-icon" as const,
@@ -59,23 +60,14 @@ export const rootHeadConfig = (appCss: string) => {
         crossOrigin: "anonymous" as const,
       },
       {
-        rel: "preconnect" as const,
-        href: "https://my-cdn.publicgold.com.my",
-        crossOrigin: "anonymous" as const,
-      },
-      {
-        rel: "preconnect" as const,
-        href: "https://be-public-gold-indonesia.vercel.app",
-        crossOrigin: "anonymous" as const,
-      },
-      {
         rel: "preload" as const,
         href: "/fonts/geist-variable.woff2",
         as: "font" as const,
         type: "font/woff2",
         crossOrigin: "anonymous" as const,
       },
-      { rel: "dns-prefetch" as const, href: "https://res.cloudinary.com" },
+      { rel: "dns-prefetch" as const, href: "https://my-cdn.publicgold.com.my" },
+      { rel: "dns-prefetch" as const, href: "https://be-public-gold-indonesia.vercel.app" },
     ],
   };
 };
