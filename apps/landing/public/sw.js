@@ -4,7 +4,7 @@
  */
 
 const CACHE_NAME = "public-gold-cache-v1";
-const STATIC_ASSETS = ["/", "/logo.webp", "/logo.svg", "/whatsapp.png"];
+const STATIC_ASSETS = ["/", "/logo.webp", "/logo.svg"];
 
 // 1. INSTALL: Cache initial static assets
 self.addEventListener("install", (event) => {
