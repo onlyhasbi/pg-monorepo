@@ -9,7 +9,6 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/auth"
-	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/database"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/settings"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/admin"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/overview"
