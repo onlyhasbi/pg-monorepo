@@ -33,7 +33,7 @@ export const rootHeadConfig = (
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: siteUrl },
-      { property: "og:image", content: `${siteUrl}/me.webp` },
+      { property: "og:image", content: getCloudinaryUrl("/logo.webp", { width: 800, format: "jpg" }) },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "5G Associates Public Gold Indonesia" },
       {
@@ -41,7 +41,7 @@ export const rootHeadConfig = (
         content:
           "5G x G100 adalah Network bisnis yang terbesar di Public Gold Indonesia",
       },
-      { name: "twitter:image", content: `${siteUrl}/me.webp` },
+      { name: "twitter:image", content: getCloudinaryUrl("/logo.webp", { width: 800, format: "jpg" }) },
     ],
     links: [
       { rel: "stylesheet" as const, href: appCss },

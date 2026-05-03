@@ -12,7 +12,7 @@ export interface CloudinaryOptions {
 
 export const HERO_IMAGE_CONFIG = {
   width: 400,
-  sizes: "(max-width: 768px) 100vw, 400px",
+  sizes: "(max-width: 768px) 256px, 320px",
 };
 
 /**
