@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"image/jpeg"
 	_ "image/gif"
-	_ "image/jpeg"
 	_ "image/png"
 	"io"
 	"strings"
 
 	"github.com/disintegration/imaging"
-	"github.com/chai2010/webp"
 )
 
 type ProcessedImage struct {
@@ -51,18 +50,16 @@ func ProcessImage(file io.Reader, filename string, contentType string) (*Process
 	// Sharp's "inside" is equivalent to imaging.Fit
 	dst := imaging.Fit(src, 800, 800, imaging.Lanczos)
 
-	// 4. Encode to WebP
-	// Note: Standard Go library only has WebP decoder. 
-	// For Encoder, we usually use "github.com/chai2010/webp"
+	// 4. Encode to JPEG (Pure Go, No CGO needed)
 	var buf bytes.Buffer
-	err = webp.Encode(&buf, dst, &webp.Options{Lossless: false, Quality: 80})
+	err = jpeg.Encode(&buf, dst, &jpeg.Options{Quality: 85})
 	if err != nil {
-		return nil, fmt.Errorf("failed to encode webp: %v", err)
+		return nil, fmt.Errorf("failed to encode jpeg: %v", err)
 	}
 
 	return &ProcessedImage{
 		Buffer:    buf.Bytes(),
-		MimeType:  "image/webp",
-		Extension: "webp",
+		MimeType:  "image/jpeg",
+		Extension: "jpg",
 	}, nil
 }

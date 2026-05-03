@@ -4,7 +4,6 @@ go 1.21
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
-	github.com/chai2010/webp v1.1.1
 	github.com/cloudinary/cloudinary-go/v2 v2.7.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/gin-contrib/gzip v0.0.6
