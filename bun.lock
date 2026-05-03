@@ -147,7 +147,6 @@
       "name": "@repo/services",
       "version": "0.0.0",
       "dependencies": {
-        "@repo/lib": "workspace:*",
         "@tanstack/react-start": "latest",
         "cookie": "latest",
       },

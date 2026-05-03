@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { parse } from "cookie";
-import { API_URL } from "@repo/lib/config";
+const API_URL = typeof window !== "undefined" ? "/api" : process.env.API_URL || "http://localhost:3001/api";
 
 /**
  * BASE FETCHER: Uses native fetch and handles auth headers from cookies.
