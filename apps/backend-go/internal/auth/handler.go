@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/models"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/pkg/utils"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler struct {
@@ -65,7 +64,11 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	}
 
 	id := uuid.New().String()
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(req.Katasandi), bcrypt.DefaultCost)
+	hashedPassword, err := utils.HashPassword(req.Katasandi)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal memproses katasandi"})
+		return
+	}
 
 	if req.Role == "admin" {
 		if req.Email == "" {
@@ -161,8 +164,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Verify password (Note: We need to ensure bcrypt matches Bun's hash)
-	if err := bcrypt.CompareHashAndPassword([]byte(katasandiHash), []byte(req.Katasandi)); err != nil {
+	// Verify password (Argon2id for Bun compatibility)
+	match, err := utils.VerifyPassword(req.Katasandi, katasandiHash)
+	if err != nil || !match {
 		c.JSON(http.StatusUnauthorized, models.AuthResponse{
 			Success: false,
 			Message: "Kredensial salah",

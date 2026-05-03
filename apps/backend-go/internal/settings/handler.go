@@ -11,7 +11,6 @@ import (
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/middleware"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/models"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/pkg/utils"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type SettingsHandler struct {
@@ -143,14 +142,13 @@ func (h *SettingsHandler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	// Verify old password
-	if err := bcrypt.CompareHashAndPassword([]byte(currentHash), []byte(req.KatasandiLama)); err != nil {
+	match, err := utils.VerifyPassword(req.KatasandiLama, currentHash)
+	if err != nil || !match {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Katasandi lama salah"})
 		return
 	}
 
-	// Hash new password
-	newHash, err := bcrypt.GenerateFromPassword([]byte(req.KatasandiBaru), bcrypt.DefaultCost)
+	newHash, err := utils.HashPassword(req.KatasandiBaru)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal memproses katasandi baru"})
 		return

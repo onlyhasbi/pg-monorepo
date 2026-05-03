@@ -14,7 +14,6 @@ import (
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/database"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/models"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/pkg/utils"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AdminHandler struct {
@@ -70,7 +69,11 @@ func (h *AdminHandler) CreatePGBO(c *gin.Context) {
 		return
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(katasandi), bcrypt.DefaultCost)
+	hashedPassword, err := utils.HashPassword(katasandi)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal memproses katasandi"})
+		return
+	}
 	id := uuid.New().String()
 	nama := c.PostForm("nama_lengkap")
 	noTelpon := c.PostForm("no_telpon")
