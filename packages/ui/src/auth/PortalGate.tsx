@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { ArrowRight, ShieldAlert } from "lucide-react";
 import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +11,7 @@ import {
 } from "@repo/lib/portalOptions";
 
 export function PortalGate() {
+  const [animationParent] = useAutoAnimate();
   const queryClient = useQueryClient();
   const [lockoutTime, setLockoutTime] = useState<number>(0);
 
@@ -104,11 +105,8 @@ export function PortalGate() {
   };
 
   return (
-    <motion.div
-      key="secret-gate"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.98 }}
+    <div
+      ref={animationParent}
       className="w-full max-w-md mx-auto p-8 py-12 md:py-16 bg-white shadow-xl shadow-slate-200/40 rounded-[2rem] overflow-hidden ring-0"
     >
       {lockoutTime > 0 ? (
@@ -152,36 +150,32 @@ export function PortalGate() {
               className="flex-1 bg-transparent text-slate-900 text-center pl-8 pr-1 h-full focus:outline-none placeholder:text-slate-200 text-sm font-black tracking-[0.5em] selection:bg-rose-100"
               autoFocus
             />
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               type="submit"
               disabled={lockoutTime > 0 || isVerifying || secretCode.length < 3}
-              className="h-9 w-9 bg-slate-900 text-white rounded-md shadow-lg shadow-slate-900/20 transition-colors hover:bg-black disabled:opacity-20 flex items-center justify-center shrink-0"
+              className="h-9 w-9 bg-slate-900 text-white rounded-md shadow-lg shadow-slate-900/20 transition-all hover:bg-black hover:scale-105 active:scale-95 disabled:opacity-20 flex items-center justify-center shrink-0"
             >
               {isVerifying ? (
                 <Spinner size={14} className="text-white" />
               ) : (
                 <ArrowRight className="w-4 h-4 stroke-[3]" />
               )}
-            </motion.button>
+            </button>
           </div>
           {errorMsg && (
-            <motion.div
-              initial={{ opacity: 0, y: -2 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-center gap-1 text-[10px] text-rose-500 mt-1"
+            <div
+              className="flex items-center justify-center gap-1 text-[10px] text-rose-500 mt-1 transition-all"
             >
               <ShieldAlert className="w-3 h-3" />
               {errorMsg}{" "}
               {attempts > 0 && (attempts ?? 0) < 5 && (
                 <span className="opacity-60">({attempts}/5)</span>
               )}
-            </motion.div>
+            </div>
           )}
         </form>
       )}
-    </motion.div>
+    </div>
   );
 }
 

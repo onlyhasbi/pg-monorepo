@@ -26,7 +26,7 @@ import {
   MessageCircle,
   Send,
 } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useWatch } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -331,6 +331,7 @@ function RegisterPage() {
 
   const { t, i18n } = useTranslation();
   const [countryMode, setCountryMode] = useState<"ID" | "MY" | "INTL">("ID");
+  const [animationParent] = useAutoAnimate();
 
   useEffect(() => {
     if (!isMounted) return;
@@ -525,13 +526,9 @@ function RegisterPage() {
               </TabsList>
             </Tabs>
 
-            <AnimatePresence mode="wait">
-              <motion.div
+            <div ref={animationParent}>
+              <div
                 key={isAnak ? "anak" : "dewasa"}
-                initial={{ opacity: 0, x: isAnak ? -20 : 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: isAnak ? 20 : -20 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
               >
                 {isAnak && (
                   <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
@@ -958,8 +955,8 @@ function RegisterPage() {
                     </div>
                   </div>
                 </form>
-              </motion.div>
-            </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
 

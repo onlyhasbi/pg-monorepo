@@ -3,7 +3,7 @@ import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Check } from "lucide-react";
-import { motion } from "motion/react";
+
 import { useState } from "react";
 import { Button } from "@repo/ui/ui/button";
 import { Spinner } from "@repo/ui/ui/spinner";
@@ -16,11 +16,7 @@ import { queryClient } from "@repo/lib/queryClient";
 import { authDealerQueryOptions } from "@repo/lib/queryOptions";
 import { cn } from "@repo/lib/utils";
 
-const formVariants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
-  exit: { opacity: 0, x: -20, transition: { duration: 0.4 } },
-};
+
 
 export function SignUpForm({
   onSignupSuccess,
@@ -192,13 +188,9 @@ export function SignUpForm({
   };
 
   return (
-    <motion.form
+    <form
       key="signup-form"
-      className="space-y-6"
-      variants={formVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
+      className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500"
       onSubmit={signupForm.handleSubmit(onSubmit)}
     >
       <div className="space-y-4">
@@ -364,7 +356,7 @@ export function SignUpForm({
         />
       </div>
 
-      <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+      <div className="transition-all hover:-translate-y-0.5 active:scale-[0.98]">
         <Button
           type="submit"
           disabled={
@@ -382,8 +374,8 @@ export function SignUpForm({
             "Buat Akun"
           )}
         </Button>
-      </motion.div>
-    </motion.form>
+      </div>
+    </form>
   );
 }
 

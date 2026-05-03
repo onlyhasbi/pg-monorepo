@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { motion } from "motion/react";
+
 import { Button } from "@repo/ui/ui/button";
 import { Spinner } from "@repo/ui/ui/spinner";
 import { InputField, PasswordInput } from "@repo/ui/ui/form-elements";
@@ -13,11 +13,7 @@ import { useToast } from "@repo/ui/toast";
 import { queryClient } from "@repo/lib/queryClient";
 import { authDealerQueryOptions } from "@repo/lib/queryOptions";
 
-const formVariants = {
-  initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
-  exit: { opacity: 0, x: -20, transition: { duration: 0.4 } },
-};
+
 
 export function SignInForm() {
   const navigate = useNavigate();
@@ -83,13 +79,9 @@ export function SignInForm() {
   });
 
   return (
-    <motion.form
+    <form
       key="signin-form"
-      className="space-y-6"
-      variants={formVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
+      className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500"
       onSubmit={signinForm.handleSubmit((data) => loginMutation.mutate(data))}
     >
       <div className="space-y-5">
@@ -114,7 +106,7 @@ export function SignInForm() {
           error={signinForm.formState.errors.katasandi?.message}
         />
       </div>
-      <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
+      <div className="transition-all hover:-translate-y-0.5 active:scale-[0.98]">
         <Button
           type="submit"
           disabled={loginMutation.isPending || !signinForm.formState.isValid}
@@ -126,8 +118,8 @@ export function SignInForm() {
             "Masuk"
           )}
         </Button>
-      </motion.div>
-    </motion.form>
+      </div>
+    </form>
   );
 }
 
