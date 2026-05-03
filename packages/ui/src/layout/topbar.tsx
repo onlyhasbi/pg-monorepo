@@ -10,7 +10,6 @@ import { ChevronDown, Languages, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { OptimizedImage } from "@repo/ui/ui/optimized-image";
-import { useIsMounted } from "@repo/hooks/useIsMounted";
 
 interface TopbarProps {
   pgbo?: any;
@@ -25,7 +24,6 @@ function Topbar({
   onNavigateRegister,
   onHoverRegister,
 }: TopbarProps) {
-  const isMounted = useIsMounted();
   const [isOpen, setIsOpen] = useState(false);
   const { t, i18n } = useTranslation();
 
@@ -33,7 +31,6 @@ function Topbar({
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    if (!isMounted) return;
     let ticking = false;
 
     const updateScrolledState = () => {
@@ -51,7 +48,7 @@ function Topbar({
     updateScrolledState();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [isMounted]);
+  }, []);
 
   const lang = i18n.language || "id";
 
