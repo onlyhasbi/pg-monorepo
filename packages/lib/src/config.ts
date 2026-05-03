@@ -6,7 +6,7 @@
 export const API_URL =
   typeof window !== "undefined"
     ? "/api"
-    : process.env.API_URL || "http://localhost:3001/api";
+    : process.env.API_URL || "https://be-public-gold-indonesia.vercel.app/api";
 
 export const SITE_URL =
   typeof window !== "undefined"
