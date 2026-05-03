@@ -221,13 +221,6 @@ function App() {
 
 export const Route = createFileRoute("/$pgcode")({
   component: App,
-  headers: ({ loaderData }) => {
-    const pgbo = (loaderData as any)?.pgbo;
-    if (pgbo?.pgcode) {
-      return { "Vercel-Cache-Tag": `pgbo-${pgbo.pgcode.toLowerCase()}` };
-    }
-    return {} as Record<string, string>;
-  },
   loader: async ({ params, context }) => {
     try {
       const data = await context.queryClient.ensureQueryData(
