@@ -112,9 +112,19 @@ export function getCloudinarySrcSet(
 
   // If we know the target width (e.g. for a logo), generate 1x, 2x, 3x versions
   // to avoid downloading massive 1600px versions for a 200px image.
+  // Generate more granular sizes to satisfy PageSpeed Insights "Properly size images"
+  // If the browser needs 445px, providing 500w saves bandwidth compared to forcing 800w.
   const widths = maxWidth
-    ? [maxWidth, maxWidth * 2, maxWidth * 3].filter((w) => w <= 2000)
-    : [400, 800, 1200, 1600];
+    ? [
+        Math.round(maxWidth * 0.5),
+        Math.round(maxWidth * 0.75),
+        maxWidth,
+        Math.round(maxWidth * 1.25),
+        Math.round(maxWidth * 1.5),
+        maxWidth * 2,
+        maxWidth * 3,
+      ].filter((w) => w <= 2000 && w >= 100)
+    : [300, 400, 600, 800, 1200, 1600];
 
   return widths
     .map((w) => `${getCloudinaryUrl(src, { ...rest, width: w })} ${w}w`)
