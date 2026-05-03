@@ -59,15 +59,6 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	userClaims, _ := c.Get("user")
 	user := userClaims.(*middleware.UserClaims)
 
-	// Set limit 10MB
-	if err := c.Request.ParseMultipartForm(10 << 20); err != nil {
-		// Jika bukan multipart (misal JSON), abaikan saja atau tangani error
-		if err != http.ErrNotMultipart {
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal membaca form data"})
-			return
-		}
-	}
-
 	// Ambil data manual untuk menghindari error binding multipart
 	namaLengkap := c.PostForm("nama_lengkap")
 	namaPanggilan := c.PostForm("nama_panggilan")

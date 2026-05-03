@@ -60,14 +60,6 @@ func (h *AdminHandler) GetPGBO(c *gin.Context) {
 }
 
 func (h *AdminHandler) CreatePGBO(c *gin.Context) {
-	// Set limit 10MB
-	if err := c.Request.ParseMultipartForm(10 << 20); err != nil {
-		if err != http.ErrNotMultipart {
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal membaca form data"})
-			return
-		}
-	}
-
 	pgcode := utils.SanitizePGCode(c.PostForm("pgcode"))
 	pageid := utils.SanitizePageId(c.PostForm("pageid"))
 	katasandi := c.PostForm("katasandi")
