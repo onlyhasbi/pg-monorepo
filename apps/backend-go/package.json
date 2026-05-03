@@ -1,0 +1,10 @@
+{
+  "name": "backend-go",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "/Users/onlyhasbi/go/bin/air",
+    "build": "/Users/onlyhasbi/.local/share/mise/installs/go/1.25.1/bin/go build -o server main.go",
+    "start": "./server"
+  }
+}

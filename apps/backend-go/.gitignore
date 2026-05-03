@@ -1,0 +1,7 @@
+.env
+tmp/
+server
+docs/
+*.db
+*.db-shm
+*.db-wal
