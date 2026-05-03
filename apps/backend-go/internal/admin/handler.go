@@ -60,6 +60,14 @@ func (h *AdminHandler) GetPGBO(c *gin.Context) {
 }
 
 func (h *AdminHandler) CreatePGBO(c *gin.Context) {
+	// Set limit 10MB
+	if err := c.Request.ParseMultipartForm(10 << 20); err != nil {
+		if err != http.ErrNotMultipart {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal membaca form data"})
+			return
+		}
+	}
+
 	pgcode := utils.SanitizePGCode(c.PostForm("pgcode"))
 	pageid := utils.SanitizePageId(c.PostForm("pageid"))
 	katasandi := c.PostForm("katasandi")
@@ -81,16 +89,18 @@ func (h *AdminHandler) CreatePGBO(c *gin.Context) {
 	var photoURL *string
 	header, err := c.FormFile("foto_profil")
 	if err == nil {
-		file, _ := header.Open()
-		defer file.Close()
-		
-		processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
+		file, err := header.Open()
 		if err == nil {
-			uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
-				Folder: "profile_pictures",
-			})
+			defer file.Close()
+			
+			processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
 			if err == nil {
-				photoURL = &uploadRes.SecureURL
+				uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+					Folder: "profile_pictures",
+				})
+				if err == nil {
+					photoURL = &uploadRes.SecureURL
+				}
 			}
 		}
 	}
@@ -105,7 +115,7 @@ func (h *AdminHandler) CreatePGBO(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"success": true, "message": "PGBO berhasil didaftarkan"})
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "PGBO berhasil dibuat"})
 }
 
 func (h *AdminHandler) TogglePGBO(c *gin.Context) {

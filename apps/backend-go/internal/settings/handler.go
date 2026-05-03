@@ -59,57 +59,74 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	userClaims, _ := c.Get("user")
 	user := userClaims.(*middleware.UserClaims)
 
-	var req UpdateProfileRequest
-	if err := c.ShouldBind(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
-		return
+	// Set limit 10MB
+	if err := c.Request.ParseMultipartForm(10 << 20); err != nil {
+		// Jika bukan multipart (misal JSON), abaikan saja atau tangani error
+		if err != http.ErrNotMultipart {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal membaca form data"})
+			return
+		}
 	}
 
-	photoURL := req.FotoProfilURL
+	// Ambil data manual untuk menghindari error binding multipart
+	namaLengkap := c.PostForm("nama_lengkap")
+	namaPanggilan := c.PostForm("nama_panggilan")
+	email := c.PostForm("email")
+	noTelpon := c.PostForm("no_telpon")
+	linkWA := c.PostForm("link_group_whatsapp")
+	sosmedFB := c.PostForm("sosmed_facebook")
+	sosmedIG := c.PostForm("sosmed_instagram")
+	sosmedTiktok := c.PostForm("sosmed_tiktok")
+
+	var photoURL *string
 
 	// Handle Image Upload
 	header, err := c.FormFile("foto_profil")
 	if err == nil {
-		file, _ := header.Open()
-		defer file.Close()
-		
-		// Process Image (Resize & JPEG)
-		processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal memproses gambar"})
-			return
+		file, err := header.Open()
+		if err == nil {
+			defer file.Close()
+			
+			// Process Image (Resize & JPEG)
+			processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
+			if err == nil {
+				// Upload to Cloudinary
+				ctx := context.Background()
+				uploadRes, err := h.Cloudinary.Upload.Upload(ctx, processed.Buffer, uploader.UploadParams{
+					Folder: "profile_pictures",
+				})
+				if err == nil {
+					photoURL = &uploadRes.SecureURL
+				}
+			}
 		}
-
-		// Upload to Cloudinary
-		ctx := context.Background()
-		uploadRes, err := h.Cloudinary.Upload.Upload(ctx, processed.Buffer, uploader.UploadParams{
-			Folder: "profile_pictures",
-		})
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
-			return
-		}
-		photoURL = &uploadRes.SecureURL
 	}
 
-	// Update DB
+	// Update DB - Gunakan data yang diambil manual
 	query := `
 		UPDATE users SET 
 			foto_profil_url = COALESCE(?, foto_profil_url),
-			nama_lengkap = COALESCE(?, nama_lengkap),
-			nama_panggilan = COALESCE(?, nama_panggilan),
-			email = COALESCE(?, email),
-			no_telpon = COALESCE(?, no_telpon),
-			link_group_whatsapp = COALESCE(?, link_group_whatsapp),
-			sosmed_facebook = COALESCE(?, sosmed_facebook),
-			sosmed_instagram = COALESCE(?, sosmed_instagram),
-			sosmed_tiktok = COALESCE(?, sosmed_tiktok)
+			nama_lengkap = CASE WHEN ? = '' THEN nama_lengkap ELSE ? END,
+			nama_panggilan = CASE WHEN ? = '' THEN nama_panggilan ELSE ? END,
+			email = CASE WHEN ? = '' THEN email ELSE ? END,
+			no_telpon = CASE WHEN ? = '' THEN no_telpon ELSE ? END,
+			link_group_whatsapp = CASE WHEN ? = '' THEN link_group_whatsapp ELSE ? END,
+			sosmed_facebook = CASE WHEN ? = '' THEN sosmed_facebook ELSE ? END,
+			sosmed_instagram = CASE WHEN ? = '' THEN sosmed_instagram ELSE ? END,
+			sosmed_tiktok = CASE WHEN ? = '' THEN sosmed_tiktok ELSE ? END
 		WHERE id = ?
 	`
 	_, err = h.DB.Exec(query, 
-		photoURL, req.NamaLengkap, req.NamaPanggilan, req.Email, 
-		req.NoTelpon, req.LinkGroupWhatsApp, req.SosmedFacebook, 
-		req.SosmedInstagram, req.SosmedTiktok, user.ID,
+		photoURL, 
+		namaLengkap, namaLengkap,
+		namaPanggilan, namaPanggilan,
+		email, email,
+		noTelpon, noTelpon,
+		linkWA, linkWA,
+		sosmedFB, sosmedFB,
+		sosmedIG, sosmedIG,
+		sosmedTiktok, sosmedTiktok,
+		user.ID,
 	)
 
 	if err != nil {
