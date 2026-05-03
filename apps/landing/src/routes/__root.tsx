@@ -19,6 +19,7 @@ import { ScrollUnlocker } from "@repo/ui/ScrollUnlocker";
 import { agentQueryOptions } from "@repo/lib/queryOptions";
 import i18n from "i18next";
 import appCss from "@/styles.css?url";
+import deferredCss from "@/styles-deferred.css?url";
 
 const TanStackRouterDevtools = import.meta.env.PROD
   ? () => null
@@ -69,6 +70,7 @@ function RootDocument({
       </head>
       <body>
         <div id="app">{children}</div>
+        <link rel="stylesheet" href={deferredCss} />
         <Scripts />
       </body>
     </html>
