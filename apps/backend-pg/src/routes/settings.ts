@@ -186,6 +186,27 @@ export const settingsRoutes = new Elysia({
           args: [user.id || user.sub || ""],
         });
 
+        // Trigger Vercel On-Demand Cache Invalidation
+        if (process.env.VERCEL_API_TOKEN && process.env.VERCEL_PROJECT_ID) {
+          const targetPgcode = user.sub?.toLowerCase();
+          if (targetPgcode) {
+            fetch(
+              `https://api.vercel.com/v1/edge-cache/invalidate-by-tags?projectIdOrName=${process.env.VERCEL_PROJECT_ID}`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${process.env.VERCEL_API_TOKEN}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  tags: [`pgbo-${targetPgcode}`],
+                  target: "production",
+                }),
+              }
+            ).catch((err) => console.error("Vercel Cache Invalidation Failed:", err));
+          }
+        }
+
         return {
           success: true,
           message: "Profil berhasil diperbarui",

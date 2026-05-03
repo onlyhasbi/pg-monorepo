@@ -26,6 +26,7 @@ export default defineConfig({
         },
       },
       routeRules: {
+        "/**": { isr: true }, // Cache indefinitely until invalidated via API
         "/api-proxy/**": { proxy: "https://publicgold.co.id/**" },
         "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" }
       }
