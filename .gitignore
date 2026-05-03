@@ -45,3 +45,8 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Backend Database
+*.db
+*.db.backup
+local.db
