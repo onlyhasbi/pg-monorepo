@@ -79,14 +79,20 @@ func (h *AdminHandler) CreatePGBO(c *gin.Context) {
 	noTelpon := c.PostForm("no_telpon")
 
 	var photoURL *string
-	file, header, err := c.Request.FormFile("foto_profil")
+	header, err := c.FormFile("foto_profil")
 	if err == nil {
-		processed, _ := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
-		uploadRes, _ := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
-			Folder: "profile_pictures",
-			Format: "webp",
-		})
-		photoURL = &uploadRes.SecureURL
+		file, _ := header.Open()
+		defer file.Close()
+		
+		processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
+		if err == nil {
+			uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+				Folder: "profile_pictures",
+			})
+			if err == nil {
+				photoURL = &uploadRes.SecureURL
+			}
+		}
 	}
 
 	_, err = h.DB.Exec(

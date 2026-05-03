@@ -68,11 +68,12 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	photoURL := req.FotoProfilURL
 
 	// Handle Image Upload
-	file, header, err := c.Request.FormFile("foto_profil")
+	header, err := c.FormFile("foto_profil")
 	if err == nil {
+		file, _ := header.Open()
 		defer file.Close()
 		
-		// Process Image (Resize & WebP)
+		// Process Image (Resize & JPEG)
 		processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal memproses gambar"})
@@ -83,7 +84,6 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 		ctx := context.Background()
 		uploadRes, err := h.Cloudinary.Upload.Upload(ctx, processed.Buffer, uploader.UploadParams{
 			Folder: "profile_pictures",
-			Format: "webp",
 		})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
