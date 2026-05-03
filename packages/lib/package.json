@@ -5,5 +5,8 @@
   "exports": {
     "./*": "./src/*.ts",
     "./router-wrappers": "./src/router-wrappers.tsx"
+  },
+  "dependencies": {
+    "@repo/services": "workspace:*"
   }
 }
