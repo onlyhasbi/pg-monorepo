@@ -19,7 +19,7 @@ export const agentQueryOptions = (pgcode: string) =>
       const res = await getAgentData({ data: pgcode });
       return res.data;
     },
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000,
   });
 
 export const agentsListQueryOptions = () =>

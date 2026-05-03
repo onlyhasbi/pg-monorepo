@@ -27,6 +27,7 @@ export default defineConfig({
       },
       routeRules: {
         "/**": { isr: true }, // Cache indefinitely until invalidated via API
+        "/_server/**": { isr: false, cache: false }, // NEVER cache TanStack server functions
         "/api-proxy/**": { proxy: "https://publicgold.co.id/**" },
         "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" }
       }
