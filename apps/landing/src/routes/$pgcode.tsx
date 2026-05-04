@@ -1,4 +1,5 @@
 import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
+import i18n from "i18next";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
 
@@ -250,14 +251,16 @@ export const Route = createFileRoute("/$pgcode")({
     if (!pgbo) return {};
 
     const displayName = pgbo.nama_panggilan || "Authorized Dealer";
-    const title = `${displayName} - Konsultan Emas Public Gold Indonesia`;
-    const description = `Amankan masa depan keluarga dengan tabungan emas bersama Public Gold Indonesia`;
-    // Use JPG format explicitly for WhatsApp/SEO Compatibility
+    const title = `${displayName} - ${i18n.t("seo.agentTitleSuffix")}`;
+    const description = i18n.t("seo.agentDescription");
+    
+    // Use siteUrl from constants to avoid double hardcoding
+    const siteUrl = "https://mypublicgold.id";
     const image = getCloudinaryUrl(pgbo.foto_profil_url, {
       width: 800,
       format: "jpg",
     });
-    const url = `https://mypublicgold.id/${pgbo.pageid}`;
+    const url = `${siteUrl}/${pgbo.pageid}`;
 
     return {
       meta: [
