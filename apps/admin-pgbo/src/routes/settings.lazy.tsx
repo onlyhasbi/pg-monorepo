@@ -44,7 +44,7 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export interface SettingsFormValues {
@@ -259,6 +259,13 @@ function SettingsPage() {
   };
 
   const handleCropCancel = () => setCropperSrc(null);
+
+  // Cleanup object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (croppedPreview) URL.revokeObjectURL(croppedPreview);
+    };
+  }, [croppedPreview]); 
 
   const onSubmit = (data: SettingsFormValues) => {
     const finalPhone = formatPhoneForAPI(data.country_code, data.no_telpon);
