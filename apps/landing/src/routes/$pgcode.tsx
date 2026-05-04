@@ -35,6 +35,8 @@ import {
 } from "@repo/lib/images";
 import { useLazyInteraction } from "@repo/hooks/useLazyInteraction";
 import { LazySection } from "@repo/ui/ui/lazy-section";
+import { AgentLandingSkeleton } from "@repo/ui/agent-landing-skeleton";
+import { SectionSkeleton } from "@repo/ui/ui/section-skeleton";
 
 function App() {
   const { pgcode } = Route.useParams();
@@ -133,25 +135,25 @@ function App() {
       </section>
 
       <section id="advantage" className="scroll-mt-20">
-        <LazySection minHeight="400px">
+        <LazySection minHeight="400px" fallback={<SectionSkeleton type="grid" cardCount={6} />}>
           <Benefit />
         </LazySection>
       </section>
 
       <section id="public-gold" className="scroll-mt-20">
-        <LazySection minHeight="500px">
+        <LazySection minHeight="500px" fallback={<SectionSkeleton type="grid" cardCount={2} />}>
           <PublicGold />
         </LazySection>
       </section>
 
       <section id="products" className="scroll-mt-20">
-        <LazySection minHeight="600px">
+        <LazySection minHeight="600px" fallback={<SectionSkeleton type="price" />}>
           <PriceList price={goldPrices ?? undefined} pgbo={pgbo} />
         </LazySection>
       </section>
 
       <section id="excellence" className="scroll-mt-20">
-        <LazySection minHeight="600px">
+        <LazySection minHeight="600px" fallback={<SectionSkeleton type="grid" cardCount={3} />}>
           <PaymentMethods pgbo={pgbo} />
           <Excellence />
         </LazySection>
@@ -221,6 +223,7 @@ function App() {
 
 export const Route = createFileRoute("/$pgcode")({
   component: App,
+  pendingComponent: AgentLandingSkeleton,
   loader: async ({ params, context }) => {
     try {
       const data = await context.queryClient.ensureQueryData(
