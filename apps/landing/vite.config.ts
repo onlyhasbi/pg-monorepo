@@ -1,5 +1,8 @@
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+// @ts-ignore
+import { nitro } from "nitro/vite";
+import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
@@ -10,6 +13,26 @@ export default defineConfig({
         enabled: false,
       },
     }),
+    // Keep nitro as a separate plugin if tanstackStart doesn't accept it in this version
+    nitro({
+      preset: "vercel",
+      rollupConfig: {
+        onwarn(warning, warn) {
+          if (
+            (warning.code === "MODULE_LEVEL_DIRECTIVE" && warning.message.includes("use client")) ||
+            (warning.code === "UNKNOWN_OPTION" && warning.message.includes("platform"))
+          ) {
+            return;
+          }
+          warn(warning);
+        },
+      },
+      routeRules: {
+        "/api-proxy/**": { proxy: "https://publicgold.co.id/**" },
+        "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" }
+      }
+    }),
+    viteReact(),
     tailwindcss(),
   ],
   build: {
