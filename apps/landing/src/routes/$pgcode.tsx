@@ -2,7 +2,7 @@ import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
 
-import { lazy, useEffect, useRef, useMemo } from "react";
+import { Suspense, lazy, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 const Benefit = lazy(() => import("@repo/ui/benefit"));
@@ -38,12 +38,7 @@ import { LazySection } from "@repo/ui/ui/lazy-section";
 import { AgentLandingSkeleton } from "@repo/ui/agent-landing-skeleton";
 import { SectionSkeleton } from "@repo/ui/ui/section-skeleton";
 
-function App() {
-  const { pgcode } = Route.useParams();
-
-  // If we're transitioning out, pgcode might be undefined
-  if (!pgcode) return null;
-
+function LandingContent({ pgcode }: { pgcode: string }) {
   const { data: pgbo } = useSuspenseQuery(agentQueryOptions(pgcode));
 
   // LAZY FETCH: Trigger gold prices only after human interaction for LCP Optimization
@@ -194,7 +189,7 @@ function App() {
       </LazySection>
 
       <section id="contact" className="scroll-mt-20">
-        <LazySection minHeight="400px">
+        <LazySection minHeight="400px" fallback={<SectionSkeleton type="grid" cardCount={1} />}>
           <CallToAction pgbo={pgbo} />
         </LazySection>
       </section>
@@ -218,6 +213,19 @@ function App() {
         <ArrowUp className="w-5 h-5 stroke-[2.5]" />
       </button>
     </div>
+  );
+}
+
+function App() {
+  const { pgcode } = Route.useParams();
+
+  // If we're transitioning out, pgcode might be undefined
+  if (!pgcode) return null;
+
+  return (
+    <Suspense fallback={<AgentLandingSkeleton />}>
+      <LandingContent pgcode={pgcode} />
+    </Suspense>
   );
 }
 

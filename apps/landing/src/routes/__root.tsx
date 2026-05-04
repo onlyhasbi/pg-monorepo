@@ -38,15 +38,17 @@ import { getCloudinaryUrl } from "@repo/lib/images";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  auth?: { token: string | null; adminToken: string | null };
+  auth?: { token: Promise<string | null>; adminToken: Promise<string | null> };
 }>()({
-  beforeLoad: async () => {
-    // Determine auth status once at the root level.
-    const token = await getAuthToken(false);
-    const adminToken = await getAuthToken(true);
+  beforeLoad: () => {
+    const userTokenPromise = getAuthToken(false);
+    const adminTokenPromise = getAuthToken(true);
 
     return {
-      auth: { token, adminToken },
+      auth: { 
+        token: userTokenPromise, 
+        adminToken: adminTokenPromise 
+      },
     };
   },
   component: RootComponent,
@@ -65,6 +67,10 @@ function RootDocument({
   return (
     <html lang={lang}>
       <head>
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://be-public-gold-indonesia.vercel.app" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="" />
+        <link rel="preconnect" href="https://be-public-gold-indonesia.vercel.app" crossOrigin="" />
         <CriticalCss />
         <HeadContent />
       </head>
