@@ -17,7 +17,7 @@ import { ToastProvider } from "@repo/ui/toast";
 import NotFound from "@repo/ui/not_found";
 import { ScrollUnlocker } from "@repo/ui/ScrollUnlocker";
 import { agentQueryOptions } from "@repo/lib/queryOptions";
-import i18n from "i18next";
+import i18n from "@/i18n";
 import appCss from "@/styles.css?url";
 import deferredCss from "@/styles-deferred.css?url";
 

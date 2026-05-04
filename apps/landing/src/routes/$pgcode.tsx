@@ -1,5 +1,5 @@
 import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
-import i18n from "i18next";
+import i18n from "@/i18n";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
 
