@@ -86,14 +86,19 @@ func (h *AdminHandler) CreatePGBO(c *gin.Context) {
 			defer file.Close()
 			
 			processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
-			if err == nil {
-				uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
-					Folder: "profile_pictures",
-				})
-				if err == nil {
-					photoURL = &uploadRes.SecureURL
-				}
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal memproses gambar: " + err.Error()})
+				return
 			}
+			
+			uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+				Folder: "profile_pictures",
+			})
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
+				return
+			}
+			photoURL = &uploadRes.SecureURL
 		}
 	}
 
@@ -153,10 +158,19 @@ func (h *AdminHandler) UpdatePGBO(c *gin.Context) {
 	photoURL := ""
 	file, header, err := c.Request.FormFile("foto_profil")
 	if err == nil {
-		processed, _ := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
-		uploadRes, _ := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+		processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal memproses gambar: " + err.Error()})
+			return
+		}
+		
+		uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
 			Folder: "profile_pictures",
 		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
+			return
+		}
 		photoURL = uploadRes.SecureURL
 	}
 

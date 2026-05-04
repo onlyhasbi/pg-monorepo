@@ -71,26 +71,29 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 
 	var photoURL *string
 
-	// Handle Image Upload
 	header, err := c.FormFile("foto_profil")
 	if err == nil {
 		file, err := header.Open()
-		if err == nil {
-			defer file.Close()
-			
-			// Process Image (Resize & JPEG)
-			processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
-			if err == nil {
-				// Upload to Cloudinary
-				ctx := context.Background()
-				uploadRes, err := h.Cloudinary.Upload.Upload(ctx, processed.Buffer, uploader.UploadParams{
-					Folder: "profile_pictures",
-				})
-				if err == nil {
-					photoURL = &uploadRes.SecureURL
-				}
-			}
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal membuka file gambar"})
+			return
 		}
+		defer file.Close()
+		
+		processed, err := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Gagal memproses gambar: " + err.Error()})
+			return
+		}
+		
+		uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+			Folder: "profile_pictures",
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
+			return
+		}
+		photoURL = &uploadRes.SecureURL
 	}
 
 	// Update DB - Gunakan data yang diambil manual
@@ -107,7 +110,7 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 			sosmed_tiktok = CASE WHEN ? = '' THEN sosmed_tiktok ELSE ? END
 		WHERE id = ?
 	`
-	_, err = h.DB.Exec(query, 
+	res, err := h.DB.Exec(query, 
 		photoURL, 
 		namaLengkap, namaLengkap,
 		namaPanggilan, namaPanggilan,
@@ -122,6 +125,12 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal update database"})
+		return
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		c.JSON(http.StatusOK, gin.H{"success": false, "message": "Tidak ada data yang diperbarui. Pastikan data berbeda atau User ID benar."})
 		return
 	}
 
