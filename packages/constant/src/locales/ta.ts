@@ -8,6 +8,8 @@ export const ta: TranslationKeys = {
     title: "{{name}} | Public Gold அங்கீகரிக்கப்பட்ட டீலர்",
     description:
       "Public Gold Indonesia-வின் அங்கீகரிக்கப்பட்ட டீலரிடமிருந்து 24K தூய தங்கத்தை வாங்குங்கள். உங்கள் தங்கச் சேமிப்பைத் தொடங்க {{name}}-ஐத் தொடர்பு கொள்ளுங்கள்.",
+    agentTitleSuffix: "Public Gold தங்க ஆலோசகர்",
+    agentDescription: "Public Gold தங்க சேமிப்பு திட்டத்தின் மூலம் உங்கள் குடும்பத்தின் எதிர்காலத்தை பாதுகாக்கவும்",
   },
   ui: {
     highlightTestimonials: "வாடிக்கையாளர் கருத்து",

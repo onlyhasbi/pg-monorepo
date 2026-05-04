@@ -8,6 +8,8 @@ export const zh: TranslationKeys = {
     title: "{{name}} | Public Gold 授权代理商",
     description:
       "从 Public Gold Indonesia 授权代理商处购买 24K 纯金。联系 {{name}} 开启您的黄金储蓄之旅。",
+    agentTitleSuffix: "Public Gold 黄金顾问",
+    agentDescription: "通过 Public Gold 黄金储蓄计划保障您的家庭未来",
   },
   ui: {
     highlightTestimonials: "客户见证",

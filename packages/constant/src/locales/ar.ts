@@ -8,6 +8,8 @@ export const ar: TranslationKeys = {
     title: "{{name}} | وكيل معتمد لـ Public Gold",
     description:
       "اشترِ الذهب الخالص عيار 24 من وكيل معتمد لشركة Public Gold Indonesia. تواصل مع {{name}} لبدء رحلة ادخار الذهب الخاصة بك.",
+    agentTitleSuffix: "مستشار ذهب Public Gold",
+    agentDescription: "احمِ مستقبل عائلتك مع برنامج ادخار الذهب من Public Gold",
   },
   ui: {
     highlightTestimonials: "الشهادات",

@@ -35,6 +35,7 @@ import {
   HERO_IMAGE_CONFIG,
 } from "@repo/lib/images";
 import { useLazyInteraction } from "@repo/hooks/useLazyInteraction";
+import { useSEO } from "@repo/hooks/useSEO";
 import { LazySection } from "@repo/ui/ui/lazy-section";
 import { AgentLandingSkeleton } from "@repo/ui/agent-landing-skeleton";
 import { SectionSkeleton } from "@repo/ui/ui/section-skeleton";
@@ -51,6 +52,12 @@ function LandingContent({ pgcode }: { pgcode: string }) {
 
   const { t } = useTranslation();
   const scrollBtnRef = useRef<HTMLButtonElement>(null);
+
+  const displayName = pgbo?.nama_panggilan || "Authorized Dealer";
+  useSEO({
+    title: `${displayName} - ${t("seo.agentTitleSuffix")}`,
+    description: t("seo.agentDescription"),
+  });
 
   // Memoize heavy arrays to prevent <MovingCards> from unnecessary re-renders
   const testimonialItems = useMemo(
