@@ -160,11 +160,26 @@ function SettingsPage() {
     },
     onSuccess: async (data: any) => {
       if (data.profile.success) {
+        const newUrl = data.profile.debug?.new_url;
+
+        // Manually update cache to prevent flicker before invalidation finishes
+        if (newUrl) {
+          queryClient.setQueryData(settingsQueryOptions().queryKey, (old: any) => {
+            if (!old) return old;
+            return { ...old, foto_profil_url: newUrl };
+          });
+
+          queryClient.setQueryData(authDealerQueryOptions().queryKey, (old: any) => {
+            if (!old?.user) return old;
+            return { ...old, user: { ...old.user, foto_profil_url: newUrl } };
+          });
+        }
+
         // Clear preview and file states after successful upload
         setCroppedPreview(null);
         setFotoFile(null);
 
-        // Invalidate all relevant user data queries to force fresh fetch from DB
+        // Invalidate in background to ensure total sync with server
         await Promise.all([
           queryClient.invalidateQueries(settingsQueryOptions()),
           queryClient.invalidateQueries(authDealerQueryOptions()),
