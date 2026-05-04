@@ -57,10 +57,9 @@ export function SignInForm() {
         // 1. SET COOKIE (For SSR Auth support)
         setAuthToken(data.token);
 
-        // 2. SET QUERY DATA (For Client state)
-        queryClient.setQueryData(authDealerQueryOptions().queryKey, {
-          user: data.user,
-          token: data.token,
+        // 2. CLEAR/INVALIDATE QUERY DATA (Ensure fresh profile fetch on dashboard)
+        await queryClient.invalidateQueries({
+          queryKey: authDealerQueryOptions().queryKey,
         });
 
         // 3. INVALIDATE AND NAVIGATE
