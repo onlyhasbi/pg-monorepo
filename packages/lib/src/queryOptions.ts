@@ -1,4 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
+import { queryClient } from "./queryClient";
 import {
   getAdminProfileFn,
   getAgentData,
@@ -70,33 +71,21 @@ export const overviewQueryOptions = (search?: string, cookieStr?: string) =>
   });
 
 /**
- * Query Options for User Settings (Dealer)
+ * Query Options for Dealer Profile/Settings
+ * Consolidated as the Single Source of Truth for all dealer profile data.
+ * Both settings and auth now share the exact same structure: { user, token }.
  */
 export const settingsQueryOptions = (cookieStr?: string) =>
   queryOptions({
-    queryKey: ["settings"],
+    queryKey: ["dealer", "profile"],
     queryFn: async () => {
       const res = await getSettingsFn({ data: { cookieStr } });
-      return res.data;
-    },
-  });
-
-/**
- * AUTH PROFILE QUERIES
- * We use staleTime: Infinity to ensure the profile is fetched once and cached.
- * Stride: These queries store { user, token }.
- * If the cache is empty, we only fetch the user as the token is credentials.
- */
-
-export const authDealerQueryOptions = (cookieStr?: string) =>
-  queryOptions({
-    queryKey: ["auth", "dealer"],
-    queryFn: async () => {
-      const res = await getSettingsFn({ data: { cookieStr } });
-      return { user: res.data, token: null }; // Token is usually primed via setQueryData
+      return { user: res.data, token: null };
     },
     staleTime: Infinity,
   });
+
+export const authDealerQueryOptions = settingsQueryOptions;
 
 export const authAdminQueryOptions = (cookieStr?: string) =>
   queryOptions({

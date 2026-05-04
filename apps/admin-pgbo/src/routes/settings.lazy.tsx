@@ -2,7 +2,6 @@ import { dialCodeOptions } from "@repo/constant/countries";
 import { useSEO } from "@repo/hooks/useSEO";
 import { formatPhoneForAPI } from "@repo/lib/phone";
 import {
-  authDealerQueryOptions,
   settingsQueryOptions,
 } from "@repo/lib/queryOptions";
 import {
@@ -76,7 +75,8 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
-  const { data: profileData } = useSuspenseQuery(settingsQueryOptions());
+  const { data: profileDataResponse } = useSuspenseQuery(settingsQueryOptions());
+  const profileData = profileDataResponse?.user;
 
   useSEO({ title: "Pengaturan Profil | Public Gold Indonesia" });
 
@@ -130,7 +130,7 @@ function SettingsPage() {
         opt.label.toLowerCase().includes(term) || opt.value.includes(term),
     );
   }, [dialCodeSearch]);
-
+  
   const mutation = useMutation({
     mutationFn: async (formData: SettingsFormValues) => {
       const data = new FormData();
@@ -166,25 +166,19 @@ function SettingsPage() {
         if (newUrl) {
           queryClient.setQueryData(settingsQueryOptions().queryKey, (old: any) => {
             if (!old) return old;
-            return { ...old, foto_profil_url: newUrl };
-          });
-
-          queryClient.setQueryData(authDealerQueryOptions().queryKey, (old: any) => {
-            if (!old?.user) return old;
-            return { ...old, user: { ...old.user, foto_profil_url: newUrl } };
+            return {
+              ...old,
+              foto_profil_url: newUrl,
+            };
           });
         }
 
-        // Clear preview and file states after successful upload
-        setCroppedPreview(null);
-        setFotoFile(null);
-
-        // Invalidate in background to ensure total sync with server
-        await Promise.all([
-          queryClient.invalidateQueries(settingsQueryOptions()),
-          queryClient.invalidateQueries(authDealerQueryOptions()),
-          queryClient.invalidateQueries({ queryKey: ["agent"] }),
-        ]);
+        // Invalidate settings in background to ensure total sync with server
+        queryClient.invalidateQueries(settingsQueryOptions());
+        queryClient.invalidateQueries({ queryKey: ["agent"] });
+        
+        // Force refetch auth even if Infinity to sync the photo
+        queryClient.refetchQueries(settingsQueryOptions());
 
         const profileFieldsChanged =
           Object.keys(dirtyFields).some(

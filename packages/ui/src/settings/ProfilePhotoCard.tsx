@@ -54,6 +54,7 @@ export function ProfilePhotoCard({
                     alt="Profile"
                     width={112}
                     height={112}
+                    priority={true}
                     className="w-full h-full object-cover"
                   />
                 ) : (

@@ -1,28 +1,27 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { createProtectedLoader } from "@repo/lib/auth";
+import { useDebounce } from "@repo/hooks/useDebounce";
+import { useSEO } from "@repo/hooks/useSEO";
+import { createProtectedLoader, logout } from "@repo/lib/auth";
 import {
   authDealerQueryOptions,
   overviewQueryOptions,
 } from "@repo/lib/queryOptions";
+import { LeadsDataTable } from "@repo/ui/overview/LeadsDataTable";
+import { StatsGrid } from "@repo/ui/overview/StatsGrid";
+import { Button } from "@repo/ui/ui/button";
+import { Card } from "@repo/ui/ui/card";
+import { OptimizedImage } from "@repo/ui/ui/optimized-image";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useState, Suspense } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
-  Settings,
-  LogOut,
-  ExternalLink,
-  Copy,
   Check,
+  Copy,
+  ExternalLink,
   Loader2,
+  LogOut,
+  Settings,
   Users,
 } from "lucide-react";
-import { OptimizedImage } from "@repo/ui/ui/optimized-image";
-import { Card } from "@repo/ui/ui/card";
-import { Button } from "@repo/ui/ui/button";
-import { useSEO } from "@repo/hooks/useSEO";
-import { StatsGrid } from "@repo/ui/overview/StatsGrid";
-import { LeadsDataTable } from "@repo/ui/overview/LeadsDataTable";
-import { useDebounce } from "@repo/hooks/useDebounce";
-import { logout } from "@repo/lib/auth";
+import { Suspense, useState } from "react";
 
 export const Route = createFileRoute("/overview")({
   loader: async ({ context: { queryClient } }) => {
@@ -74,6 +73,7 @@ function OverviewPage() {
                     alt="Profile"
                     width={56}
                     height={56}
+                    priority={true}
                     className="w-full h-full object-cover"
                   />
                 ) : (
