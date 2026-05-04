@@ -8,6 +8,8 @@ export const id: TranslationKeys = {
     title: "{{name}} | Dealer Resmi Public Gold Indonesia",
     description:
       "Beli emas murni 24K dari Dealer Resmi Public Gold Indonesia. Hubungi {{name}} untuk mulai tabungan emas Anda.",
+    agentTitleSuffix: "Konsultan Emas Public Gold Indonesia",
+    agentDescription: "Amankan masa depan keluarga dengan tabungan emas bersama Public Gold Indonesia",
   },
   ui: {
     highlightTestimonials: "Kata Mereka",

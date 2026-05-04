@@ -8,6 +8,8 @@ export const ms: TranslationKeys = {
     title: "{{name}} | Pengedar Sah Public Gold Malaysia",
     description:
       "Beli emas tulen 24K daripada Pengedar Sah Public Gold Indonesia. Hubungi {{name}} untuk mula simpanan emas anda.",
+    agentTitleSuffix: "Konsultan Emas Public Gold Indonesia",
+    agentDescription: "Amankan masa depan keluarga dengan simpanan emas bersama Public Gold Indonesia",
   },
   ui: {
     highlightTestimonials: "Kata Mereka",

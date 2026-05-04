@@ -8,6 +8,8 @@ export const en: TranslationKeys = {
     title: "{{name}} | Public Gold Authorized Dealer",
     description:
       "Buy 24K pure gold from an Authorized Dealer of Public Gold Indonesia. Contact {{name}} to start your gold savings journey.",
+    agentTitleSuffix: "Public Gold Indonesia Gold Consultant",
+    agentDescription: "Secure your family's future with gold savings with Public Gold Indonesia",
   },
   ui: {
     highlightTestimonials: "Testimonials",
