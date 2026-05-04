@@ -156,7 +156,6 @@ func (h *AdminHandler) UpdatePGBO(c *gin.Context) {
 		processed, _ := utils.ProcessImage(file, header.Filename, header.Header.Get("Content-Type"))
 		uploadRes, _ := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
 			Folder: "profile_pictures",
-			Format: "webp",
 		})
 		photoURL = uploadRes.SecureURL
 	}

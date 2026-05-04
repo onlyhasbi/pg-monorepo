@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"image/png"
 	_ "image/gif"
 	_ "image/png"
 	"io"
@@ -20,46 +21,60 @@ type ProcessedImage struct {
 }
 
 /**
- * processImage: Porting dari Sharp (NodeJS) ke Go.
- *
- * - Resizes to max 800x800 (preserving aspect ratio)
- * - Converts to WebP format
- * - Quality set to 80 (standard balance)
+ * ProcessImage: Optimasi gambar sebelum diupload ke Cloudinary.
+ * 
+ * Fungsi ini melakukan resize ke max 800x800 dan memilih encoder yang tepat:
+ * - PNG/GIF -> Diencode ke PNG untuk mempertahankan transparansi.
+ * - Lainnya -> Diencode ke JPEG untuk efisiensi ukuran file.
  */
 func ProcessImage(file io.Reader, filename string, contentType string) (*ProcessedImage, error) {
-	// 1. Jika sudah WebP, langsung kembalikan
-	if contentType == "image/webp" || strings.HasSuffix(strings.ToLower(filename), ".webp") {
-		buf := new(bytes.Buffer)
-		if _, err := io.Copy(buf, file); err != nil {
-			return nil, err
-		}
-		return &ProcessedImage{
-			Buffer:    buf.Bytes(),
-			MimeType:  "image/webp",
-			Extension: "webp",
-		}, nil
-	}
-
-	// 2. Decode image
-	src, _, err := image.Decode(file)
+	// 1. Decode image (Mendukung PNG, JPEG, GIF)
+	src, format, err := image.Decode(file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode image: %v", err)
 	}
 
-	// 3. Resize (Fit inside 800x800, maintain aspect ratio)
-	// Sharp's "inside" is equivalent to imaging.Fit
+	// 2. Resize (Fit inside 800x800, maintain aspect ratio)
 	dst := imaging.Fit(src, 800, 800, imaging.Lanczos)
 
-	// 4. Encode to JPEG (Pure Go, No CGO needed)
 	var buf bytes.Buffer
-	err = jpeg.Encode(&buf, dst, &jpeg.Options{Quality: 85})
+	var mimeType string
+	var extension string
+
+	// 3. Conditional Encoding
+	// Jika PNG atau GIF, kita gunakan PNG untuk mempertahankan transparansi
+	if format == "png" || format == "gif" {
+		err = png.Encode(&buf, dst)
+		mimeType = "image/png"
+		extension = "png"
+	} else {
+		// Default ke JPEG untuk foto/gambar biasa agar ukuran file kecil
+		err = jpeg.Encode(&buf, dst, &jpeg.Options{Quality: 80})
+		mimeType = "image/jpeg"
+		extension = "jpg"
+	}
+
 	if err != nil {
-		return nil, fmt.Errorf("failed to encode jpeg: %v", err)
+		return nil, fmt.Errorf("failed to encode image: %v", err)
 	}
 
 	return &ProcessedImage{
 		Buffer:    buf.Bytes(),
-		MimeType:  "image/jpeg",
-		Extension: "jpg",
+		MimeType:  mimeType,
+		Extension: extension,
 	}, nil
+}
+
+/**
+ * GetOptimizedURL: Mengubah URL standard Cloudinary menjadi URL yang teroptimasi.
+ * Menambahkan parameter:
+ * - f_auto: Format otomatis (WebP/AVIF tergantung browser)
+ * - q_auto: Kualitas otomatis (kompresi terbaik tanpa merusak visual)
+ */
+func GetOptimizedURL(url string) string {
+	if url == "" || !strings.Contains(url, "cloudinary.com") {
+		return url
+	}
+	// Menyisipkan f_auto,q_auto setelah '/upload/' di URL Cloudinary
+	return strings.Replace(url, "/upload/", "/upload/f_auto,q_auto/", 1)
 }

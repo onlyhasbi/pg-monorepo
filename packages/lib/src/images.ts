@@ -46,9 +46,9 @@ export function getCloudinaryUrl(src: string, options: CloudinaryOptions = {}) {
     return src;
   }
 
-  // Force explicit format (default to AVIF for extreme compression if not SEO)
+  // Force explicit format (default to auto for dynamic format selection based on browser)
   // SVGs are skipped to preserve vector elasticity
-  const transformations = isSvg ? [] : [format ? `f_${format}` : "f_avif"];
+  const transformations = isSvg ? [] : [format ? `f_${format}` : "f_auto"];
 
   transformations.push(priority ? "q_auto" : "q_auto:eco");
   if (!priority) {
