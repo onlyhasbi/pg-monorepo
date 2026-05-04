@@ -29,7 +29,6 @@ const TanStackRouterDevtools = import.meta.env.PROD
       })),
     );
 
-import { getAuthToken } from "@repo/lib/auth";
 
 import { RootError } from "@repo/ui/root_error";
 import { rootHeadConfig } from "@repo/constant/seo";
@@ -38,19 +37,7 @@ import { getCloudinaryUrl } from "@repo/lib/images";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-  auth?: { token: Promise<string | null>; adminToken: Promise<string | null> };
 }>()({
-  beforeLoad: () => {
-    const userTokenPromise = getAuthToken(false);
-    const adminTokenPromise = getAuthToken(true);
-
-    return {
-      auth: { 
-        token: userTokenPromise, 
-        adminToken: adminTokenPromise 
-      },
-    };
-  },
   component: RootComponent,
   notFoundComponent: NotFound,
   errorComponent: RootError,
