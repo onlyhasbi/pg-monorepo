@@ -269,6 +269,7 @@ function AdminDashboard() {
 
   const handleLogout = () => {
     try {
+      queryClient.clear();
       logout();
       navigate({ to: "/signin" });
     } catch (error) {

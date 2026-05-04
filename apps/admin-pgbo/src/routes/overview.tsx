@@ -54,7 +54,9 @@ function OverviewPage() {
 
   const [copied, setCopied] = useState(false);
 
+  const { queryClient } = Route.useRouteContext();
   const handleLogout = () => {
+    queryClient.clear();
     logout();
     navigate({ to: "/" });
   };
