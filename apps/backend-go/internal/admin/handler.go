@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
@@ -91,11 +92,15 @@ func (h *AdminHandler) CreatePGBO(c *gin.Context) {
 				return
 			}
 			
-			uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+			uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), bytes.NewReader(processed.Buffer), uploader.UploadParams{
 				Folder: "profile_pictures",
 			})
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"success": false, 
+					"message": "Gagal upload ke Cloudinary",
+					"error": err.Error(),
+				})
 				return
 			}
 			photoURL = &uploadRes.SecureURL
@@ -164,11 +169,15 @@ func (h *AdminHandler) UpdatePGBO(c *gin.Context) {
 			return
 		}
 		
-		uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+		uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), bytes.NewReader(processed.Buffer), uploader.UploadParams{
 			Folder: "profile_pictures",
 		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false, 
+				"message": "Gagal upload ke Cloudinary",
+				"error": err.Error(),
+			})
 			return
 		}
 		photoURL = uploadRes.SecureURL

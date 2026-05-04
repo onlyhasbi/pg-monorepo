@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"fmt"
@@ -88,11 +89,15 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 			return
 		}
 		
-		uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), processed.Buffer, uploader.UploadParams{
+		uploadRes, err := h.Cloudinary.Upload.Upload(context.Background(), bytes.NewReader(processed.Buffer), uploader.UploadParams{
 			Folder: "profile_pictures",
 		})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"success": false, 
+				"message": "Gagal upload ke Cloudinary",
+				"error": err.Error(),
+			})
 			return
 		}
 		photoURL = sql.NullString{String: uploadRes.SecureURL, Valid: true}
