@@ -69,7 +69,7 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	sosmedIG := c.PostForm("sosmed_instagram")
 	sosmedTiktok := c.PostForm("sosmed_tiktok")
 
-	var photoURL *string
+	var photoURL sql.NullString
 
 	header, err := c.FormFile("foto_profil")
 	if err == nil {
@@ -93,21 +93,21 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal upload ke Cloudinary"})
 			return
 		}
-		photoURL = &uploadRes.SecureURL
+		photoURL = sql.NullString{String: uploadRes.SecureURL, Valid: true}
 	}
 
 	// Update DB - Gunakan data yang diambil manual
 	query := `
 		UPDATE users SET 
 			foto_profil_url = COALESCE(?, foto_profil_url),
-			nama_lengkap = CASE WHEN ? = '' THEN nama_lengkap ELSE ? END,
-			nama_panggilan = CASE WHEN ? = '' THEN nama_panggilan ELSE ? END,
-			email = CASE WHEN ? = '' THEN email ELSE ? END,
-			no_telpon = CASE WHEN ? = '' THEN no_telpon ELSE ? END,
-			link_group_whatsapp = CASE WHEN ? = '' THEN link_group_whatsapp ELSE ? END,
-			sosmed_facebook = CASE WHEN ? = '' THEN sosmed_facebook ELSE ? END,
-			sosmed_instagram = CASE WHEN ? = '' THEN sosmed_instagram ELSE ? END,
-			sosmed_tiktok = CASE WHEN ? = '' THEN sosmed_tiktok ELSE ? END
+			nama_lengkap = CASE WHEN ? != '' THEN ? ELSE nama_lengkap END,
+			nama_panggilan = CASE WHEN ? != '' THEN ? ELSE nama_panggilan END,
+			email = CASE WHEN ? != '' THEN ? ELSE email END,
+			no_telpon = CASE WHEN ? != '' THEN ? ELSE no_telpon END,
+			link_group_whatsapp = CASE WHEN ? != '' THEN ? ELSE link_group_whatsapp END,
+			sosmed_facebook = CASE WHEN ? != '' THEN ? ELSE sosmed_facebook END,
+			sosmed_instagram = CASE WHEN ? != '' THEN ? ELSE sosmed_instagram END,
+			sosmed_tiktok = CASE WHEN ? != '' THEN ? ELSE sosmed_tiktok END
 		WHERE id = ?
 	`
 	res, err := h.DB.Exec(query, 
@@ -134,7 +134,20 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Profil berhasil diperbarui"})
+	// Add cache buster to debug URL
+	finalURL := photoURL.String
+	if photoURL.Valid {
+		finalURL = fmt.Sprintf("%s?v=%d", finalURL, time.Now().Unix())
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true, 
+		"message": "Profil berhasil diperbarui",
+		"debug": gin.H{
+			"new_url": finalURL,
+			"updated": photoURL.Valid,
+		},
+	})
 }
 
 type ChangePasswordRequest struct {

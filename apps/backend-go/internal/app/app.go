@@ -59,8 +59,8 @@ func SetupRouter(db *sql.DB, cld *cloudinary.Cloudinary) *gin.Engine {
 		settingsGroup := api.Group("/settings")
 		settingsGroup.Use(middleware.AuthGuard(jwtSecret))
 		{
-			settingsGroup.GET("/", settingsHandler.GetProfile)
-			settingsGroup.PUT("/", settingsHandler.UpdateProfile)
+			settingsGroup.GET("", settingsHandler.GetProfile)
+			settingsGroup.PUT("", settingsHandler.UpdateProfile)
 			settingsGroup.PATCH("/password", settingsHandler.ChangePassword)
 		}
 

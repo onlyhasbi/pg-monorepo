@@ -160,6 +160,10 @@ function SettingsPage() {
     },
     onSuccess: async (data: any) => {
       if (data.profile.success) {
+        // Clear preview and file states after successful upload
+        setCroppedPreview(null);
+        setFotoFile(null);
+
         // Invalidate all relevant user data queries to force fresh fetch from DB
         await Promise.all([
           queryClient.invalidateQueries(settingsQueryOptions()),
