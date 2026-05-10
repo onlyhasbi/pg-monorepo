@@ -114,7 +114,7 @@ function RootComponent() {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               onNavigateRegister={(type) => {
-                navigate({ to: "/register", search: { type, ref: pgbo?.pageid } });
+                window.location.assign(`/register?type=${type}&ref=${pgbo?.pageid || ""}`);
               }}
               onHoverRegister={() => {
                 router.preloadRoute({ to: "/register", search: { type: "dewasa", ref: pgbo?.pageid } });

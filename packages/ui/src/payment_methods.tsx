@@ -146,6 +146,10 @@ export default function PaymentMethods({ pgbo: propsPgbo }: { pgbo?: any }) {
                     ) : (
                       <a
                         href={`/register?type=${method.id === "poe" ? "dewasa" : method.id === "outright" ? "dewasa" : "dewasa"}&ref=${pgbo?.pageid || ""}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.assign(`/register?type=${method.id === "poe" ? "dewasa" : method.id === "outright" ? "dewasa" : "dewasa"}&ref=${pgbo?.pageid || ""}`);
+                        }}
                         className={cn(
                           buttonVariants({ variant: "outline" }),
                           "w-full h-12 rounded-xl font-bold transition-all duration-300 shadow-md",

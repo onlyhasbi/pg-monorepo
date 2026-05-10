@@ -653,6 +653,10 @@ function PriceList({ price, pgbo }: Props) {
                     <div className="embla__tween__node w-full">
                       <a
                         href={`/register?type=dewasa&ref=${pgbo?.pageid || ""}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.assign(`/register?type=dewasa&ref=${pgbo?.pageid || ""}`);
+                        }}
                         className={cn(
                           "group relative flex w-full flex-col items-center overflow-hidden rounded-[2.5rem] bg-white/70 backdrop-blur-xl p-5 md:py-8 md:px-8 text-center shadow-[0_20px_50px_-15px_rgba(0,0,0,0.06)] transition-all duration-500 no-underline border border-white/40",
                           "backdrop-blur-none md:backdrop-blur-xl",
