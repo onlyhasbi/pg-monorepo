@@ -383,10 +383,7 @@ function PetunjukPage() {
           <div className="flex-1 flex justify-start">
             <button
               onClick={() =>
-                navigate({
-                  to: "/register",
-                  search: { ref: pageId || undefined },
-                })
+                window.location.assign(`/register${pageId ? `?ref=${pageId}` : ""}`)
               }
               className="inline-flex items-center gap-2 text-slate-400 hover:text-red-600 transition-colors font-medium text-sm cursor-pointer"
             >

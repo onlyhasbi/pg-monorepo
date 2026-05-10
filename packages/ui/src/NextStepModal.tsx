@@ -72,10 +72,7 @@ export function NextStepModal({
             rounded="xl"
             onClick={() => {
               onClose();
-              navigate({
-                to: "/petunjuk",
-                search: refId ? { ref: refId } : {},
-              });
+              window.location.assign(`/petunjuk${refId ? `?ref=${refId}` : ""}`);
             }}
             className="group w-full gap-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold h-16 shadow-xl shadow-emerald-200/50 hover:shadow-emerald-300/60 border-none"
           >
