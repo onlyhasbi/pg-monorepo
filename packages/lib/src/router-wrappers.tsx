@@ -11,25 +11,21 @@ import {
 const CreatedLink = createLink(Link);
 
 /**
- * AppLink is a wrapper around the standard Link component that defaults
- * the 'from' prop to '/' (root). This ensures that all navigations resolve
- * from the absolute root and prevents 'Could not find match for from' warnings
- * during route transitions.
- *
- * We force 'from="/"' to ensure absolute character for all links.
+ * AppLink is a type-safe wrapper around the standard Link component.
+ * Uses createLink for proper generics and autocomplete.
+ * All paths should be absolute (e.g., to="/register") to avoid ambiguity.
  */
 export const AppLink: typeof CreatedLink = (props) => {
-  return <CreatedLink from="/" {...props} />;
+  return <CreatedLink {...props} />;
 };
 
 /**
- * useAppNavigate is a custom hook that wraps useNavigate and ensures
- * that all navigations default to 'from: "/"'.
+ * useAppNavigate wraps useNavigate for consistent navigation patterns.
  */
 export function useAppNavigate() {
   const navigate = useNavigate();
 
   return (options: NavigateOptions) => {
-    return navigate({ from: "/", ...options });
+    return navigate(options);
   };
 }

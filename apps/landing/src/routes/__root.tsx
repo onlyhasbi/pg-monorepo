@@ -16,7 +16,7 @@ import { ToastProvider } from "@repo/ui/toast";
 
 import NotFound from "@repo/ui/not_found";
 import { ScrollUnlocker } from "@repo/ui/ScrollUnlocker";
-import { agentQueryOptions } from "@repo/lib/queryOptions";
+
 import i18n from "@/i18n";
 import appCss from "@/styles.css?url";
 import deferredCss from "@/styles-deferred.css?url";
@@ -99,9 +99,7 @@ function RootComponent() {
 
   const pgboMatch = matches.find((m) => m.routeId === "/$pgcode");
   const pgcode = (pgboMatch?.params as any)?.pgcode;
-  const pgbo = pgcode
-    ? queryClient.getQueryData(agentQueryOptions(pgcode).queryKey)
-    : null;
+  const pgbo = (pgboMatch?.loaderData as any)?.pgbo ?? null;
 
   return (
     <QueryClientProvider client={queryClient}>

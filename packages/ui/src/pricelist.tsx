@@ -1,5 +1,4 @@
 import { OptimizedImage } from "./ui/optimized-image";
-import { AppLink as Link } from "@repo/lib/router-wrappers";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
 import { AlertCircle, Info } from "lucide-react";
@@ -652,12 +651,8 @@ function PriceList({ price, pgbo }: Props) {
                     key={`${item.title}-${index}`}
                   >
                     <div className="embla__tween__node w-full">
-                      <Link
-                        to="/register"
-                        search={{
-                          ref: pgbo?.pageid || undefined,
-                        }}
-                        preload="intent"
+                      <a
+                        href={`/register?type=dewasa&ref=${pgbo?.pageid || ""}`}
                         className={cn(
                           "group relative flex w-full flex-col items-center overflow-hidden rounded-[2.5rem] bg-white/70 backdrop-blur-xl p-5 md:py-8 md:px-8 text-center shadow-[0_20px_50px_-15px_rgba(0,0,0,0.06)] transition-all duration-500 no-underline border border-white/40",
                           "backdrop-blur-none md:backdrop-blur-xl",
@@ -703,7 +698,7 @@ function PriceList({ price, pgbo }: Props) {
                           </div>
                           <div className="w-8 md:w-10 h-1.5 bg-red-600 rounded-full mt-3"></div>
                         </div>
-                      </Link>
+                      </a>
                     </div>
                   </div>
                 );

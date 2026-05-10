@@ -1,5 +1,4 @@
 import { CreditCard, Clock, Wallet, Check, X } from "lucide-react";
-import { AppLink as Link } from "@repo/lib/router-wrappers";
 import BaseLayout from "@repo/ui/layout/base";
 import SectionHeader from "./ui/section_header";
 import { useTranslation } from "react-i18next";
@@ -145,10 +144,8 @@ export default function PaymentMethods({ pgbo: propsPgbo }: { pgbo?: any }) {
                         {method.cta}
                       </Button>
                     ) : (
-                      <Link
-                        to="/register"
-                        search={{ ref: pgbo?.pageid }}
-                        preload="intent"
+                      <a
+                        href={`/register?type=${method.id === "poe" ? "dewasa" : method.id === "outright" ? "dewasa" : "dewasa"}&ref=${pgbo?.pageid || ""}`}
                         className={cn(
                           buttonVariants({ variant: "outline" }),
                           "w-full h-12 rounded-xl font-bold transition-all duration-300 shadow-md",
@@ -159,7 +156,7 @@ export default function PaymentMethods({ pgbo: propsPgbo }: { pgbo?: any }) {
                         )}
                       >
                         {method.cta}
-                      </Link>
+                      </a>
                     )}
                   </div>
 
