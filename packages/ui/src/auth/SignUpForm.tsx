@@ -13,10 +13,11 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { motion } from "motion/react";
+import type { Variants } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-const formVariants = {
+const formVariants: Variants = {
   initial: { opacity: 0, x: 20 },
   animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
   exit: { opacity: 0, x: -20, transition: { duration: 0.4 } },
@@ -75,7 +76,7 @@ export function SignUpForm({
       // MIGRATION: Using TanStack Server Function
       return signupFn({ data });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       if (data.success) {
         if (data.user?.role !== "pgbo") {
           showToast(
@@ -105,12 +106,12 @@ export function SignUpForm({
          */
         const performAutoLogin = async () => {
           try {
-            const loginData = await loginFn({
+            const loginData = (await loginFn({
               data: {
                 identifier: signupForm.getValues("pgcode"),
                 katasandi: signupForm.getValues("katasandi"),
               },
-            });
+            })) as { success: boolean; token: string; user: Record<string, unknown> };
 
             if (loginData.success) {
               // 1. SET COOKIE
@@ -161,12 +162,14 @@ export function SignUpForm({
     }
     setIsVerifyingPgcode(true);
     try {
+      const countryCode = signupForm.getValues("country_code");
+      const proxyPrefix = countryCode === "60" ? "/api-proxy-my" : "/api-proxy";
+      const endpoint = `${proxyPrefix}/index.php?route=account/register/getIntroducer`;
+
       const params = new URLSearchParams();
       params.append("pgcode", pgcode);
-      const res = await fetch(
-        "/api-proxy/index.php?route=account/register/getIntroducer",
-        {
-          method: "POST",
+      const res = await fetch(endpoint, {
+        method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
           },

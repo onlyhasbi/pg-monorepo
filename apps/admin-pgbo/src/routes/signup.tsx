@@ -26,7 +26,10 @@ function SignupPage() {
   const isMounted = useIsMounted();
   const navigate = useNavigate();
 
-  const { data: authData } = useQuery(authDealerQueryOptions());
+  const { data: authData } = useQuery({
+    ...authDealerQueryOptions(),
+    enabled: false,
+  });
   const user = authData?.user;
   const token = authData?.token;
 
