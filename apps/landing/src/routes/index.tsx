@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const ADMIN_PGBO_URL = import.meta.env.DEV
   ? "http://localhost:3003/signin"
-  : import.meta.env.VITE_ADMIN_URL;
+  : "https://admin.mypublicgold.id/signin";
 
 export const Route = createFileRoute("/")({
   component: LandingHomePage,
