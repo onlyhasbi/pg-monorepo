@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-// @ts-ignore
 import { nitro } from "nitro/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -13,24 +12,12 @@ export default defineConfig({
         enabled: false,
       },
     }),
-    // Keep nitro as a separate plugin if tanstackStart doesn't accept it in this version
     nitro({
       preset: "vercel",
-      rollupConfig: {
-        onwarn(warning, warn) {
-          if (
-            (warning.code === "MODULE_LEVEL_DIRECTIVE" && warning.message.includes("use client")) ||
-            (warning.code === "UNKNOWN_OPTION" && warning.message.includes("platform"))
-          ) {
-            return;
-          }
-          warn(warning);
-        },
-      },
       routeRules: {
         "/api-proxy/**": { proxy: "https://publicgold.co.id/**" },
-        "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" }
-      }
+        "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" },
+      },
     }),
     viteReact(),
     tailwindcss(),
@@ -44,37 +31,6 @@ export default defineConfig({
       },
     },
     modulePreload: false,
-    rollupOptions: {
-      onwarn(warning, warn) {
-        if (
-          (warning.code === "MODULE_LEVEL_DIRECTIVE" && warning.message.includes("use client")) ||
-          (warning.code === "UNKNOWN_OPTION" && warning.message.includes("platform"))
-        ) {
-          return;
-        }
-        warn(warning);
-      },
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (
-              id.includes("@tanstack/react-router") ||
-              id.includes("@tanstack/router") ||
-              id.includes("react-dom") ||
-              id.includes("@radix-ui") ||
-              id.includes("@base-ui") ||
-              id.includes("i18next") ||
-              id.includes("react-i18next")
-            ) {
-              return "vendor-core";
-            }
-            if (id.includes("@tanstack/react-query") || id.includes("@tanstack/query")) return "vendor-query";
-            if (id.includes("motion") || id.includes("framer-motion")) return "vendor-motion";
-            if (id.includes("embla-carousel")) return "vendor-carousel";
-          }
-        },
-      },
-    },
   },
 
   server: {
@@ -100,14 +56,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@repo/ui": path.resolve(__dirname, "../../packages/ui/src"),
-      "@repo/lib": path.resolve(__dirname, "../../packages/lib/src"),
-      "@repo/hooks": path.resolve(__dirname, "../../packages/hooks/src"),
-      "@repo/schemas": path.resolve(__dirname, "../../packages/schemas/src"),
-      "@repo/constant": path.resolve(__dirname, "../../packages/constant/src"),
-      "@repo/services": path.resolve(__dirname, "../../packages/services/src"),
-      "@repo/types": path.resolve(__dirname, "../../packages/types/src/index.ts"),
-      "@repo/config": path.resolve(__dirname, "../../packages/config/src"),
       "@/components": path.resolve(__dirname, "../../packages/ui/src"),
       "@/lib": path.resolve(__dirname, "../../packages/lib/src"),
       "@/hooks": path.resolve(__dirname, "../../packages/hooks/src"),
@@ -115,6 +63,14 @@ export default defineConfig({
       "@/constant": path.resolve(__dirname, "../../packages/constant/src"),
       "@/services": path.resolve(__dirname, "../../packages/services/src"),
       "@/types": path.resolve(__dirname, "../../packages/types/src/index.ts"),
+      "@repo/ui": path.resolve(__dirname, "../../packages/ui/src"),
+      "@repo/lib": path.resolve(__dirname, "../../packages/lib/src"),
+      "@repo/hooks": path.resolve(__dirname, "../../packages/hooks/src"),
+      "@repo/schemas": path.resolve(__dirname, "../../packages/schemas/src"),
+      "@repo/constant": path.resolve(__dirname, "../../packages/constant/src"),
+      "@repo/services": path.resolve(__dirname, "../../packages/services/src"),
+      "@repo/types": path.resolve(__dirname, "../../packages/types/src"),
+      "@repo/config": path.resolve(__dirname, "../../packages/config/src"),
     },
     conditions: ["import", "module", "browser", "default"],
   },

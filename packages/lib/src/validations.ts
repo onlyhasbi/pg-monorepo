@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import * as v from "valibot";
 
 const nameRegex = /^[a-zA-Z\s.,]+$/;
@@ -21,7 +22,7 @@ export type RegisterFormData = {
 export const getValidationSchema = (
   isAnak: boolean,
   isIndonesia: boolean,
-  t: any,
+  t: TFunction,
 ) => {
   return v.object({
     "label-name": v.pipe(

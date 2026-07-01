@@ -1,17 +1,16 @@
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { ArrowRight, ShieldAlert } from "lucide-react";
-import React, { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Spinner } from "@repo/ui/ui/spinner";
-import { verifyPortalFn } from "@repo/services/api.functions";
 import {
-  portalUnlockedOptions,
-  portalLockoutOptions,
   portalAttemptsOptions,
+  portalLockoutOptions,
+  portalUnlockedOptions,
 } from "@repo/lib/portalOptions";
+import { verifyPortalFn } from "@repo/services/api.functions";
+import { Spinner } from "@repo/ui/ui/spinner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowRight, ShieldAlert } from "lucide-react";
+import { motion } from "motion/react";
+import React, { useState } from "react";
 
-export function PortalGate() {
-  const [animationParent] = useAutoAnimate();
+export function PortalGate({ ref }: { ref?: React.Ref<HTMLDivElement> }) {
   const queryClient = useQueryClient();
   const [lockoutTime, setLockoutTime] = useState<number>(0);
 
@@ -27,8 +26,10 @@ export function PortalGate() {
   const setLockoutExpiry = (val: number | null) =>
     queryClient.setQueryData(portalLockoutOptions().queryKey, val);
   const setAttempts = (val: number | ((prev: number) => number)) => {
-    queryClient.setQueryData(portalAttemptsOptions().queryKey, (old: any) =>
-      typeof val === "function" ? val(old ?? 0) : val,
+    queryClient.setQueryData(
+      portalAttemptsOptions().queryKey,
+      (old: number | undefined) =>
+        typeof val === "function" ? val(old ?? 0) : val,
     );
   };
 
@@ -45,10 +46,10 @@ export function PortalGate() {
         setLockoutExpiry(null);
       }
     }
-  }, [lockoutExpiry]);
+  }, [lockoutExpiry, setLockoutExpiry]);
 
   React.useEffect(() => {
-    if (lockoutTime > 0) {
+    if (lockoutExpiry) {
       const timer = setInterval(() => {
         setLockoutTime((prev) => {
           if (prev <= 1) {
@@ -63,7 +64,7 @@ export function PortalGate() {
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [lockoutTime]);
+  }, [lockoutExpiry, setLockoutExpiry, setAttempts]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -84,7 +85,7 @@ export function PortalGate() {
         setErrorMsg("");
         setAttempts(0);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       const newAttempts = (attempts ?? 0) + 1;
       setAttempts(newAttempts);
       const isLockout = newAttempts >= 5;
@@ -96,7 +97,7 @@ export function PortalGate() {
       setErrorMsg(
         isLockout
           ? "Banyak percobaan yang salah"
-          : error.message || "Secret code salah.",
+          : (error as any).message || "Secret code salah.",
       );
     } finally {
       setIsVerifying(false);
@@ -105,9 +106,13 @@ export function PortalGate() {
   };
 
   return (
-    <div
-      ref={animationParent}
-      className="w-full max-w-md mx-auto p-8 py-12 md:py-16 bg-white shadow-xl shadow-slate-200/40 rounded-[2rem] overflow-hidden ring-0"
+    <motion.div
+      ref={ref}
+      key="secret-gate"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      className="w-full max-w-md mx-auto p-8 py-12 md:py-16 bg-white shadow-xl shadow-slate-200/40 rounded-[var(--radius-card)] overflow-hidden ring-0"
     >
       {lockoutTime > 0 ? (
         <div className="flex flex-col items-center justify-center text-center space-y-8 py-8 transition-all duration-700">
@@ -139,7 +144,7 @@ export function PortalGate() {
           onSubmit={handleSecretSubmit}
           className="relative group max-w-xs mx-auto space-y-5"
         >
-          <div className="relative flex items-center bg-white border border-slate-200 shadow-sm rounded-xl h-12 p-1 focus-within:border-slate-900 focus-within:ring-4 focus-within:ring-slate-900/5 transition-all duration-300">
+          <div className="relative flex items-center bg-white border border-slate-200 shadow-sm rounded-[var(--radius-input)] h-12 p-1 focus-within:border-slate-900 focus-within:ring-4 focus-within:ring-slate-900/5 transition-all duration-300">
             <input
               type="password"
               value={secretCode}
@@ -148,34 +153,37 @@ export function PortalGate() {
               }
               placeholder="••••••"
               className="flex-1 bg-transparent text-slate-900 text-center pl-8 pr-1 h-full focus:outline-none placeholder:text-slate-200 text-sm font-black tracking-[0.5em] selection:bg-rose-100"
-              autoFocus
             />
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={lockoutTime > 0 || isVerifying || secretCode.length < 3}
-              className="h-9 w-9 bg-slate-900 text-white rounded-md shadow-lg shadow-slate-900/20 transition-all hover:bg-black hover:scale-105 active:scale-95 disabled:opacity-20 flex items-center justify-center shrink-0"
+              className="h-9 w-9 bg-slate-900 text-white rounded-[var(--radius-button)] shadow-lg shadow-slate-900/20 transition-colors hover:bg-black disabled:opacity-20 flex items-center justify-center shrink-0"
             >
               {isVerifying ? (
                 <Spinner size={14} className="text-white" />
               ) : (
                 <ArrowRight className="w-4 h-4 stroke-[3]" />
               )}
-            </button>
+            </motion.button>
           </div>
           {errorMsg && (
-            <div
-              className="flex items-center justify-center gap-1 text-[10px] text-rose-500 mt-1 transition-all"
+            <motion.div
+              initial={{ opacity: 0, y: -2 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-center gap-1 text-[10px] text-rose-500 mt-1"
             >
               <ShieldAlert className="w-3 h-3" />
               {errorMsg}{" "}
               {attempts > 0 && (attempts ?? 0) < 5 && (
                 <span className="opacity-60">({attempts}/5)</span>
               )}
-            </div>
+            </motion.div>
           )}
         </form>
       )}
-    </div>
+    </motion.div>
   );
 }
 

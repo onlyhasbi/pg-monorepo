@@ -5,8 +5,6 @@ export interface TranslationKeys {
   seo: {
     title: string;
     description: string;
-    agentTitleSuffix: string;
-    agentDescription: string;
   };
   ui: {
     highlightTestimonials: string;

@@ -50,3 +50,5 @@ pnpm-debug.log*
 *.db
 *.db.backup
 local.db
+*.db-shm
+*.db-wal

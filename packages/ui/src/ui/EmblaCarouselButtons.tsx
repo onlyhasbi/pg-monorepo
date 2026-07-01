@@ -1,7 +1,7 @@
-import type { ComponentPropsWithRef, FC } from "react";
-import { useCallback, useEffect, useState } from "react";
 import type { EmblaCarouselType } from "embla-carousel";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { ComponentPropsWithRef, FC } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type UsePrevNextButtonsType = {
   prevBtnDisabled: boolean;

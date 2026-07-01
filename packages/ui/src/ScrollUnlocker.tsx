@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { useLocation } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
  * fail to cleanup scroll locks during rapid unmounts or heavy re-renders.
  */
 export function ScrollUnlocker() {
-  const location = useLocation();
+  const _location = useLocation();
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function ScrollUnlocker() {
     ];
 
     return () => timers.forEach(clearTimeout);
-  }, [location.pathname, location.search, i18n.language]);
+  }, [_location, i18n]);
 
   return null;
 }

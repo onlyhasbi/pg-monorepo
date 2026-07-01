@@ -34,6 +34,7 @@ export const branchOptionsId = [
   { value: "32", label: "Yogyakarta" },
   { value: "36", label: "Surabaya" },
   { value: "265", label: "Bekasi" },
+  { value: "268", label: "Balikpapan" },
 ];
 
 export const branchOptionsMy = [

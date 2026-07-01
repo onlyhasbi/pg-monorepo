@@ -1,0 +1,21 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.9 [39m[90m/Users/onlyhasbi/Documents/Project/Public Gold/frontend-pg/apps/landing[39m
+
+[90mstdout[2m | src/__tests__/gold-prices.test.tsx
+[22m[39m🌐 i18next is made possible by our own product, Locize — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com 💙
+
+[90mstdout[2m | src/__tests__/submit-lead.test.tsx
+[22m[39m🌐 i18next is made possible by our own product, Locize — consider powering your project with managed localization (AI, CDN, integrations): https://locize.com 💙
+
+[90mstderr[2m | src/__tests__/gold-prices.test.tsx[2m > [22m[2mGold Prices Display[2m > [22m[2mshould fetch and display gold prices on the landing page
+[22m[39mAn empty string ("") was passed to the href attribute. To fix this, either do not render the element at all or pass null to href instead of an empty string.
+In HTML, <html> cannot be a child of <div>.
+This will cause a hydration error.
+
+[90mstderr[2m | src/__tests__/submit-lead.test.tsx[2m > [22m[2mSubmit Lead Flow[2m > [22m[2mrenders the registration form for a valid referral
+[22m[39mAn empty string ("") was passed to the href attribute. To fix this, either do not render the element at all or pass null to href instead of an empty string.
+In HTML, <html> cannot be a child of <div>.
+This will cause a hydration error.
+
+ [31m❯[39m src/__tests__/gold-prices.test.tsx [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 4184[2mms[22m[39m
+[31m     [31m×[31m should fetch and display gold prices on the landing page[39m[33m 4153[2mms[22m[39m

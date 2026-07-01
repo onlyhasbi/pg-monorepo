@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { cn } from "@repo/lib/utils";
+import React, { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 export const MovingCards = ({
@@ -29,24 +29,25 @@ export const MovingCards = ({
     rootMargin: "150px 0px",
   });
 
-  useEffect(() => {
-    addAnimation();
-  }, []);
   const [start, setStart] = useState(false);
-  function addAnimation() {
+
+  useEffect(() => {
     if (containerRef.current && scrollerRef.current) {
+      // Avoid double-duplication in React Strict Mode or on re-renders
+      if (scrollerRef.current.getAttribute("data-cloned") === "true") {
+        setStart(true);
+        return;
+      }
+      scrollerRef.current.setAttribute("data-cloned", "true");
+
       const scrollerContent = Array.from(scrollerRef.current.children);
-
-      scrollerContent.forEach((item) => {
+      for (const item of scrollerContent) {
         const duplicatedItem = item.cloneNode(true);
-        if (scrollerRef.current) {
-          scrollerRef.current.appendChild(duplicatedItem);
-        }
-      });
-
+        scrollerRef.current.appendChild(duplicatedItem);
+      }
       setStart(true);
     }
-  }
+  }, []);
 
   useEffect(() => {
     if (containerRef.current) {

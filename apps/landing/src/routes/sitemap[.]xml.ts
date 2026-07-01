@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { getAgentsFn } from "@repo/services/api.functions";
 import { SITE_URL } from "@repo/lib/config";
+import { getAgentsFn } from "@repo/services/api.functions";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
@@ -14,17 +14,20 @@ export const Route = createFileRoute("/sitemap.xml")({
           xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
 
           // Main Pages
-          const routes = ["", "/register"];
-          routes.forEach((route) => {
+          const routes = [
+            { path: "/register", priority: "0.9", changefreq: "daily" },
+            { path: "/petunjuk", priority: "0.9", changefreq: "daily" },
+          ];
+          routes.forEach(({ path, priority, changefreq }) => {
             xml += `  <url>\n`;
-            xml += `    <loc>${SITE_URL}${route}</loc>\n`;
-            xml += `    <changefreq>daily</changefreq>\n`;
-            xml += `    <priority>${route === "" ? "1.0" : "0.9"}</priority>\n`;
+            xml += `    <loc>${SITE_URL}${path}</loc>\n`;
+            xml += `    <changefreq>${changefreq}</changefreq>\n`;
+            xml += `    <priority>${priority}</priority>\n`;
             xml += `  </url>\n`;
           });
 
           // Agent Pages
-          agents.forEach((agent: any) => {
+          agents.forEach((agent: { pageid: string }) => {
             xml += `  <url>\n`;
             xml += `    <loc>${SITE_URL}/${agent.pageid}</loc>\n`;
             xml += `    <changefreq>daily</changefreq>\n`;

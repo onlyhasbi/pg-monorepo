@@ -1,29 +1,14 @@
-import { cn } from "@repo/lib/utils";
-import { useTranslation } from "react-i18next";
 import { trackEvent } from "@repo/lib/analytics";
-import { buttonVariants } from "@repo/ui/ui/button";
 import { getWhatsAppLink } from "@repo/lib/contact";
-import { OptimizedImage } from "./ui/optimized-image";
 import { HERO_IMAGE_CONFIG } from "@repo/lib/images";
+import { cn } from "@repo/lib/utils";
+import type { PgboData } from "@repo/types";
+import { buttonVariants } from "@repo/ui/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@repo/ui/ui/popover";
-import {
-  MoreVertical,
-  Facebook,
-  Instagram,
-  Music2,
-  Share2,
-} from "lucide-react";
-
-interface PgboData {
-  foto_profil_url?: string | null;
-  nama_lengkap?: string | null;
-  nama_panggilan?: string | null;
-  no_telpon?: string | null;
-  link_group_whatsapp?: string | null;
-  pgcode?: string | null;
-  pageid?: string | null;
-  [key: string]: any;
-}
+import { MoreVertical, Share2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { FacebookIcon, InstagramIcon, TikTokIcon } from "./icons/SocialIcons";
+import { OptimizedImage } from "./ui/optimized-image";
 
 const formatSocialUrl = (
   url: string | null | undefined,
@@ -111,9 +96,9 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
 
       {/* Hero Image Container */}
       <div className="pg-profile-skeleton relative w-64 h-64 md:w-80 md:h-80 z-10 shrink-0">
-        {/* Pulse ripple rings (Pure CSS Deferred Animation) */}
-        <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-0 animate-[pg-ripple_2s_ease-out_2s_infinite]" />
-        <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-0 animate-[pg-ripple_2s_ease-out_2.8s_infinite]" />
+        {/* Pulse ripple rings */}
+        <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-40 animate-[pg-ripple_2s_ease-out_infinite]" />
+        <span className="absolute inset-0 rounded-full border-2 border-red-400 opacity-30 animate-[pg-ripple_2s_ease-out_0.8s_infinite]" />
 
         {/* Profile Image with Card-like shadow */}
         <div className="relative w-full h-full rounded-full overflow-hidden shadow-2xl shadow-slate-200 border border-slate-100 bg-white">
@@ -136,8 +121,8 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
           )}
         </div>
 
-        {/* Badge (5G Team) */}
-        <span className="w-20 h-20 md:w-24 md:h-24 absolute bottom-0 right-0 z-20 animate-[pg-float_4s_ease-in-out_2s_infinite]">
+        {/* Floating Badge (5G Team) */}
+        <span className="w-20 h-20 md:w-24 md:h-24 absolute bottom-0 right-0 z-20 animate-[pg-float_4s_ease-in-out_infinite]">
           <OptimizedImage
             className="rounded-full overflow-hidden w-full h-full border-4 border-white shadow-xl"
             src="/5g.webp"
@@ -180,7 +165,7 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
                   size: "default",
                   rounded: "full",
                 }),
-                "px-10 py-6 font-bold transition-all duration-300 shadow-[0_10px_25px_-5px_rgba(220,38,38,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(220,38,38,0.5)] hover:-translate-y-1 active:scale-95 bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 text-white no-underline ring-1 ring-white/10",
+                "px-10 py-6 font-bold transition-all duration-300 shadow-[0_10px_25px_-5px_rgba(220,38,38,0.4)] hover:shadow-[0_15px_30px_-5px_rgba(220,38,38,0.5)] hover:-translate-y-1 active:scale-95 bg-gradient-to-r from-red-600 to-red-400 hover:from-red-700 hover:to-red-500 !text-white no-underline ring-1 ring-white/10 decoration-none",
               )}
             >
               <span className="relative flex h-2 w-2 mr-2">
@@ -212,10 +197,10 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
                       href={formatSocialUrl(pgbo.sosmed_instagram, "instagram")}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors text-slate-700 hover:text-rose-600 font-medium text-sm no-underline group"
+                      className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors !text-slate-900 hover:!text-rose-600 font-medium text-sm no-underline group"
                     >
                       <div className="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center group-hover:bg-rose-100 transition-colors">
-                        <Instagram className="w-4 h-4 text-rose-500" />
+                        <InstagramIcon className="w-4 h-4 text-rose-500" />
                       </div>
                       Instagram
                     </a>
@@ -225,10 +210,10 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
                       href={formatSocialUrl(pgbo.sosmed_tiktok, "tiktok")}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors text-slate-700 hover:text-slate-900 font-medium text-sm no-underline group"
+                      className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors !text-slate-900 hover:!text-slate-900 font-medium text-sm no-underline group"
                     >
                       <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                        <Music2 className="w-4 h-4 text-slate-700" />
+                        <TikTokIcon className="w-4 h-4 text-slate-700" />
                       </div>
                       TikTok
                     </a>
@@ -238,10 +223,10 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
                       href={formatSocialUrl(pgbo.sosmed_facebook, "facebook")}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors text-slate-700 hover:text-blue-600 font-medium text-sm no-underline group"
+                      className="flex items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors !text-slate-900 hover:!text-blue-600 font-medium text-sm no-underline group"
                     >
                       <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                        <Facebook className="w-4 h-4 text-blue-500" />
+                        <FacebookIcon className="w-4 h-4 text-blue-500" />
                       </div>
                       Facebook
                     </a>
@@ -251,10 +236,13 @@ function Header({ pgbo }: { pgbo?: PgboData }) {
 
                   <button
                     onClick={handleShare}
-                    className="flex w-full text-left items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors text-slate-700 hover:text-slate-900 font-medium text-sm group"
+                    className="flex w-full text-left items-center gap-3 px-3 py-2.5 hover:bg-slate-50 rounded-xl transition-colors !text-slate-900 hover:!text-slate-900 font-medium text-sm group"
                   >
                     <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                      <Share2 className="w-4 h-4 text-slate-500 group-hover:text-slate-700" />
+                      <Share2
+                        className="w-4 h-4 text-slate-500 group-hover:text-slate-700"
+                        strokeWidth={2.5}
+                      />
                     </div>
                     {t("nav.share")}
                   </button>

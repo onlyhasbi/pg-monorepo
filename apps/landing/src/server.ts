@@ -8,11 +8,14 @@ import { initI18n } from "./i18n";
 
 const handler = createStartHandler(
   defineHandlerCallback(async (event) => {
-    // Ambil bahasa dari cookie atau header Accept-Language
+    // Ambil bahasa dari query params (?lang=...), cookie, atau header Accept-Language
+    const url = new URL(event.request.url);
+    const langParam = url.searchParams.get("lang");
+
     const cookies = parse(event.request.headers.get("cookie") || "");
     const acceptLanguage = event.request.headers.get("accept-language") || "";
 
-    let lang = cookies.app_lang;
+    let lang = langParam || cookies.app_lang;
     if (!lang && acceptLanguage) {
       lang = acceptLanguage.split(",")[0].split("-")[0];
     }

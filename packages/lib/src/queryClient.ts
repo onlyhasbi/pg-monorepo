@@ -1,6 +1,6 @@
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { QueryClient } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
-import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 
 /**
  * FACTORY FUNCTION: Creates a fresh QueryClient instance.
@@ -44,7 +44,9 @@ if (typeof window !== "undefined") {
         localStorage.setItem("PUBLIC_GOLD_QUERY_CACHE", JSON.stringify(cache));
       }
     }
-  } catch {}
+  } catch (e) {
+    console.warn("[queryClient] Cache migration failed:", e);
+  }
 
   persistQueryClient({
     queryClient,

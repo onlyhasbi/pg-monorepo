@@ -1,29 +1,52 @@
-import { useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useMutation } from "@tanstack/react-query";
-import { useNavigate, useRouter } from "@tanstack/react-router";
-import { Check } from "lucide-react";
-
-import { useState } from "react";
-import { Button } from "@repo/ui/ui/button";
-import { Spinner } from "@repo/ui/ui/spinner";
-import { PasswordInput } from "@repo/ui/ui/form-elements";
-import { signupSchema } from "@repo/schemas/auth.schema";
-import { signupFn, loginFn, checkPageIdFn } from "@repo/services/api.functions";
 import { setAuthToken } from "@repo/lib/auth";
-import { useToast } from "@repo/ui/toast";
 import { queryClient } from "@repo/lib/queryClient";
 import { authDealerQueryOptions } from "@repo/lib/queryOptions";
 import { cn } from "@repo/lib/utils";
+import { signupSchema } from "@repo/schemas/auth.schema";
+import { checkPageIdFn, loginFn, signupFn } from "@repo/services/api.functions";
+import { useToast } from "@repo/ui/toast";
+import { Button } from "@repo/ui/ui/button";
+import { PasswordInput } from "@repo/ui/ui/form-elements";
+import { Spinner } from "@repo/ui/ui/spinner";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { Check } from "lucide-react";
+import { motion } from "motion/react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
+const formVariants = {
+  initial: { opacity: 0, x: 20 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+  exit: { opacity: 0, x: -20, transition: { duration: 0.4 } },
+};
 
+type SignUpFormValues = {
+  pgcode: string;
+  katasandi: string;
+  pageid: string;
+  country_code: string;
+  no_telpon: string;
+};
+
+type SignupPayload = {
+  pgcode: string;
+  katasandi: string;
+  pageid: string;
+  country_code?: string;
+  no_telpon: string;
+  nama_lengkap?: string;
+  role?: string;
+};
 
 export function SignUpForm({
   onSignupSuccess,
+  onLoginSuccess,
 }: {
   onSignupSuccess: () => void;
+  onLoginSuccess?: () => void;
 }) {
-  const navigate = useNavigate();
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -48,7 +71,7 @@ export function SignUpForm({
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: SignupPayload) => {
       // MIGRATION: Using TanStack Server Function
       return signupFn({ data });
     },
@@ -102,7 +125,11 @@ export function SignUpForm({
               // 3. INVALIDATE AND NAVIGATE
               await router.invalidate();
               showToast("Registrasi berhasil dan Anda telah masuk!", "success");
-              navigate({ to: "/overview" });
+              if (onLoginSuccess) {
+                onLoginSuccess();
+              } else {
+                window.location.href = "/overview";
+              }
             } else {
               showToast("Registrasi berhasil, silakan login manual.", "info");
               onSignupSuccess();
@@ -119,7 +146,7 @@ export function SignUpForm({
         showToast(data.message, "error");
       }
     },
-    onError: (error: any) => {
+    onError: (error: { message?: string } & Record<string, unknown>) => {
       showToast(error.message || "Registrasi gagal", "error");
     },
   });
@@ -173,8 +200,8 @@ export function SignUpForm({
     }
   };
 
-  const onSubmit = (data: any) => {
-    let finalPhone = undefined;
+  const onSubmit = (data: SignUpFormValues) => {
+    let finalPhone = data.no_telpon || "";
     if (data.no_telpon) {
       const cleanPhone = data.no_telpon.replace(/^0+/, "");
       finalPhone = `${data.country_code}${cleanPhone}`;
@@ -182,15 +209,19 @@ export function SignUpForm({
     registerMutation.mutate({
       ...data,
       role: "pgbo",
-      nama_lengkap: namaLengkap || undefined,
+      nama_lengkap: namaLengkap || "",
       no_telpon: finalPhone,
     });
   };
 
   return (
-    <form
+    <motion.form
       key="signup-form"
-      className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500"
+      className="space-y-6"
+      variants={formVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
       onSubmit={signupForm.handleSubmit(onSubmit)}
     >
       <div className="space-y-4">
@@ -227,7 +258,7 @@ export function SignUpForm({
               })}
               placeholder="PG123456"
               className={cn(
-                "w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-400 transition-all duration-200",
+                "w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-[var(--radius-input)] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-400 transition-all duration-200",
                 signupForm.formState.errors.pgcode &&
                   "border-red-500 focus:ring-red-500/30 focus:border-red-500 bg-red-50/30",
               )}
@@ -254,7 +285,7 @@ export function SignUpForm({
             </label>
             <div
               className={cn(
-                "flex w-full bg-slate-50/80 border border-slate-200 rounded-xl focus-within:ring-2 focus-within:ring-red-500/30 focus-within:border-red-400 transition-all duration-200 overflow-hidden",
+                "flex w-full bg-slate-50/80 border border-slate-200 rounded-[var(--radius-input)] focus-within:ring-2 focus-within:ring-red-500/30 focus-within:border-red-400 transition-all duration-200 overflow-hidden",
                 signupForm.formState.errors.no_telpon &&
                   "border-red-500 focus-within:ring-red-500/30 focus-within:border-red-500",
               )}
@@ -300,7 +331,7 @@ export function SignUpForm({
                 {...signupForm.register("pageid", {
                   onChange: (e) => {
                     const value = e.target.value;
-                    const sanitized = value.replace(/[^a-zA-Z0-9_\-]/g, "");
+                    const sanitized = value.replace(/[^a-zA-Z0-9_-]/g, "");
                     if (value !== sanitized) {
                       signupForm.setValue("pageid", sanitized);
                     }
@@ -324,7 +355,7 @@ export function SignUpForm({
                 })}
                 placeholder="username"
                 className={cn(
-                  "w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-xl text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-400 transition-all duration-200",
+                  "w-full px-4 py-3 bg-slate-50/80 border border-slate-200 rounded-[var(--radius-input)] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-400 transition-all duration-200",
                   (signupForm.formState.errors.pageid || pageIdError) &&
                     "border-red-500 focus:ring-red-500/30 bg-red-50/30",
                 )}
@@ -356,7 +387,7 @@ export function SignUpForm({
         />
       </div>
 
-      <div className="transition-all hover:-translate-y-0.5 active:scale-[0.98]">
+      <motion.div whileHover={{ y: -1 }} whileTap={{ scale: 0.98 }}>
         <Button
           type="submit"
           disabled={
@@ -366,7 +397,7 @@ export function SignUpForm({
             !isPageIdValid ||
             !!pageIdError
           }
-          className="font-bold w-full h-11 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98] border-none"
+          className="font-bold w-full h-11 shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98] border-none"
         >
           {registerMutation.isPending ? (
             <Spinner size={20} className="text-white" />
@@ -374,8 +405,8 @@ export function SignUpForm({
             "Buat Akun"
           )}
         </Button>
-      </div>
-    </form>
+      </motion.div>
+    </motion.form>
   );
 }
 

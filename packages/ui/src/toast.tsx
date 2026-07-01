@@ -1,6 +1,6 @@
-import { Toaster } from "./ui/sonner";
-import { toast } from "sonner";
 import type { ReactNode } from "react";
+import { toast } from "sonner";
+import { Toaster } from "./ui/sonner";
 
 type ToastType = "success" | "error" | "warning" | "info";
 

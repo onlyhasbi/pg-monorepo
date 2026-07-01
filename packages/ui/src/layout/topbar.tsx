@@ -1,3 +1,7 @@
+import { LANGUAGES } from "@repo/constant/languages";
+import { useIsMounted } from "@repo/hooks/useIsMounted";
+import { AppLink as Link } from "@repo/lib/router-wrappers";
+import { cn } from "@repo/lib/utils";
 import { Button } from "@repo/ui/ui/button";
 import {
   DropdownMenu,
@@ -5,32 +9,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui/ui/dropdown-menu";
-import { cn } from "@repo/lib/utils";
+import { OptimizedImage } from "@repo/ui/ui/optimized-image";
+import { useParams, useSearch } from "@tanstack/react-router";
 import { ChevronDown, Languages, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { OptimizedImage } from "@repo/ui/ui/optimized-image";
 
-interface TopbarProps {
-  pgbo?: any;
-  onNavigateLogo?: () => void;
-  onNavigateRegister?: (type: "dewasa" | "anak") => void;
-  onHoverRegister?: () => void;
-}
-
-function Topbar({
-  pgbo: propsPgbo,
-  onNavigateLogo,
-  onNavigateRegister,
-  onHoverRegister,
-}: TopbarProps) {
+function Topbar() {
+  const isMounted = useIsMounted();
   const [isOpen, setIsOpen] = useState(false);
   const { t, i18n } = useTranslation();
+  const { pgcode } = useParams({ strict: false }) as { pgcode?: string };
+  const { ref } = useSearch({ strict: false }) as { ref?: string };
 
-  const pgbo = propsPgbo;
+  const activeRefCode = pgcode || ref;
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
+    if (!isMounted) return;
     let ticking = false;
 
     const updateScrolledState = () => {
@@ -48,25 +44,16 @@ function Topbar({
     updateScrolledState();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isMounted]);
 
   const lang = i18n.language || "id";
-
-  const languages = [
-    { id: "id", label: "Indonesia", emoji: "🇮🇩", code: "ID" },
-    { id: "en", label: "English", emoji: "🇬🇧", code: "EN" },
-    { id: "ms", label: "Malaysia", emoji: "🇲🇾", code: "MS" },
-    { id: "zh", label: "Chinese", emoji: "🇨🇳", code: "ZH" },
-    { id: "ta", label: "Tamil", emoji: "🇮🇳", code: "TA" },
-    { id: "ar", label: "العربية", emoji: "🇸🇦", code: "AR" },
-  ];
 
   const toggleLang = (selected: string) => {
     i18n.changeLanguage(selected);
     setIsOpen(false);
   };
 
-  const currentLang = languages.find((l) => lang.startsWith(l.id));
+  const currentLang = LANGUAGES.find((l) => lang.startsWith(l.id));
   const currentLangEmoji = currentLang?.emoji ?? "🌐";
   const currentLangLabel = currentLang?.code ?? "EN";
 
@@ -82,16 +69,13 @@ function Topbar({
       >
         <div className="flex h-full w-full max-w-7xl items-center justify-between mx-auto px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <a
-            href={`/${pgbo?.pageid || ""}`}
-            onClick={(e) => {
-              if (onNavigateLogo) {
-                e.preventDefault();
-                onNavigateLogo();
-              } else {
-                if (window.location.pathname.startsWith("/")) {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }
+          <Link
+            to="/$pgcode"
+            params={{ pgcode: activeRefCode || "_" }}
+            search={{ lang: undefined }}
+            onClick={() => {
+              if (window.location.pathname.startsWith("/")) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
               }
             }}
             className="group flex items-center gap-2 cursor-pointer"
@@ -104,7 +88,7 @@ function Topbar({
               width={200}
               height={56}
             />
-          </a>
+          </Link>
 
           <div className="flex items-center gap-4">
             {/* Language Selector (Desktop) */}
@@ -114,7 +98,6 @@ function Topbar({
                   render={
                     <Button
                       variant="outline"
-                      rounded="xl"
                       className="flex items-center gap-2 px-3 font-semibold border-slate-200 hover:border-slate-300 transition-all h-11"
                     >
                       <Languages className="w-4 h-4 text-slate-400" />
@@ -128,16 +111,13 @@ function Topbar({
                     </Button>
                   }
                 />
-                <DropdownMenuContent
-                  align="end"
-                  className="w-48 rounded-2xl p-2"
-                >
-                  {languages.map((l) => (
+                <DropdownMenuContent align="end" className="w-48 p-2">
+                  {LANGUAGES.map((l) => (
                     <DropdownMenuItem
                       key={l.id}
                       onClick={() => toggleLang(l.id as any)}
                       className={cn(
-                        "flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer",
+                        "flex items-center justify-between px-3 py-2.5 cursor-pointer rounded-[var(--radius-button)]",
                         lang.startsWith(l.id)
                           ? "text-red-600 font-bold bg-red-50/50"
                           : "text-slate-600",
@@ -160,31 +140,24 @@ function Topbar({
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button
-                    rounded="xl"
-                    onMouseEnter={onHoverRegister}
-                    className="font-bold shadow-lg shadow-red-600/20 active:scale-95 transition-all h-11"
-                  >
+                  <Button className="font-bold shadow-lg shadow-red-600/20 active:scale-95 transition-all h-11">
                     {t("nav.register")}
                     <ChevronDown className="w-3.5 h-3.5 ml-1 transition-transform duration-200" />
                   </Button>
                 }
               />
-              <DropdownMenuContent
-                align="end"
-                className="w-52 rounded-2xl p-2 z-50"
-              >
+              <DropdownMenuContent align="end" className="w-52 p-2 z-50">
                 <DropdownMenuItem
                   render={
-                    <a
-                      href={`/register?type=dewasa&ref=${pgbo?.pageid || ""}`}
-                      onClick={(e) => {
-                        if (onNavigateRegister) {
-                          e.preventDefault();
-                          onNavigateRegister("dewasa");
-                        }
+                    <Link
+                      to="/register"
+                      search={{
+                        type: "dewasa",
+                        ref: activeRefCode,
+                        lang: undefined,
                       }}
-                      className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 rounded-xl cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
+                      preload="intent"
+                      className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 cursor-pointer rounded-[var(--radius-button)] focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
                     >
                       <OptimizedImage
                         src="/dewasa.webp"
@@ -194,20 +167,20 @@ function Topbar({
                         height={28}
                       />
                       {t("nav.accountAdult")}
-                    </a>
+                    </Link>
                   }
                 />
                 <DropdownMenuItem
                   render={
-                    <a
-                      href={`/register?type=anak&ref=${pgbo?.pageid || ""}`}
-                      onClick={(e) => {
-                        if (onNavigateRegister) {
-                          e.preventDefault();
-                          onNavigateRegister("anak");
-                        }
+                    <Link
+                      to="/register"
+                      search={{
+                        type: "anak",
+                        ref: activeRefCode,
+                        lang: undefined,
                       }}
-                      className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 rounded-xl cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
+                      preload="intent"
+                      className="flex items-center gap-3 px-3 py-3 text-sm text-slate-700 cursor-pointer rounded-[var(--radius-button)] focus:bg-red-50 focus:text-red-600 transition-colors font-semibold no-underline"
                     >
                       <OptimizedImage
                         src="/anak.webp"
@@ -217,7 +190,7 @@ function Topbar({
                         height={28}
                       />
                       {t("nav.accountChild")}
-                    </a>
+                    </Link>
                   }
                 />
               </DropdownMenuContent>
@@ -225,7 +198,7 @@ function Topbar({
 
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+              className="lg:hidden p-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-[var(--radius-button)] transition-all border border-transparent hover:border-red-100"
               onClick={() => setIsOpen(!isOpen)}
             >
               {isOpen ? (
@@ -248,14 +221,11 @@ function Topbar({
         )}
       >
         <div className="flex h-20 items-center justify-between border-b border-slate-100 px-6">
-          <a
-            href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsOpen(false);
-              if (onNavigateLogo) onNavigateLogo();
-            }}
-            className="inline-flex shrink-0 items-center cursor-pointer"
+          <Link
+            to="/"
+            search={{ lang: undefined }}
+            onClick={() => setIsOpen(false)}
+            className="inline-flex shrink-0 items-center"
           >
             <OptimizedImage
               src="/logo.webp"
@@ -265,7 +235,7 @@ function Topbar({
               width={200}
               height={56}
             />
-          </a>
+          </Link>
           <button
             onClick={() => setIsOpen(false)}
             className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
@@ -280,12 +250,12 @@ function Topbar({
               Language
             </h3>
             <div className="grid grid-cols-2 gap-3">
-              {languages.map((l) => (
+              {LANGUAGES.map((l) => (
                 <button
                   key={l.id}
                   onClick={() => toggleLang(l.id as any)}
                   className={cn(
-                    "flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all",
+                    "flex flex-col items-center gap-2 p-4 rounded-[var(--radius-button)] border transition-all",
                     lang.startsWith(l.id)
                       ? "bg-white border-red-600 text-red-600 shadow-md shadow-red-100"
                       : "bg-slate-50 border-transparent text-slate-500 hover:bg-slate-100",

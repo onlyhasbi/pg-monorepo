@@ -1,26 +1,25 @@
-import React, { useState, useEffect, useCallback } from "react";
 import { cn } from "@repo/lib/utils";
 import BaseLayout from "@repo/ui/layout/base";
-import SectionHeader from "./ui/section_header";
+import {
+  Award,
+  Building2,
+  Check,
+  Clock,
+  CreditCard,
+  Globe,
+  ImageIcon,
+  Lock,
+  Play,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { Card, CardContent } from "./ui/card";
 import { LiteYouTube } from "./ui/lite-youtube";
 import { OptimizedImage } from "./ui/optimized-image";
-
-import {
-  Check,
-  ShieldCheck,
-  CreditCard,
-  Truck,
-  Building2,
-  Award,
-  Clock,
-  Lock,
-  Globe,
-  Play,
-  ImageIcon,
-} from "lucide-react";
+import SectionHeader from "./ui/section_header";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 type Slide = {
   type: "video" | "image";
@@ -361,26 +360,34 @@ const Excellence = () => {
                               {item.title}
                             </h4>
                             <div className="space-y-3">
-                              {item.features.map((feature: any, i: number) => {
-                                const FeatureIcon = feature.icon;
-                                return (
-                                  <div
-                                    key={i}
-                                    className="flex items-start gap-4 p-4 rounded-none lg:rounded-xl border-0 border-b border-slate-100 last:border-b-0 lg:border-b-0 transition-all duration-300 hover:bg-white hover:shadow-md group/item"
-                                  >
+                              {item.features.map(
+                                (
+                                  feature: {
+                                    label: string;
+                                    icon: React.ElementType;
+                                  },
+                                  i: number,
+                                ) => {
+                                  const FeatureIcon = feature.icon;
+                                  return (
                                     <div
-                                      className={`w-8 h-8 rounded-lg ${item.bgColor} bg-opacity-20 flex items-center justify-center`}
+                                      key={i}
+                                      className="flex items-start gap-4 p-4 rounded-none lg:rounded-xl border-0 border-b border-slate-100 last:border-b-0 lg:border-b-0 transition-all duration-300 hover:bg-white hover:shadow-md group/item"
                                     >
-                                      <FeatureIcon
-                                        className={`w-4 h-4 ${item.bgColor.replace("bg-", "text-")}`}
-                                      />
+                                      <div
+                                        className={`w-8 h-8 rounded-lg ${item.bgColor} bg-opacity-20 flex items-center justify-center`}
+                                      >
+                                        <FeatureIcon
+                                          className={`w-4 h-4 ${item.bgColor.replace("bg-", "text-")}`}
+                                        />
+                                      </div>
+                                      <span className="text-sm font-medium text-slate-700">
+                                        {feature.label}
+                                      </span>
                                     </div>
-                                    <span className="text-sm font-medium text-slate-700">
-                                      {feature.label}
-                                    </span>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                },
+                              )}
                             </div>
                             <div
                               className={`absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r ${item.color} rounded-full`}
@@ -414,15 +421,20 @@ const Excellence = () => {
 
                     {/* Feature tags */}
                     <div className="flex flex-wrap gap-2 mt-6">
-                      {item.features.map((feature: any, i: number) => (
-                        <span
-                          key={i}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-medium text-slate-600"
-                        >
-                          <Check className="w-3 h-3 text-red-500" />
-                          {feature.label}
-                        </span>
-                      ))}
+                      {item.features.map(
+                        (
+                          feature: { label: string; icon: React.ElementType },
+                          i: number,
+                        ) => (
+                          <span
+                            key={i}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-xs font-medium text-slate-600"
+                          >
+                            <Check className="w-3 h-3 text-red-500" />
+                            {feature.label}
+                          </span>
+                        ),
+                      )}
                     </div>
                   </div>
                 </div>

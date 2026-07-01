@@ -1,5 +1,6 @@
 import { parse } from "cookie";
 import { API_URL } from "./config";
+import { ApiError } from "./errors";
 
 function getToken(isAdmin = false): string | null {
   if (typeof window === "undefined") return null;
@@ -13,15 +14,15 @@ interface RequestConfig {
   responseType?: string;
 }
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   data: T;
   status: number;
 }
 
-async function request<T = any>(
+async function request<T = unknown>(
   method: string,
   endpoint: string,
-  data?: any,
+  data?: unknown,
   config: RequestConfig = {},
 ): Promise<ApiResponse<T>> {
   const url = endpoint.startsWith("http") ? endpoint : `${API_URL}${endpoint}`;
@@ -34,7 +35,7 @@ async function request<T = any>(
   };
 
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
 
   const isFormData = data instanceof FormData;
@@ -51,42 +52,53 @@ async function request<T = any>(
   };
 
   if (data !== undefined && data !== null) {
-    fetchOptions.body = isFormData ? data : JSON.stringify(data);
+    fetchOptions.body = isFormData ? (data as FormData) : JSON.stringify(data);
   }
 
   const response = await fetch(url, fetchOptions);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const error: any = new Error(
-      errorData.message || `API Error: ${response.status}`,
-    );
-    error.response = { data: errorData, status: response.status };
-    throw error;
+    const message =
+      typeof errorData === "object" &&
+      errorData !== null &&
+      "message" in errorData
+        ? String((errorData as Record<string, unknown>).message)
+        : `API Error: ${response.status}`;
+    throw new ApiError(message, response.status, errorData);
   }
 
   if (config.responseType === "blob") {
     const blob = await response.blob();
-    return { data: blob as any, status: response.status };
+    return { data: blob as T, status: response.status };
   }
 
   const json = await response.json();
-  return { data: json, status: response.status };
+  return { data: json as T, status: response.status };
 }
 
 export const api = {
-  get: <T = any>(endpoint: string, config?: RequestConfig) =>
+  get: <T = unknown>(endpoint: string, config?: RequestConfig) =>
     request<T>("GET", endpoint, undefined, config),
 
-  post: <T = any>(endpoint: string, data?: any, config?: RequestConfig) =>
-    request<T>("POST", endpoint, data, config),
+  post: <T = unknown>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig,
+  ) => request<T>("POST", endpoint, data, config),
 
-  put: <T = any>(endpoint: string, data?: any, config?: RequestConfig) =>
-    request<T>("PUT", endpoint, data, config),
+  put: <T = unknown>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig,
+  ) => request<T>("PUT", endpoint, data, config),
 
-  patch: <T = any>(endpoint: string, data?: any, config?: RequestConfig) =>
-    request<T>("PATCH", endpoint, data, config),
+  patch: <T = unknown>(
+    endpoint: string,
+    data?: unknown,
+    config?: RequestConfig,
+  ) => request<T>("PATCH", endpoint, data, config),
 
-  delete: <T = any>(endpoint: string, config?: RequestConfig) =>
+  delete: <T = unknown>(endpoint: string, config?: RequestConfig) =>
     request<T>("DELETE", endpoint, undefined, config),
 };

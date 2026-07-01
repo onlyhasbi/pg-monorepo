@@ -18,15 +18,18 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-white animate-in fade-in duration-700">
-      <div className="text-center space-y-10 max-w-md w-full">
-        {/* Simple Number */}
-        <h1 className="text-[12rem] md:text-[16rem] font-black tracking-tighter text-slate-100 select-none leading-none">
+      <div className="text-center flex flex-col items-center justify-center space-y-8 w-full max-w-2xl">
+        {/* Giant Number */}
+        <h1
+          className="font-black tracking-tighter text-slate-100 select-none"
+          style={{ fontSize: "clamp(10rem, 30vw, 20rem)", lineHeight: 0.9 }}
+        >
           404
         </h1>
 
-        {/* Simple Typography */}
+        {/* Typography */}
         <div className="space-y-4">
-          <h2 className="text-3xl font-bold text-slate-900 tracking-wide">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-wide">
             {t("notFound.title", "Halaman Tidak Ditemukan")}
           </h2>
           <p className="text-slate-500 text-lg leading-relaxed max-w-sm mx-auto">

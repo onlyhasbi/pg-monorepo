@@ -1,14 +1,14 @@
-import { AlertTriangle } from "lucide-react";
 import type { FormSummaryItem } from "@repo/hooks/useRegisterForm";
+import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
-  DialogFooter,
   DialogDescription,
+  DialogFooter,
+  DialogTitle,
 } from "./ui/dialog";
-import { Button } from "./ui/button";
-import { useTranslation } from "react-i18next";
 
 export function ConfirmationModal({
   isAnak,
@@ -59,13 +59,13 @@ export function ConfirmationModal({
           <Button
             variant="outline"
             onClick={onCancel}
-            className="w-full sm:flex-1 font-semibold text-slate-600 bg-white border-slate-200 hover:bg-slate-50 rounded-xl"
+            className="w-full sm:flex-1 font-semibold text-slate-600 bg-white border-slate-200 hover:bg-slate-50"
           >
             {t("registerForm.backBtn")}
           </Button>
           <Button
             onClick={onConfirm}
-            className="w-full sm:flex-1 font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 border-none shadow-lg shadow-red-200/60 rounded-xl"
+            className="w-full sm:flex-1 font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 border-none shadow-lg shadow-red-200/60"
           >
             {t("registerForm.confirmBtn")}
           </Button>
@@ -122,13 +122,13 @@ export function AgeSwitchModal({
           <Button
             variant="outline"
             onClick={onCancel}
-            className="w-full sm:flex-1 font-semibold text-slate-600 bg-white border-slate-200 hover:bg-slate-50 rounded-xl"
+            className="w-full sm:flex-1 font-semibold text-slate-600 bg-white border-slate-200 hover:bg-slate-50"
           >
             {t("registerForm.ageValidationCancelBtn")}
           </Button>
           <Button
             onClick={onConfirm}
-            className="w-full sm:flex-1 font-bold text-amber-900 bg-amber-400 hover:bg-amber-500 border-none shadow-lg shadow-amber-200/60 rounded-xl"
+            className="w-full sm:flex-1 font-bold text-amber-900 bg-amber-400 hover:bg-amber-500 border-none shadow-lg shadow-amber-200/60"
           >
             {t("registerForm.ageValidationSwitchBtn")}
           </Button>

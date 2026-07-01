@@ -11,9 +11,10 @@ import (
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/models"
 )
 
-const publicGoldURL = "https://publicgold.co.id/"
+const defaultPublicGoldURL = "https://publicgold.co.id/"
 
 type GoldPriceService struct {
+	TargetURL string
 	cache     *models.GoldPricesResult
 	cacheTime time.Time
 	cacheTTL  time.Duration
@@ -22,7 +23,8 @@ type GoldPriceService struct {
 
 func NewGoldPriceService() *GoldPriceService {
 	return &GoldPriceService{
-		cacheTTL: 2 * time.Minute,
+		TargetURL: defaultPublicGoldURL,
+		cacheTTL:  2 * time.Minute,
 	}
 }
 
@@ -45,7 +47,7 @@ func (s *GoldPriceService) FetchGoldPrices() (*models.GoldPricesResult, error) {
 	}
 
 	client := &http.Client{Timeout: 10 * time.Second}
-	req, err := http.NewRequest("GET", publicGoldURL, nil)
+	req, err := http.NewRequest("GET", s.TargetURL, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,41 @@
+import { API_URL } from "@repo/lib/config";
+import { ApiError } from "@repo/lib/errors";
+import type {
+  RegisterTrackPayload,
+  SecretCodeData,
+  SignupPayload,
+} from "@repo/types";
 import { createServerFn } from "@tanstack/react-start";
 import { parse } from "cookie";
-const API_URL = typeof window !== "undefined" ? "/api" : process.env.API_URL || "https://be-public-gold-indonesia.vercel.app/api";
+
+export const submitRegisterFormFn = createServerFn({ method: "POST" })
+  .inputValidator((data: { endpoint: string; formDataStr: string }) => data)
+  .handler(async ({ data }) => {
+    const targetUrl = data.endpoint.startsWith("/api-proxy-my")
+      ? data.endpoint.replace(/^\/api-proxy-my/, "https://publicgold.com.my")
+      : data.endpoint.replace(/^\/api-proxy/, "https://publicgold.co.id");
+
+    const response = await fetch(targetUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: data.formDataStr,
+      redirect: "manual",
+    });
+
+    if (
+      response.type === "opaqueredirect" ||
+      (response.status >= 300 && response.status < 400)
+    ) {
+      return { success: true, isRedirect: true, htmlText: "" };
+    }
+
+    const htmlText = await response.text();
+    return {
+      success: response.ok,
+      status: response.status,
+      htmlText,
+    };
+  });
 
 /**
  * BASE FETCHER: Uses native fetch and handles auth headers from cookies.
@@ -20,6 +55,7 @@ async function baseFetch(
       const request = getRequest();
       finalCookieStr = request?.headers.get("cookie") || "";
     } catch {
+      // Expected in client context — fallback to document.cookie
       finalCookieStr = typeof document !== "undefined" ? document.cookie : "";
     }
   }
@@ -46,17 +82,13 @@ async function baseFetch(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const error = new Error(
-      errorData.message || `API Error: ${response.status}`,
-    );
-    (error as any).status = response.status;
-    (error as any).response = { data: errorData, status: response.status };
-    throw error;
-  }
-
-  const contentType = response.headers.get("content-type");
-  if (contentType && (contentType.includes("text/") || contentType.includes("application/octet-stream"))) {
-    return response.text();
+    const message =
+      typeof errorData === "object" &&
+      errorData !== null &&
+      "message" in errorData
+        ? String((errorData as Record<string, unknown>).message)
+        : `API Error: ${response.status}`;
+    throw new ApiError(message, response.status, errorData);
   }
 
   return response.json();
@@ -97,7 +129,7 @@ export const loginFn = createServerFn({ method: "POST" })
   });
 
 export const signupFn = createServerFn({ method: "POST" })
-  .inputValidator((d: any) => d)
+  .inputValidator((d: SignupPayload) => d)
   .handler(async ({ data }) => {
     return baseFetch("/auth/register", {
       method: "POST",
@@ -131,7 +163,7 @@ export const getAdminProfileFn = createServerFn({ method: "GET" })
   });
 
 export const registerTrackFn = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
+  .inputValidator((data: RegisterTrackPayload) => data)
   .handler(async ({ data }) => {
     return baseFetch("/public/register-track", {
       method: "POST",
@@ -172,7 +204,7 @@ export const getAdminSecretFn = createServerFn({ method: "GET" }).handler(
 );
 
 export const updateAdminSecretFn = createServerFn({ method: "POST" })
-  .inputValidator((d: { code: string; auto_rotate: boolean }) => d)
+  .inputValidator((d: SecretCodeData) => d)
   .handler(async ({ data }) => {
     return baseFetch(
       "/admin/settings/secret-code",
@@ -180,113 +212,6 @@ export const updateAdminSecretFn = createServerFn({ method: "POST" })
         method: "PATCH",
         body: JSON.stringify(data),
       },
-      true,
-    );
-  });
-
-export const updateSettingsFn = createServerFn({ method: "POST" })
-  .inputValidator((formData: any) => formData) // FormData is handled natively
-  .handler(async ({ data: formData }) => {
-    return baseFetch("/settings", {
-      method: "PUT",
-      body: formData,
-    });
-  });
-
-export const updatePasswordFn = createServerFn({ method: "POST" })
-  .inputValidator((d: { katasandi_lama: string; katasandi_baru: string }) => d)
-  .handler(async ({ data }) => {
-    return baseFetch("/settings/password", {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    });
-  });
-
-// Leads
-export const exportLeadsFn = createServerFn({ method: "POST" })
-  .inputValidator((d: { ids: string[] }) => d)
-  .handler(async ({ data }) => {
-    return baseFetch("/overview/leads/export-vcf", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  });
-
-export const deleteLeadFn = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
-  .handler(async ({ data: id }) => {
-    return baseFetch(`/overview/leads/${id}`, { method: "DELETE" });
-  });
-
-export const bulkDeleteLeadsFn = createServerFn({ method: "POST" })
-  .inputValidator((d: { ids: string[] }) => d)
-  .handler(async ({ data }) => {
-    return baseFetch("/overview/leads/bulk-delete", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  });
-
-// Admin PGBO Operations
-export const exportAdminPgboFn = createServerFn({ method: "GET" })
-  .handler(async () => {
-    return baseFetch("/admin/pgbo/export", {}, true);
-  });
-
-export const createAdminPgboFn = createServerFn({ method: "POST" })
-  .inputValidator((data: any) => data)
-  .handler(async ({ data }) => {
-    return baseFetch("/admin/pgbo", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }, true);
-  });
-
-export const updateAdminPgboFn = createServerFn({ method: "POST" })
-  .inputValidator((d: { id: string; data: any }) => d)
-  .handler(async ({ data: { id, data } }) => {
-    return baseFetch(`/admin/pgbo/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }, true);
-  });
-
-export const deleteAdminPgboFn = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
-  .handler(async ({ data: id }) => {
-    return baseFetch(`/admin/pgbo/${id}`, { method: "DELETE" }, true);
-  });
-
-export const toggleAdminPgboFn = createServerFn({ method: "POST" })
-  .inputValidator((id: string) => id)
-  .handler(async ({ data: id }) => {
-    return baseFetch(`/admin/pgbo/${id}/toggle`, { method: "PATCH" }, true);
-  });
-
-export const bulkDeleteAdminPgboFn = createServerFn({ method: "POST" })
-  .inputValidator((d: { ids: string[] }) => d)
-  .handler(async ({ data }) => {
-    return baseFetch("/admin/pgbo/bulk-delete", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }, true);
-  });
-
-export const bulkToggleAdminPgboFn = createServerFn({ method: "POST" })
-  .inputValidator((d: { ids: string[]; active: boolean }) => d)
-  .handler(async ({ data }) => {
-    return baseFetch("/admin/pgbo/bulk-toggle", {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    }, true);
-  });
-
-export const checkAdminPageIdFn = createServerFn({ method: "GET" })
-  .inputValidator((d: { pageid: string; excludeId?: string }) => d)
-  .handler(async ({ data: { pageid, excludeId } }) => {
-    return baseFetch(
-      `/admin/pgbo/check-pageid?pageid=${pageid}${excludeId ? `&excludeId=${excludeId}` : ""}`,
-      {},
       true,
     );
   });

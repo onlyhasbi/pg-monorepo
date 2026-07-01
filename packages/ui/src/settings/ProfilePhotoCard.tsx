@@ -1,8 +1,8 @@
-import { useRef } from "react";
-import { Camera, User } from "lucide-react";
 import { Card, CardContent } from "@repo/ui/ui/card";
 import { ImageCropper } from "@repo/ui/ui/image-cropper";
 import { OptimizedImage } from "@repo/ui/ui/optimized-image";
+import { Camera, User } from "lucide-react";
+import { useRef } from "react";
 
 interface ProfilePhotoCardProps {
   fotoProfilUrl?: string;
@@ -37,7 +37,7 @@ export function ProfilePhotoCard({
         />
       )}
 
-      <Card className="rounded-2xl shadow-sm border-slate-100 p-5 sm:p-6 bg-white">
+      <Card className="shadow-sm border-slate-100 p-5 sm:p-6 bg-white">
         <CardContent className="p-0">
           <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
             <div className="relative group flex-shrink-0">
@@ -54,7 +54,6 @@ export function ProfilePhotoCard({
                     alt="Profile"
                     width={112}
                     height={112}
-                    priority={true}
                     className="w-full h-full object-cover"
                   />
                 ) : (

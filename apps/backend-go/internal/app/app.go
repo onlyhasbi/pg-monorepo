@@ -81,12 +81,17 @@ func SetupRouter(db *sql.DB, cld *cloudinary.Cloudinary) *gin.Engine {
 		adminGroup.Use(middleware.AuthGuard(jwtSecret))
 		adminGroup.Use(middleware.AdminGuard())
 		{
+			adminGroup.GET("/profile", adminHandler.GetProfile)
+			
 			adminGroup.GET("/pgbo", adminHandler.GetPGBO)
+			adminGroup.GET("/pgbo/check-pageid", adminHandler.CheckPageID)
 			adminGroup.POST("/pgbo", adminHandler.CreatePGBO)
 			adminGroup.PATCH("/pgbo/:id/toggle", adminHandler.TogglePGBO)
 			adminGroup.PUT("/pgbo/:id", adminHandler.UpdatePGBO)
+			adminGroup.DELETE("/pgbo/:id", adminHandler.DeletePGBO)
 			adminGroup.POST("/pgbo/bulk-delete", adminHandler.BulkDeletePGBO)
 			adminGroup.PATCH("/pgbo/bulk-toggle", adminHandler.BulkTogglePGBO)
+			
 			adminGroup.GET("/settings/secret-code", adminHandler.GetSecretCode)
 			adminGroup.PATCH("/settings/secret-code", adminHandler.UpdateSecretCode)
 		}

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "vite start"
+    "start": "vite start",
+    "test": "vitest run"
   },
   "dependencies": {
     "@repo/ui": "workspace:*",

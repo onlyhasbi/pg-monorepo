@@ -1,20 +1,28 @@
-import {
-  createFileRoute,
-  useNavigate,
-  useRouter,
-} from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Eye, EyeOff, ShieldCheck } from "lucide-react";
-
-import { useToast } from "@repo/ui/toast";
-import { useForm } from "react-hook-form";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { api } from "@repo/lib/api";
 import { requireAdminGuest } from "@repo/lib/auth";
 import { queryClient } from "@repo/lib/queryClient";
 import { authAdminQueryOptions } from "@repo/lib/queryOptions";
-import { valibotResolver } from "@hookform/resolvers/valibot";
+import { loginFn } from "@repo/services/api.functions";
+import type { ApiErrorResponse, AuthResponse } from "@repo/types/api";
+import { useToast } from "@repo/ui/toast";
+import { Button } from "@repo/ui/ui/button";
+import { Card, CardContent } from "@repo/ui/ui/card";
+import { InputField, PasswordInput } from "@repo/ui/ui/form-elements";
+import { Spinner } from "@repo/ui/ui/spinner";
+import { useMutation } from "@tanstack/react-query";
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useRouter,
+} from "@tanstack/react-router";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import * as v from "valibot";
-import { loginFn, signupFn } from "@repo/services/api.functions";
+
+const MotionCard = motion.create(Card);
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: async () => await requireAdminGuest(),
@@ -38,6 +46,15 @@ const schema = v.object({
   ),
 });
 
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
 function AdminSignupPage() {
   const navigate = useNavigate();
   const router = useRouter();
@@ -46,9 +63,6 @@ function AdminSignupPage() {
   useEffect(() => {
     document.title = "Daftar Super Admin | Public Gold Indonesia";
   }, []);
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showSecret, setShowSecret] = useState(false);
 
   const {
     register,
@@ -66,18 +80,14 @@ function AdminSignupPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: any) => {
-      // Pass role as admin to backend auth registration
-      const res = await signupFn({ data: { ...data, role: "admin" } });
-      return res;
+    mutationFn: async (
+      data: v.InferOutput<typeof schema>,
+    ): Promise<AuthResponse> => {
+      const res = await api.post("/auth/register", { ...data, role: "admin" });
+      return res.data as AuthResponse;
     },
     onSuccess: (data) => {
       if (data.success) {
-        /**
-         * USER REQUIREMENT: Post-register login fetch
-         * After successful admin registration, we trigger a login fetch
-         * to fully initialize the admin session and prime the cache.
-         */
         const performAdminAutoLogin = async () => {
           try {
             const loginData = await loginFn({
@@ -88,7 +98,6 @@ function AdminSignupPage() {
             });
 
             if (loginData.success && loginData.user?.role === "admin") {
-              // UNIFIED PERSISTENCE: Just set query data.
               queryClient.setQueryData(authAdminQueryOptions().queryKey, {
                 user: loginData.user,
                 token: loginData.token,
@@ -113,128 +122,95 @@ function AdminSignupPage() {
         showToast(data.message, "error");
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error & ApiErrorResponse) => {
       showToast(error.response?.data?.message || "Pendaftaran gagal", "error");
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: v.InferOutput<typeof schema>) => {
     mutation.mutate(data);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-900 p-4">
-      <div className="w-full max-w-sm bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-700">
-        <div className="mb-8 text-center">
-          <div className="w-16 h-16 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
-            <ShieldCheck className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-bold text-white">Buat Akun Admin</h2>
-          <p className="text-slate-400 text-sm mt-1">
-            Sistem Proteksi Lapis Ganda
-          </p>
-        </div>
+    <div className="relative min-h-dvh flex flex-col items-center justify-center bg-background overflow-hidden px-6 font-sans">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-rose-50/50 via-background to-background pointer-events-none" />
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/3 rounded-full blur-[100px] pointer-events-none" />
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <fieldset disabled={mutation.isPending} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                {...register("email")}
-                className={`w-full px-4 py-2 bg-slate-900 border rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none text-white ${errors.email ? "border-red-500" : "border-slate-600"}`}
-                placeholder="admin@domain.com"
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  {...register("katasandi")}
-                  className={`w-full px-4 py-2 pr-10 bg-slate-900 border rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none text-white ${errors.katasandi ? "border-red-500" : "border-slate-600"}`}
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.katasandi && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.katasandi.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-1">
-                Secret Code
-              </label>
-              <div className="relative">
-                <input
-                  type={showSecret ? "text" : "password"}
-                  {...register("secretCode")}
-                  autoComplete="off"
-                  data-1p-ignore="true"
-                  data-lpignore="true"
-                  className={`w-full px-4 py-2 pr-10 bg-slate-900 border rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none text-white ${errors.secretCode ? "border-red-500" : "border-slate-600"}`}
-                  placeholder="Kode Akses Pendaftaran"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowSecret(!showSecret)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
-                  tabIndex={-1}
-                >
-                  {showSecret ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.secretCode && (
-                <p className="mt-1 text-sm text-red-400">
-                  {errors.secretCode.message}
-                </p>
-              )}
-            </div>
-            <button
-              type="submit"
-              disabled={mutation.isPending || !isValid}
-              className="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition duration-200 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
-            >
-              {mutation.isPending ? "Verifikasi..." : "Daftar Admin"}
-            </button>
-          </fieldset>
-        </form>
-        <p className="mt-4 text-center text-sm text-slate-400">
-          Sudah terdaftar?{" "}
-          <a
-            onClick={() => navigate({ to: "/signin" })}
-            className="text-red-400 hover:text-white hover:underline cursor-pointer transition"
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="relative z-10 w-full max-w-5xl flex flex-col items-center gap-8 md:gap-10"
+      >
+        <AnimatePresence mode="wait">
+          <MotionCard
+            key="auth-content"
+            initial={{ opacity: 0, filter: "blur(8px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            className="bg-card rounded-[1.5rem] overflow-hidden shadow-2xl shadow-foreground/5 border-none ring-0 max-w-lg mx-auto w-full"
           >
-            Masuk di sini
-          </a>
-        </p>
-      </div>
+            <CardContent className="p-0 flex flex-col h-full">
+              <div className="p-6 sm:px-10 pb-8 pt-10">
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  <fieldset disabled={mutation.isPending} className="space-y-5">
+                    <InputField
+                      id="email"
+                      label="Email"
+                      type="email"
+                      placeholder="admin@domain.com"
+                      error={errors.email?.message}
+                      {...register("email")}
+                    />
+                    <PasswordInput
+                      id="katasandi"
+                      label="Password"
+                      placeholder="••••••••"
+                      error={errors.katasandi?.message}
+                      {...register("katasandi")}
+                    />
+                    <PasswordInput
+                      id="secretCode"
+                      label="Secret Code"
+                      placeholder="Kode Akses Pendaftaran"
+                      error={errors.secretCode?.message}
+                      {...register("secretCode")}
+                    />
+                    <motion.div
+                      whileHover={{ y: -1 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button
+                        type="submit"
+                        disabled={mutation.isPending || !isValid}
+                        className="font-bold w-full"
+                      >
+                        {mutation.isPending ? (
+                          <Spinner
+                            size={20}
+                            className="text-primary-foreground"
+                          />
+                        ) : (
+                          "Daftar Admin"
+                        )}
+                      </Button>
+                    </motion.div>
+                  </fieldset>
+                </form>
+
+                <div className="mt-6 text-center text-sm text-muted-foreground">
+                  Sudah terdaftar?{" "}
+                  <Link
+                    to="/signin"
+                    className="text-primary font-bold hover:underline"
+                  >
+                    Masuk di sini
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </MotionCard>
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

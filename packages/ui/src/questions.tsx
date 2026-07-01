@@ -1,14 +1,14 @@
-import React from "react";
 import BaseLayout from "@repo/ui/layout/base";
-import SectionHeader from "./ui/section_header";
-import { HelpCircle } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@repo/ui/ui/accordion";
+import { HelpCircle } from "lucide-react";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import SectionHeader from "./ui/section_header";
 
 interface FAQItem {
   category: string;

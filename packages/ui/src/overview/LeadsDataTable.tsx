@@ -1,11 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createColumnHelper } from "@tanstack/react-table";
-import dayjs from "dayjs";
-import { Check, Download, Loader2, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
 import { api } from "@repo/lib/api";
-import { cn } from "@repo/lib/utils";
-import { deleteLeadFn, bulkDeleteLeadsFn, exportLeadsFn } from "@repo/services/api.functions";
+import type { ApiErrorResponse } from "@repo/types";
 import { useToast } from "@repo/ui/toast";
 import { Button } from "@repo/ui/ui/button";
 import { DataTable } from "@repo/ui/ui/data-table";
@@ -17,11 +11,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/ui/dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createColumnHelper } from "@tanstack/react-table";
+import dayjs from "dayjs";
+import { Check, Download, Loader2, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
 
-const columnHelper = createColumnHelper<any>();
+const columnHelper = createColumnHelper<Lead>();
+
+interface Lead {
+  id: string;
+  nama: string;
+  branch: string;
+  no_telpon: string;
+  created_at: string;
+  exported_at?: string;
+}
 
 interface LeadsDataTableProps {
-  leads: any[];
+  leads: Lead[];
   serverSearchValue?: string;
   onServerSearchChange?: (val: string) => void;
 }
@@ -37,11 +45,17 @@ export function LeadsDataTable({
 
   const exportVcfMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const resText = await exportLeadsFn({ data: { ids } });
-      return resText;
+      const res = await api.post<Blob>(
+        "/overview/leads/export-vcf",
+        { ids },
+        {
+          responseType: "blob",
+        },
+      );
+      return res.data;
     },
     onSuccess: (blob) => {
-      const url = window.URL.createObjectURL(new Blob([blob], { type: "text/vcard" }));
+      const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", "kontak-pendaftar.vcf");
@@ -53,7 +67,7 @@ export function LeadsDataTable({
       showToast("Berhasil mendownload kontak (.vcf)", "success");
       queryClient.invalidateQueries({ queryKey: ["overview"] });
     },
-    onError: (error: any) => {
+    onError: (error: Error & ApiErrorResponse) => {
       showToast(
         error.response?.data?.message ||
           error.message ||
@@ -65,15 +79,17 @@ export function LeadsDataTable({
 
   const deleteLeadMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await deleteLeadFn({ data: id });
-      return res;
+      const res = await api.delete<{ message: string }>(
+        `/overview/leads/${id}`,
+      );
+      return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: { message: string }) => {
       showToast(data.message, "success");
       queryClient.invalidateQueries({ queryKey: ["overview"] });
       setLeadToDelete(null);
     },
-    onError: (error: any) => {
+    onError: (error: Error & ApiErrorResponse) => {
       showToast(
         error.response?.data?.message || "Gagal menghapus pendaftar",
         "error",
@@ -84,14 +100,17 @@ export function LeadsDataTable({
 
   const bulkDeleteLeadMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const res = await bulkDeleteLeadsFn({ data: { ids } });
-      return res;
+      const res = await api.post<{ message: string }>(
+        "/overview/leads/bulk-delete",
+        { ids },
+      );
+      return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: (data: { message: string }) => {
       showToast(data.message, "success");
       queryClient.invalidateQueries({ queryKey: ["overview"] });
     },
-    onError: (error: any) => {
+    onError: (error: Error & ApiErrorResponse) => {
       showToast(
         error.response?.data?.message || "Gagal menghapus data",
         "error",
@@ -184,7 +203,7 @@ export function LeadsDataTable({
         data={leads || []}
         emptyMessage="Belum ada pendaftar"
         enableSearch
-        searchPlaceholder="Cari nama, branch, no. telepon..."
+        searchPlaceholder="Cari"
         serverSearchValue={serverSearchValue}
         onServerSearchChange={onServerSearchChange}
         enablePagination
@@ -192,22 +211,12 @@ export function LeadsDataTable({
         enableRowSelection
         renderBulkActions={(count, selectedRows, clearSelection) => (
           <>
-            <span
-              className={cn(
-                "text-xs font-semibold px-2 py-0.5 rounded-md",
-                count > 0
-                  ? "text-red-600 bg-red-50"
-                  : "text-slate-400 bg-slate-100",
-              )}
-            >
-              {count} terpilih
-            </span>
             <Button
               onClick={() => {
                 if (
                   confirm(`Anda yakin ingin menghapus ${count} data pendaftar?`)
                 ) {
-                  const ids = selectedRows.map((r: any) => r.id);
+                  const ids = selectedRows.map((r) => r.id);
                   bulkDeleteLeadMutation.mutate(ids, {
                     onSuccess: () => clearSelection(),
                   });
@@ -222,13 +231,11 @@ export function LeadsDataTable({
               ) : (
                 <Trash2 className="w-3 h-3 mr-1.5" />
               )}
-              {bulkDeleteLeadMutation.isPending
-                ? "Menghapus..."
-                : "Hapus Terpilih"}
+              {bulkDeleteLeadMutation.isPending ? "Menghapus..." : "Hapus"}
             </Button>
             <Button
               onClick={() => {
-                const ids = selectedRows.map((r: any) => r.id);
+                const ids = selectedRows.map((r) => r.id);
                 exportVcfMutation.mutate(ids, {
                   onSuccess: () => clearSelection(),
                 });
@@ -270,7 +277,7 @@ export function LeadsDataTable({
             <Button
               variant="outline"
               onClick={() => setLeadToDelete(null)}
-              className="flex-1 rounded-xl h-auto py-2.5 font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border-slate-200"
+              className="flex-1 h-auto py-2.5 font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 border-slate-200"
             >
               Batal
             </Button>
@@ -280,7 +287,7 @@ export function LeadsDataTable({
                 leadToDelete && deleteLeadMutation.mutate(leadToDelete)
               }
               disabled={deleteLeadMutation.isPending}
-              className="flex-1 rounded-xl h-auto py-2.5 font-bold shadow-lg shadow-red-200"
+              className="flex-1 h-auto py-2.5 font-bold shadow-lg shadow-red-200"
             >
               {deleteLeadMutation.isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

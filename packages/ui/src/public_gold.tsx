@@ -1,55 +1,19 @@
-import React from "react";
 import { info } from "@repo/constant/baseInfo";
+import { GROUP_LIST, MEDIA_LIST } from "@repo/constant/company";
 import BaseLayout from "@repo/ui/layout/base";
-import GradientHighlight from "./ui/gradient_highlight";
-import { useTranslation } from "react-i18next";
-import { OptimizedImage } from "./ui/optimized-image";
 import {
+  BadgeDollarSign,
+  RefreshCcw,
   ShieldCheck,
   Smartphone,
   Truck,
   Warehouse,
-  BadgeDollarSign,
-  RefreshCcw,
 } from "lucide-react";
+import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "./ui/card";
-
-const MEDIA_LIST = [
-  {
-    name: "tvOneNews",
-    href: "https://www.tvonenews.com/berita/294721-perusahaan-ini-cetak-rekor-penjualan-74-ton-emas-15-juta-pelanggan-di-asia-tenggara",
-  },
-  {
-    name: "TribunNews",
-    href: "https://jogja.tribunnews.com/2023/06/14/buka-cabang-kelima-di-yogyakarta-public-gold-indonesia-siap-beri-edukasi-investasi-emas",
-  },
-  {
-    name: "RRI",
-    href: "https://rri.co.id/dki-jakarta/bisnis/190451/public-gold-indonesia-hadir-di-bandung-simpan-logam-mulia-lebih-mudah-dan-dekat",
-  },
-  {
-    name: "JPNN",
-    href: "https://www.jpnn.com/news/pertama-di-ri-perusahaan-ini-meluncurkan-atm-gold-beli-emas-lebih-mudah-praktis",
-  },
-];
-
-const GROUP_LIST = [
-  {
-    name: "PG Jewel",
-    href: "https://pgjewel.my/",
-    logo: "https://mypublicgold.com/img/icon/pgjewel.png",
-  },
-  {
-    name: "PG Mall",
-    href: "https://pgmall.my/",
-    logo: "https://mypublicgold.com/img/icon/pg_mall.png",
-  },
-  {
-    name: "Aurora Italia",
-    href: "https://www.auroraitalia.net/",
-    logo: "https://mypublicgold.com/img/icon/aurora_italia.png",
-  },
-];
+import GradientHighlight from "./ui/gradient_highlight";
+import { OptimizedImage } from "./ui/optimized-image";
 
 const FEATURE_ICONS = [
   ShieldCheck,

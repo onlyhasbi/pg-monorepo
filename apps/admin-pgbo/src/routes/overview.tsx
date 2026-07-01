@@ -9,14 +9,14 @@ import { LeadsDataTable } from "@repo/ui/overview/LeadsDataTable";
 import { StatsGrid } from "@repo/ui/overview/StatsGrid";
 import { Button } from "@repo/ui/ui/button";
 import { Card } from "@repo/ui/ui/card";
+import { FullPageLoader } from "@repo/ui/ui/full-page-loader";
 import { OptimizedImage } from "@repo/ui/ui/optimized-image";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import {
   Check,
   Copy,
   ExternalLink,
-  Loader2,
   LogOut,
   Settings,
   Users,
@@ -24,6 +24,11 @@ import {
 import { Suspense, useState } from "react";
 
 export const Route = createFileRoute("/overview")({
+  beforeLoad: ({ context }) => {
+    if (!context.auth?.token) {
+      throw redirect({ to: "/signin" });
+    }
+  },
   loader: async ({ context: { queryClient } }) => {
     return createProtectedLoader({
       queryClient,
@@ -54,9 +59,7 @@ function OverviewPage() {
 
   const [copied, setCopied] = useState(false);
 
-  const { queryClient } = Route.useRouteContext();
   const handleLogout = () => {
-    queryClient.clear();
     logout();
     navigate({ to: "/" });
   };
@@ -75,7 +78,6 @@ function OverviewPage() {
                     alt="Profile"
                     width={56}
                     height={56}
-                    priority={true}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -95,7 +97,7 @@ function OverviewPage() {
               <Button
                 variant="outline"
                 onClick={() => navigate({ to: "/settings" })}
-                className="bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white border-white/20 rounded-xl"
+                className="bg-white/15 hover:bg-white/25 hover:text-white backdrop-blur-sm text-white border-white/20"
               >
                 <Settings className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Pengaturan</span>
@@ -103,7 +105,7 @@ function OverviewPage() {
               <Button
                 variant="outline"
                 onClick={handleLogout}
-                className="bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white border-white/20 rounded-xl"
+                className="bg-white/15 hover:bg-white/25 hover:text-white backdrop-blur-sm text-white border-white/20"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Keluar</span>
@@ -121,7 +123,7 @@ function OverviewPage() {
         />
 
         {/* Quick Link Card */}
-        <Card className="bg-linear-to-r from-red-50 to-rose-50 rounded-2xl border-red-100 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
+        <Card className="bg-linear-to-r from-red-50 to-rose-50 rounded-[var(--radius-card)] border-red-100 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-hidden">
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-slate-700 mb-0.5">
               Link Landing Page Anda
@@ -144,7 +146,7 @@ function OverviewPage() {
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="h-8 w-8 rounded-lg hover:bg-red-100 text-red-400 hover:text-red-600 transition-all duration-200"
+                  className="h-8 w-8 hover:bg-red-100 text-red-400 hover:text-red-600 transition-all duration-200"
                   title="Salin link"
                 >
                   {copied ? (
@@ -168,7 +170,7 @@ function OverviewPage() {
                 : `https://mypublicgold.id/${user.pageid}`;
               window.open(url, "_blank");
             }}
-            className="w-full sm:w-auto h-auto py-2.5 rounded-xl transition-all duration-200 shadow-sm shrink-0"
+            className="w-full sm:w-auto h-auto py-2.5 transition-all duration-200 shadow-sm shrink-0"
           >
             <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" />
             Lihat Halaman
@@ -186,14 +188,5 @@ function OverviewPage() {
 }
 
 function DashboardLoading() {
-  return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="w-10 h-10 text-red-600 animate-spin" />
-        <p className="text-slate-500 text-sm font-medium">
-          Memuat dashboard...
-        </p>
-      </div>
-    </div>
-  );
+  return <FullPageLoader message="Memuat dashboard..." />;
 }

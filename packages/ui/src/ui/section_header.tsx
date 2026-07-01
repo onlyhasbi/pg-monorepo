@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import GradientHighlight from "./gradient_highlight";
 
 type Props = {

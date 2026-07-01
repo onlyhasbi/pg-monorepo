@@ -1,8 +1,8 @@
+import { id } from "@repo/constant/locales/id"; // Synchronously load default language
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import resourcesToBackend from "i18next-resources-to-backend";
-import { id } from "@repo/constant/locales/id"; // Synchronously load default language
+import { initReactI18next } from "react-i18next";
 
 const isServer = typeof window === "undefined";
 

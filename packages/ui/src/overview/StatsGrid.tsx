@@ -1,6 +1,6 @@
-import { MessageCircle, UserPlus, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@repo/lib/utils";
 import { Card, CardContent } from "@repo/ui/ui/card";
+import { type LucideIcon, MessageCircle, UserPlus, Users } from "lucide-react";
 
 interface StatItem {
   label: string;
@@ -55,7 +55,7 @@ export function StatsGrid({
         <Card
           key={stat.label}
           className={cn(
-            "relative rounded-2xl shadow-sm border p-3.5 sm:p-6 overflow-hidden group hover:shadow-md transition-all duration-300",
+            "relative shadow-sm border p-3.5 sm:p-6 overflow-hidden group hover:shadow-md transition-all duration-300",
             stat.accent,
           )}
         >

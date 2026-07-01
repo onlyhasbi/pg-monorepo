@@ -1,11 +1,11 @@
+import { getCloudinarySrcSet, getCloudinaryUrl } from "@repo/lib/images";
 import {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
   type ImgHTMLAttributes,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
-import { getCloudinaryUrl, getCloudinarySrcSet } from "@repo/lib/images";
 
 export type OptimizedImageProps = ImgHTMLAttributes<HTMLImageElement> & {
   src: string;
@@ -72,7 +72,8 @@ export function OptimizedImage(props: OptimizedImageProps) {
 }
 
 function LazyImage(props: OptimizedImageProps) {
-  const { src, className, width, height, aspectRatio, ...rest } = props;
+  const { src, className, priority, width, height, aspectRatio, ...rest } =
+    props;
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -83,7 +84,7 @@ function LazyImage(props: OptimizedImageProps) {
     if (imgRef.current?.complete) {
       setIsLoaded(true);
     }
-  }, [src]);
+  }, []);
 
   const isSvg = src.toLowerCase().endsWith(".svg");
   const isLocal = src.startsWith("/") && !src.startsWith("//");

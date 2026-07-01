@@ -1,9 +1,9 @@
-import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import NotFound from "./components/not_found";
 import {
   createQueryClient,
   queryClient as singletonQueryClient,
 } from "@repo/lib/queryClient";
+import NotFound from "@repo/ui/not_found";
+import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";

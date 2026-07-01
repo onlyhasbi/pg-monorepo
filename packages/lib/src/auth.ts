@@ -1,12 +1,20 @@
-import { parse, serialize } from "cookie";
+import type { QueryClient } from "@tanstack/react-query";
 import { redirect } from "@tanstack/react-router";
+import { parse, serialize } from "cookie";
+import { isApiError } from "./errors";
+import { portalUnlockedOptions } from "./portalOptions";
 import { queryClient } from "./queryClient";
 import { authAdminQueryOptions, authDealerQueryOptions } from "./queryOptions";
-import { portalUnlockedOptions } from "./portalOptions";
+
+/** Minimal shape accepted by `queryClient.ensureQueryData()` — queryKey must be defined. */
+type EnsureQueryConfig = {
+  queryKey: readonly unknown[];
+  [key: string]: unknown;
+};
 
 interface ProtectedLoaderOptions {
-  queryClient: any;
-  extraQueries?: Array<(cookieStr?: string) => any>;
+  queryClient: QueryClient;
+  extraQueries?: Array<(cookieStr?: string) => EnsureQueryConfig>;
   isAdmin?: boolean;
 }
 
@@ -41,8 +49,8 @@ const getAuthCookieString = createIsomorphicFn()
 
 export async function getAuthToken(isAdmin = false, cookieStr?: string) {
   const cookieName = isAdmin ? ADMIN_TOKEN_KEY : TOKEN_KEY;
-  const rawCookies = cookieStr ?? (await getAuthCookieString());
-  const cookies = parse(rawCookies);
+  const rawCookies = cookieStr ?? (await getAuthCookieString()) ?? "";
+  const cookies = parse(rawCookies || "");
   const token = cookies[cookieName] || null;
   return token ? token.replace(/^"|"$/g, "") : null;
 }
@@ -53,6 +61,7 @@ export const setAuthToken = (token: string, isAdmin = false) => {
   const cookieName = isAdmin ? ADMIN_TOKEN_KEY : TOKEN_KEY;
   const cleanToken = token.replace(/^"|"$/g, "");
 
+  // biome-ignore lint/suspicious/noDocumentCookie: Intentional — auth token management requires direct cookie access
   document.cookie = serialize(cookieName, cleanToken, {
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -64,6 +73,7 @@ export const setAuthToken = (token: string, isAdmin = false) => {
 const removeAuthToken = (isAdmin = false) => {
   if (typeof window === "undefined") return;
   const cookieName = isAdmin ? ADMIN_TOKEN_KEY : TOKEN_KEY;
+  // biome-ignore lint/suspicious/noDocumentCookie: Intentional — auth token removal requires direct cookie access
   document.cookie = serialize(cookieName, "", {
     path: "/",
     maxAge: -1,
@@ -102,7 +112,9 @@ export const logout = () => {
           );
         }
       }
-    } catch {}
+    } catch (e) {
+      console.warn("[auth] Cache cleanup failed:", e);
+    }
   }
 };
 
@@ -126,7 +138,7 @@ export const requireGuest = async (
 export const requireAdminGuest = async (cookieStr?: string) => {
   const token = await getAuthToken(true, cookieStr);
   if (token) {
-    throw redirect({ to: "/" });
+    throw redirect({ to: "/", search: { lang: undefined } });
   }
 };
 
@@ -139,7 +151,7 @@ export async function createProtectedLoader({
   extraQueries = [],
   isAdmin = false,
 }: ProtectedLoaderOptions) {
-  let cookieStr = (await getAuthCookieString()) || undefined;
+  const cookieStr = (await getAuthCookieString()) || undefined;
 
   try {
     // 1. Always ensure base auth data is present in cache
@@ -156,9 +168,9 @@ export async function createProtectedLoader({
         ),
       );
     }
-  } catch (e: any) {
-    if (e.status === 401) {
-      throw redirect({ to: "/" });
+  } catch (e: unknown) {
+    if (isApiError(e) && e.status === 401) {
+      throw redirect({ to: "/", search: { lang: undefined } });
     }
     throw e;
   }

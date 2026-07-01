@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/database"
+	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/middleware"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/internal/models"
 	"github.com/onlyhasbi/pg-monorepo/backend-go/pkg/utils"
 )
@@ -306,5 +307,92 @@ func (h *AdminHandler) UpdateSecretCode(c *gin.Context) {
 	database.UpdateSetting(h.DB, "portal_secret_auto_rotate", rotateVal)
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Kode rahasia berhasil diperbarui"})
+}
+
+func (h *AdminHandler) DeletePGBO(c *gin.Context) {
+	id := c.Param("id")
+
+	// Get photo url for cloudinary deletion if needed (omitted for brevity, just like bulk-delete)
+	// Execute deletions
+	_, err := h.DB.Exec("DELETE FROM leads WHERE user_id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal menghapus leads"})
+		return
+	}
+
+	_, err = h.DB.Exec("DELETE FROM analytics WHERE user_id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal menghapus analytics"})
+		return
+	}
+
+	res, err := h.DB.Exec("DELETE FROM users WHERE id = ? AND role = 'pgbo'", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal menghapus PGBO"})
+		return
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Data PGBO tidak ditemukan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Akun PGBO beserta data terkait telah dihapus permanen"})
+}
+
+func (h *AdminHandler) CheckPageID(c *gin.Context) {
+	pageid := utils.SanitizePageId(c.Query("pageid"))
+	if len(pageid) < 3 {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Page ID tidak valid"})
+		return
+	}
+
+	excludeId := c.Query("excludeId")
+
+	query := "SELECT id FROM users WHERE pageid = ?"
+	args := []interface{}{pageid}
+
+	if excludeId != "" {
+		query += " AND id != ?"
+		args = append(args, excludeId)
+	}
+
+	rows, err := h.DB.Query(query, args...)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Server error"})
+		return
+	}
+	defer rows.Close()
+
+	isAvailable := !rows.Next()
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "isAvailable": isAvailable})
+}
+
+func (h *AdminHandler) GetProfile(c *gin.Context) {
+	userClaims, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Akses ditolak"})
+		return
+	}
+	user := userClaims.(*middleware.UserClaims)
+
+	var profile struct {
+		ID        string `json:"id"`
+		Role      string `json:"role"`
+		Email     string `json:"email"`
+		CreatedAt string `json:"created_at"`
+	}
+
+	query := `SELECT id, role, email, created_at FROM users WHERE id = ? AND role = 'admin'`
+	err := h.DB.QueryRow(query, user.ID).Scan(&profile.ID, &profile.Role, &profile.Email, &profile.CreatedAt)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Admin tidak ditemukan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "data": profile})
 }
 

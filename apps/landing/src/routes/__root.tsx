@@ -1,45 +1,43 @@
-import {
-  Outlet,
-  useLocation,
-  useMatches,
-  useNavigate,
-  useRouter,
-  useRouterState,
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
-} from "@tanstack/react-router";
-import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
 import Topbar from "@repo/ui/layout/topbar";
-import { ToastProvider } from "@repo/ui/toast";
-
 import NotFound from "@repo/ui/not_found";
 import { ScrollUnlocker } from "@repo/ui/ScrollUnlocker";
-
-import i18n from "@/i18n";
+import { ToastProvider } from "@repo/ui/toast";
+import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  Scripts,
+  useLocation,
+  useMatches,
+  useRouterState,
+} from "@tanstack/react-router";
+import i18n from "i18next";
+import React from "react";
 import appCss from "@/styles.css?url";
-import deferredCss from "@/styles-deferred.css?url";
 
 const TanStackRouterDevtools = import.meta.env.PROD
   ? () => null
   : React.lazy(() =>
-      import("@tanstack/router-devtools").then((res) => ({
+      import("@tanstack/react-router-devtools").then((res) => ({
         default: res.TanStackRouterDevtools,
       })),
     );
 
-import { getAuthToken } from "@repo/lib/auth";
-
-import { RootError } from "@repo/ui/root_error";
 import { rootHeadConfig } from "@repo/constant/seo";
+import { getAuthToken } from "@repo/lib/auth";
 import { CriticalCss } from "@repo/ui/CriticalCss";
-import { getCloudinaryUrl } from "@repo/lib/images";
+import { RootError } from "@repo/ui/root_error";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
   auth?: { token: string | null; adminToken: string | null };
 }>()({
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      lang: (search.lang as string) || undefined,
+    };
+  },
   beforeLoad: async () => {
     // Determine auth status once at the root level.
     const token = await getAuthToken(false);
@@ -52,7 +50,7 @@ export const Route = createRootRouteWithContext<{
   component: RootComponent,
   notFoundComponent: NotFound,
   errorComponent: RootError,
-  head: () => rootHeadConfig(appCss, getCloudinaryUrl),
+  head: (ctx) => rootHeadConfig(appCss, ctx.match.pathname),
 });
 
 function RootDocument({
@@ -62,6 +60,10 @@ function RootDocument({
   children: React.ReactNode;
   lang: string;
 }) {
+  if (import.meta.env.TEST) {
+    return <div id="test-root-doc">{children}</div>;
+  }
+
   return (
     <html lang={lang}>
       <head>
@@ -70,7 +72,6 @@ function RootDocument({
       </head>
       <body>
         <div id="app">{children}</div>
-        <link rel="stylesheet" href={deferredCss} />
         <Scripts />
       </body>
     </html>
@@ -82,46 +83,32 @@ function RootComponent() {
   const location = useLocation();
   const matches = useMatches();
   const routerState = useRouterState();
-  const navigate = useNavigate();
-  const router = useRouter();
+  const { lang: langParam } = Route.useSearch();
 
   const lang = i18n.language || "id";
+
+  React.useEffect(() => {
+    if (langParam && i18n.language !== langParam) {
+      i18n.changeLanguage(langParam);
+    }
+  }, [langParam]);
 
   const dashboardPaths = ["/register", "/petunjuk", "/legal"];
   const isStandalone =
     dashboardPaths.some((p) => location.pathname.startsWith(p)) ||
     location.pathname === "/";
   const isNotFound =
-    (matches.length === 1 && location.pathname !== "/") ||
-    matches.some((m) => m.status === "notFound") ||
-    routerState.statusCode === 404;
+    ((matches?.length || 0) === 1 && location.pathname !== "/") ||
+    matches?.some((m) => m.status === "notFound") ||
+    routerState?.statusCode === 404;
   const hideTopbar = isStandalone || isNotFound;
-
-  const pgboMatch = matches.find((m) => m.routeId === "/$pgcode");
-  const pgcode = (pgboMatch?.params as any)?.pgcode;
-  const pgbo = (pgboMatch?.loaderData as any)?.pgbo ?? null;
 
   return (
     <QueryClientProvider client={queryClient}>
       <RootDocument lang={lang}>
         <ToastProvider>
           <ScrollUnlocker />
-          {!hideTopbar && (
-            <Topbar
-              pgbo={pgbo}
-              onNavigateLogo={() => {
-                navigate({ to: "/$pgcode", params: { pgcode: pgbo?.pageid || pgcode || "" } });
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              onNavigateRegister={(type) => {
-                window.location.assign(`/register?type=${type}&ref=${pgbo?.pageid || ""}`);
-              }}
-              onHoverRegister={() => {
-                router.preloadRoute({ to: "/register", search: { type: "dewasa", ref: pgbo?.pageid } });
-                router.preloadRoute({ to: "/register", search: { type: "anak", ref: pgbo?.pageid } });
-              }}
-            />
-          )}
+          {!hideTopbar && <Topbar />}
           <main>
             <Outlet />
           </main>

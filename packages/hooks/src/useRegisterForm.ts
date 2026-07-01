@@ -1,27 +1,66 @@
-import { useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { dialCodeOptions } from "@repo/constant/countries";
 import { branchLabelOptions } from "@repo/constant/branches";
-import { extractDataFromNIK, calculateAge } from "@repo/lib/utils";
+import { dialCodeOptions } from "@repo/constant/countries";
 import { formatPhoneForAPI } from "@repo/lib/phone";
+import { calculateAge, extractDataFromNIK } from "@repo/lib/utils";
 import {
   getValidationSchema,
   type RegisterFormData,
 } from "@repo/lib/validations";
-import { registerTrackFn } from "@repo/services/api.functions";
+import {
+  registerTrackFn,
+  submitRegisterFormFn,
+} from "@repo/services/api.functions";
+import type {
+  FormSummaryItem,
+  ReferralData,
+  RegisterTrackPayload,
+} from "@repo/types";
 import { useMutation } from "@tanstack/react-query";
+import { useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-export type FormSummaryItem = {
-  label: string;
-  value: string;
-};
+export type { FormSummaryItem, RegisterFormData };
+
+/**
+ * Sends a fire-and-forget tracking event after successful registration.
+ * Extracted to avoid duplication between redirect and normal success paths.
+ */
+function trackRegistration(
+  values: RegisterFormData,
+  referralData: ReferralData,
+): void {
+  const dialCode = values["label-mobile-dialcode"] || "62";
+  const fullPhone = formatPhoneForAPI(dialCode, values["label-mobile"]);
+  const resolvedBranchLabel =
+    branchLabelOptions[
+      values.upreferredbranch as keyof typeof branchLabelOptions
+    ] ||
+    values.upreferredbranch ||
+    "-";
+
+  const payload: RegisterTrackPayload = {
+    pageid: referralData.pageid,
+    nama: values["label-name"],
+    branch: resolvedBranchLabel,
+    no_telpon: `+${fullPhone}`,
+  };
+
+  registerTrackFn({ data: payload }).catch((err: unknown) =>
+    console.warn("Track failed:", err),
+  );
+}
+
+interface MutationResult {
+  success: boolean;
+  message: string;
+}
 
 export function useRegisterForm(
   isAnak: boolean,
   countryMode: "ID" | "MY" | "INTL",
-  referralData?: any,
+  referralData?: ReferralData,
 ) {
   const { t } = useTranslation();
   const isIndonesia = countryMode === "ID";
@@ -57,7 +96,9 @@ export function useRegisterForm(
   } = useForm<RegisterFormData>({
     mode: "onSubmit",
     reValidateMode: "onSubmit",
-    resolver: valibotResolver(schema) as any,
+    resolver: valibotResolver(schema) as NonNullable<
+      Parameters<typeof useForm<RegisterFormData>>[0]
+    >["resolver"],
     defaultValues: {
       "label-name": "",
       idselect: countryMode === "INTL" ? "passportforeign" : "newic",
@@ -75,7 +116,7 @@ export function useRegisterForm(
     },
   });
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: RegisterFormData) => {
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -104,8 +145,8 @@ export function useRegisterForm(
     const refPgcode = referralData?.pgcode;
     const refName = referralData?.nama_lengkap;
 
-    payload.append("label-intro-pgcode", refPgcode);
-    payload.append("label-intro-name", refName);
+    payload.append("label-intro-pgcode", refPgcode || "");
+    payload.append("label-intro-name", refName || "");
 
     pendingFormData.current = payload.toString();
 
@@ -177,7 +218,7 @@ export function useRegisterForm(
           value: values["label-parent-name"] || "-",
         },
         {
-          label: t("registerForm.idTypeLabel") + " (Parent)",
+          label: `${t("registerForm.idTypeLabel")} (Parent)`,
           value: parentIdTypeLabel,
         },
         {
@@ -225,42 +266,22 @@ export function useRegisterForm(
     return cleaned;
   };
 
-  const registerMutation = useMutation({
+  const registerMutation = useMutation<MutationResult | undefined, Error>({
     mutationFn: async () => {
       if (!pendingFormData.current || !pendingEndpoint.current) return;
 
-      const response = await fetch(pendingEndpoint.current, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: pendingFormData.current,
-        redirect: "manual",
+      const result = await submitRegisterFormFn({
+        data: {
+          endpoint: pendingEndpoint.current,
+          formDataStr: pendingFormData.current,
+        },
       });
 
-      if (
-        response.type === "opaqueredirect" ||
-        (response.status >= 300 && response.status < 400)
-      ) {
-        // Track locally
+      if (result.isRedirect) {
+        // Track registration on redirect success
         const values = getValues();
         if (referralData?.pageid) {
-          const dialCode = values["label-mobile-dialcode"] || "62";
-          const fullPhone = formatPhoneForAPI(dialCode, values["label-mobile"]);
-          const resolvedBranchLabel =
-            branchLabelOptions[
-              values.upreferredbranch as keyof typeof branchLabelOptions
-            ] ||
-            values.upreferredbranch ||
-            "-";
-
-          // MIGRATION: Using TanStack Server Function
-          registerTrackFn({
-            data: {
-              pageid: referralData.pageid,
-              nama: values["label-name"],
-              branch: resolvedBranchLabel,
-              no_telpon: `+${fullPhone}`,
-            },
-          }).catch((err: any) => console.warn("Track failed:", err));
+          trackRegistration(values, referralData);
         }
         return {
           success: true,
@@ -268,13 +289,13 @@ export function useRegisterForm(
         };
       }
 
-      const htmlText = await response.text();
+      const htmlText = result.htmlText;
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlText, "text/html");
       const errorAlert = doc.querySelector(".alert-danger p");
       const successAlert = doc.querySelector(".alert-success p");
 
-      if (errorAlert && errorAlert.textContent) {
+      if (errorAlert?.textContent) {
         throw new Error(errorAlert.textContent.trim());
       }
 
@@ -282,31 +303,14 @@ export function useRegisterForm(
         ? "Terjadi kesalahan pada jaringan."
         : "A network error occurred.";
 
-      if (!response.ok) {
+      if (!result.success) {
         throw new Error(genericError);
       }
 
-      // Track locally for success case
+      // Track registration on normal success
       const values = getValues();
       if (referralData?.pageid) {
-        const dialCode = values["label-mobile-dialcode"] || "62";
-        const fullPhone = formatPhoneForAPI(dialCode, values["label-mobile"]);
-        const resolvedBranchLabel =
-          branchLabelOptions[
-            values.upreferredbranch as keyof typeof branchLabelOptions
-          ] ||
-          values.upreferredbranch ||
-          "-";
-
-        // MIGRATION: Using TanStack Server Function
-        registerTrackFn({
-          data: {
-            pageid: referralData.pageid,
-            nama: values["label-name"],
-            branch: resolvedBranchLabel,
-            no_telpon: `+${fullPhone}`,
-          },
-        }).catch((err: any) => console.warn("Track failed:", err));
+        trackRegistration(values, referralData);
       }
 
       return {
@@ -315,7 +319,7 @@ export function useRegisterForm(
           successAlert?.textContent?.trim() || t("registerForm.successDesc"),
       };
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       if (data?.success) {
         setSuccessMessage(data.message);
         reset();
@@ -324,7 +328,7 @@ export function useRegisterForm(
         setFormKey((prev) => prev + 1);
       }
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       const defaultError = isIndonesia
         ? "Terjadi kesalahan saat mengirim data. Silakan coba lagi."
         : "An error occurred while sending data. Please try again.";

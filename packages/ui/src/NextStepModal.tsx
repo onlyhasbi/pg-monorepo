@@ -1,14 +1,14 @@
 import { useAppNavigate } from "@repo/lib/router-wrappers";
-import { CheckCircle, ArrowRight, Sparkles } from "lucide-react";
-import { Spinner } from "./ui/spinner";
+import { ArrowRight, CheckCircle, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
 } from "./ui/dialog";
-import { Button } from "./ui/button";
-import { useTranslation } from "react-i18next";
+import { Spinner } from "./ui/spinner";
 
 export function NextStepModal({
   refId,
@@ -69,10 +69,12 @@ export function NextStepModal({
           <Button
             type="button"
             size="lg"
-            rounded="xl"
             onClick={() => {
               onClose();
-              window.location.assign(`/petunjuk${refId ? `?ref=${refId}` : ""}`);
+              navigate({
+                to: "/petunjuk",
+                search: refId ? { ref: refId } : {},
+              });
             }}
             className="group w-full gap-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold h-16 shadow-xl shadow-emerald-200/50 hover:shadow-emerald-300/60 border-none"
           >

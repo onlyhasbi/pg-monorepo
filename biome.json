@@ -1,0 +1,59 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "tab",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "useOptionalChain": "warn",
+        "useLiteralKeys": "warn",
+        "noForEach": "off"
+      },
+      "style": {
+        "useImportType": "warn",
+        "useTemplate": "warn",
+        "noNonNullAssertion": "off",
+        "useDefaultParameterLast": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noDocumentCookie": "off",
+        "useIterableCallbackReturn": "off"
+      },
+      "a11y": {
+        "useButtonType": "warn",
+        "useAltText": "warn",
+        "noSvgWithoutTitle": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "warn",
+        "noUnusedVariables": "warn",
+        "noUnusedImports": "error"
+      }
+    }
+  },
+  "files": {
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/.vinxi",
+      "!**/.output",
+      "!**/routeTree.gen.ts",
+      "!**/*.config.ts",
+      "!**/*.config.js"
+    ]
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  }
+}

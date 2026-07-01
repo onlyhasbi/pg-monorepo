@@ -1,25 +1,32 @@
-import { CreditCard, Clock, Wallet, Check, X } from "lucide-react";
-import BaseLayout from "@repo/ui/layout/base";
-import SectionHeader from "./ui/section_header";
-import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { DINAR_COST_TABLE, GOLDBAR_COST_TABLE } from "@repo/constant/products";
 import { agentQueryOptions } from "@repo/lib/queryOptions";
-import { useState } from "react";
-import { Card, CardContent } from "@repo/ui/ui/card";
+import { AppLink as Link } from "@repo/lib/router-wrappers";
+import { cn } from "@repo/lib/utils";
+import BaseLayout from "@repo/ui/layout/base";
 import { Button, buttonVariants } from "@repo/ui/ui/button";
+import { Card, CardContent } from "@repo/ui/ui/card";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@repo/ui/ui/dialog";
-import { cn } from "@repo/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
+import { Check, Clock, CreditCard, Wallet, X } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { PrintingCostTable } from "./ui/printing-cost-table";
+import SectionHeader from "./ui/section_header";
 
 const DISABLED_INDEXES = [2]; // EPP card (index 2) is temporarily disabled
 
-export default function PaymentMethods({ pgbo: propsPgbo }: { pgbo?: any }) {
+export default function PaymentMethods({
+  pgbo: propsPgbo,
+}: {
+  pgbo?: Record<string, unknown>;
+}) {
   const { t } = useTranslation();
   const { pgcode } = useParams({ strict: false }) as { pgcode?: string };
 
@@ -63,9 +70,16 @@ export default function PaymentMethods({ pgbo: propsPgbo }: { pgbo?: any }) {
 
   const defaultStyle = styleConfigs[0];
 
+  interface PaymentMethodItem {
+    title: string;
+    description: string;
+    features: string[];
+    cta: string;
+  }
+
   const itemsData = t("paymentMethods.items", { returnObjects: true });
   const paymentMethods = (Array.isArray(itemsData) ? itemsData : []).map(
-    (method: any, index: number) => {
+    (method: PaymentMethodItem, index: number) => {
       const style = styleConfigs[index] || defaultStyle;
       return {
         ...method,
@@ -139,28 +153,26 @@ export default function PaymentMethods({ pgbo: propsPgbo }: { pgbo?: any }) {
                     {isDisabled ? (
                       <Button
                         disabled
-                        className="w-full h-12 rounded-xl bg-slate-200 text-slate-400 font-bold cursor-not-allowed line-through hover:bg-slate-200"
+                        className="w-full h-12 bg-slate-200 text-slate-400 font-bold cursor-not-allowed line-through hover:bg-slate-200"
                       >
                         {method.cta}
                       </Button>
                     ) : (
-                      <a
-                        href={`/register?type=${method.id === "poe" ? "dewasa" : method.id === "outright" ? "dewasa" : "dewasa"}&ref=${pgbo?.pageid || ""}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          window.location.assign(`/register?type=${method.id === "poe" ? "dewasa" : method.id === "outright" ? "dewasa" : "dewasa"}&ref=${pgbo?.pageid || ""}`);
-                        }}
+                      <Link
+                        to="/register"
+                        search={{ ref: pgbo?.pageid, lang: undefined }}
+                        preload="intent"
                         className={cn(
                           buttonVariants({ variant: "outline" }),
-                          "w-full h-12 rounded-xl font-bold transition-all duration-300 shadow-md",
+                          "w-full h-12 font-bold transition-all duration-300 shadow-md",
                           style.textTheme === "dark"
-                            ? "bg-white text-red-600 hover:shadow-xl hover:!bg-slate-50 border-none"
-                            : "bg-slate-800 text-white hover:shadow-xl hover:-translate-y-1 hover:bg-slate-900 border-none",
+                            ? "bg-slate-900 !text-white hover:shadow-xl hover:-translate-y-1 hover:bg-slate-800 border-none"
+                            : "bg-slate-800 !text-white hover:shadow-xl hover:-translate-y-1 hover:bg-slate-900 border-none",
                           "no-underline",
                         )}
                       >
                         {method.cta}
-                      </a>
+                      </Link>
                     )}
                   </div>
 
@@ -216,94 +228,20 @@ export default function PaymentMethods({ pgbo: propsPgbo }: { pgbo?: any }) {
           <div className="px-6 pb-6 overflow-y-auto">
             <div className="grid md:grid-cols-2 gap-8">
               {/* Tabel Logam Mulia */}
-              <div>
-                <h4 className="font-bold text-slate-800 mb-3 text-lg flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-red-600 rounded-full"></div>
-                  Emas Batangan
-                </h4>
-                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
-                      <tr>
-                        <th className="px-4 py-3 font-semibold">Gramasi</th>
-                        <th className="px-4 py-3 font-semibold text-right">
-                          Biaya Cetak
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {[
-                        { weight: "0.5g", cost: "52.500" },
-                        { weight: "1g", cost: "52.500" },
-                        { weight: "5g", cost: "30.000" },
-                        { weight: "10g", cost: "45.000" },
-                        { weight: "20g", cost: "70.000" },
-                        { weight: "50g", cost: "120.000" },
-                        { weight: "100g", cost: "210.000" },
-                      ].map((item, i) => (
-                        <tr
-                          key={i}
-                          className="hover:bg-slate-50/50 transition-colors"
-                        >
-                          <td className="px-4 py-3 font-medium text-slate-700">
-                            {item.weight}
-                          </td>
-                          <td className="px-4 py-3 text-right text-slate-600 font-medium whitespace-nowrap">
-                            Rp {item.cost}{" "}
-                            <span className="text-xs font-normal text-slate-400">
-                              / pcs
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <PrintingCostTable
+                title="Emas Batangan"
+                columnHeader="Gramasi"
+                accentColor="bg-red-600"
+                data={GOLDBAR_COST_TABLE}
+              />
 
               {/* Tabel Dinar */}
-              <div>
-                <h4 className="font-bold text-slate-800 mb-3 text-lg flex items-center gap-2">
-                  <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
-                  Emas Dinar
-                </h4>
-                <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
-                      <tr>
-                        <th className="px-4 py-3 font-semibold">Jenis</th>
-                        <th className="px-4 py-3 font-semibold text-right">
-                          Biaya Cetak
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {[
-                        { weight: "¼ Dinar (1.0625g)", cost: "70.000" },
-                        { weight: "½ Dinar (2.125g)", cost: "30.000" },
-                        { weight: "1 Dinar (4.25g)", cost: "30.000" },
-                        { weight: "5 Dinar (21.25g)", cost: "70.000" },
-                        { weight: "10 Dinar (42.5g)", cost: "120.000" },
-                      ].map((item, i) => (
-                        <tr
-                          key={i}
-                          className="hover:bg-slate-50/50 transition-colors"
-                        >
-                          <td className="px-4 py-3 font-medium text-slate-700">
-                            {item.weight}
-                          </td>
-                          <td className="px-4 py-3 text-right text-slate-600 font-medium whitespace-nowrap">
-                            Rp {item.cost}{" "}
-                            <span className="text-xs font-normal text-slate-400">
-                              / pcs
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <PrintingCostTable
+                title="Emas Dinar"
+                columnHeader="Jenis"
+                accentColor="bg-amber-500"
+                data={DINAR_COST_TABLE}
+              />
             </div>
 
             <div className="mt-6 bg-blue-50 text-blue-800 p-4 rounded-xl text-sm leading-relaxed border border-blue-100 flex items-start gap-3">

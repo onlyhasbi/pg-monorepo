@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ImageCropperProps {
   imageSrc: string;
@@ -166,11 +166,13 @@ export function ImageCropper({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in">
+      <div className="bg-card rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in">
         {/* Header */}
         <div className="px-5 pt-5 pb-3">
-          <h3 className="text-lg font-bold text-gray-900">Atur Foto Profil</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h3 className="text-lg font-bold text-foreground">
+            Atur Foto Profil
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Geser dan zoom untuk mengatur posisi gambar
           </p>
         </div>
@@ -184,7 +186,7 @@ export function ImageCropper({
               width: CANVAS_SIZE,
               height: CANVAS_SIZE,
               background:
-                "repeating-conic-gradient(#e5e7eb 0% 25%, #f9fafb 0% 50%) 50% / 20px 20px",
+                "repeating-conic-gradient(var(--border) 0% 25%, var(--muted) 0% 50%) 50% / 20px 20px",
             }}
           >
             <canvas
@@ -206,7 +208,7 @@ export function ImageCropper({
             <button
               type="button"
               onClick={() => setZoom((z) => Math.max(z - 0.1, 0.5))}
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition text-lg font-bold shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-[var(--radius-input)] bg-muted hover:bg-accent text-muted-foreground transition text-lg font-bold shrink-0 cursor-pointer"
               aria-label="Zoom out"
             >
               −
@@ -219,42 +221,42 @@ export function ImageCropper({
                 step="0.01"
                 value={zoom}
                 onChange={(e) => setZoom(parseFloat(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-yellow-500
+                className="w-full h-2 bg-muted rounded-full appearance-none cursor-pointer accent-primary
                   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5
-                  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-yellow-500 [&::-webkit-slider-thumb]:shadow-md
+                  [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-md
                   [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white
-                  [&::-webkit-slider-thumb]:hover:bg-yellow-600 [&::-webkit-slider-thumb]:transition"
+                  [&::-webkit-slider-thumb]:hover:bg-primary/90 [&::-webkit-slider-thumb]:transition"
               />
             </div>
             <button
               type="button"
               onClick={() => setZoom((z) => Math.min(z + 0.1, 3))}
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition text-lg font-bold shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-[var(--radius-input)] bg-muted hover:bg-accent text-muted-foreground transition text-lg font-bold shrink-0 cursor-pointer"
               aria-label="Zoom in"
             >
               +
             </button>
           </div>
-          <p className="text-center text-xs text-gray-400 mt-2">
+          <p className="text-center text-xs text-muted-foreground mt-2">
             {Math.round(zoom * 100)}% · Scroll mouse atau pinch untuk zoom
           </p>
         </div>
 
         {/* Actions */}
-        <div className="flex border-t border-gray-100">
+        <div className="flex border-t border-border/60">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-3.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition"
+            className="flex-1 py-3.5 text-sm font-semibold text-muted-foreground hover:bg-accent transition cursor-pointer"
           >
             Batal
           </button>
-          <div className="w-px bg-gray-100" />
+          <div className="w-px bg-border/60" />
           <button
             type="button"
             onClick={handleCrop}
             disabled={isCropping || !img}
-            className="flex-1 py-3.5 text-sm font-semibold text-yellow-600 hover:bg-yellow-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3.5 text-sm font-semibold text-primary hover:bg-primary/10 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isCropping ? "Memproses..." : "Terapkan"}
           </button>

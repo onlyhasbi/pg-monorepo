@@ -1,9 +1,8 @@
-import { useSuspenseQuery, useQuery } from "@tanstack/react-query";
-import i18n from "@/i18n";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
 
-import { Suspense, lazy, useEffect, useRef, useMemo } from "react";
+import { lazy, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 const Benefit = lazy(() => import("@repo/ui/benefit"));
@@ -19,28 +18,29 @@ const MovingCards = lazy(() =>
   })),
 );
 
-import Header from "@repo/ui/header";
-import NotFound from "@repo/ui/not_found";
-import { RootError } from "@repo/ui/root_error";
-import GradientHighlight from "@repo/ui/ui/gradient_highlight";
+import { useLazyInteraction } from "@repo/hooks/useLazyInteraction";
 import { trackEvent } from "@repo/lib/analytics";
+import {
+  getCloudinarySrcSet,
+  getCloudinaryUrl,
+  HERO_IMAGE_CONFIG,
+} from "@repo/lib/images";
 import {
   agentQueryOptions,
   goldPricesQueryOptions,
 } from "@repo/lib/queryOptions";
-
-import {
-  getCloudinaryUrl,
-  getCloudinarySrcSet,
-  HERO_IMAGE_CONFIG,
-} from "@repo/lib/images";
-import { useLazyInteraction } from "@repo/hooks/useLazyInteraction";
-import { useSEO } from "@repo/hooks/useSEO";
+import Header from "@repo/ui/header";
+import NotFound from "@repo/ui/not_found";
+import { RootError } from "@repo/ui/root_error";
+import GradientHighlight from "@repo/ui/ui/gradient_highlight";
 import { LazySection } from "@repo/ui/ui/lazy-section";
-import { AgentLandingSkeleton } from "@repo/ui/agent-landing-skeleton";
-import { SectionSkeleton } from "@repo/ui/ui/section-skeleton";
 
-function LandingContent({ pgcode }: { pgcode: string }) {
+function App() {
+  const { pgcode } = Route.useParams();
+
+  // If we're transitioning out, pgcode might be undefined
+  if (!pgcode) return null;
+
   const { data: pgbo } = useSuspenseQuery(agentQueryOptions(pgcode));
 
   // LAZY FETCH: Trigger gold prices only after human interaction for LCP Optimization
@@ -52,12 +52,6 @@ function LandingContent({ pgcode }: { pgcode: string }) {
 
   const { t } = useTranslation();
   const scrollBtnRef = useRef<HTMLButtonElement>(null);
-
-  const displayName = pgbo?.nama_panggilan || "Authorized Dealer";
-  useSEO({
-    title: `${displayName} - ${t("seo.agentTitleSuffix")}`,
-    description: t("seo.agentDescription"),
-  });
 
   // Memoize heavy arrays to prevent <MovingCards> from unnecessary re-renders
   const testimonialItems = useMemo(
@@ -138,25 +132,25 @@ function LandingContent({ pgcode }: { pgcode: string }) {
       </section>
 
       <section id="advantage" className="scroll-mt-20">
-        <LazySection minHeight="400px" fallback={<SectionSkeleton type="grid" cardCount={6} />}>
+        <LazySection minHeight="400px">
           <Benefit />
         </LazySection>
       </section>
 
       <section id="public-gold" className="scroll-mt-20">
-        <LazySection minHeight="500px" fallback={<SectionSkeleton type="grid" cardCount={2} />}>
+        <LazySection minHeight="500px">
           <PublicGold />
         </LazySection>
       </section>
 
       <section id="products" className="scroll-mt-20">
-        <LazySection minHeight="600px" fallback={<SectionSkeleton type="price" />}>
+        <LazySection minHeight="600px">
           <PriceList price={goldPrices ?? undefined} pgbo={pgbo} />
         </LazySection>
       </section>
 
       <section id="excellence" className="scroll-mt-20">
-        <LazySection minHeight="600px" fallback={<SectionSkeleton type="grid" cardCount={3} />}>
+        <LazySection minHeight="600px">
           <PaymentMethods pgbo={pgbo} />
           <Excellence />
         </LazySection>
@@ -197,7 +191,7 @@ function LandingContent({ pgcode }: { pgcode: string }) {
       </LazySection>
 
       <section id="contact" className="scroll-mt-20">
-        <LazySection minHeight="400px" fallback={<SectionSkeleton type="grid" cardCount={1} />}>
+        <LazySection minHeight="400px">
           <CallToAction pgbo={pgbo} />
         </LazySection>
       </section>
@@ -224,30 +218,17 @@ function LandingContent({ pgcode }: { pgcode: string }) {
   );
 }
 
-function App() {
-  const { pgcode } = Route.useParams();
-
-  // If we're transitioning out, pgcode might be undefined
-  if (!pgcode) return null;
-
-  return (
-    <Suspense fallback={<AgentLandingSkeleton />}>
-      <LandingContent pgcode={pgcode} />
-    </Suspense>
-  );
-}
-
 export const Route = createFileRoute("/$pgcode")({
   component: App,
-  pendingComponent: AgentLandingSkeleton,
   loader: async ({ params, context }) => {
     try {
       const data = await context.queryClient.ensureQueryData(
         agentQueryOptions(params.pgcode),
       );
       return { pgbo: data };
-    } catch (err: any) {
-      if (err.status === 404 || err.response?.status === 404) {
+    } catch (err: unknown) {
+      const error = err as { status?: number; response?: { status?: number } };
+      if (error.status === 404 || error.response?.status === 404) {
         throw notFound();
       }
       throw err;
@@ -258,16 +239,14 @@ export const Route = createFileRoute("/$pgcode")({
     if (!pgbo) return {};
 
     const displayName = pgbo.nama_panggilan || "Authorized Dealer";
-    const title = `${displayName} - ${i18n.t("seo.agentTitleSuffix")}`;
-    const description = i18n.t("seo.agentDescription");
-    
-    // Use siteUrl from constants to avoid double hardcoding
-    const siteUrl = "https://mypublicgold.id";
+    const title = `${displayName} - Konsultan Emas Public Gold Indonesia`;
+    const description = `Amankan masa depan keluarga dengan tabungan emas bersama Public Gold Indonesia`;
+    // Use JPG format explicitly for WhatsApp/SEO Compatibility
     const image = getCloudinaryUrl(pgbo.foto_profil_url, {
       width: 800,
       format: "jpg",
     });
-    const url = `${siteUrl}/${pgbo.pageid}`;
+    const url = `https://mypublicgold.id/${pgbo.pageid}`;
 
     return {
       meta: [

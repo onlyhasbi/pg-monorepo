@@ -1,7 +1,6 @@
-/// <reference lib="dom" />
-import React, { useState, useEffect, Suspense } from "react";
-import { useInView } from "react-intersection-observer";
 import { cn } from "@repo/lib/utils";
+import React, { Suspense, useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 
 interface LazySectionProps {
   children: React.ReactNode;
@@ -41,10 +40,10 @@ export const LazySection = React.memo(
 
       // Defer to idle time so we don't add to TBT during hydration
       if (typeof window !== "undefined" && "requestIdleCallback" in window) {
-        const id = (window as any).requestIdleCallback(() => setShouldRender(true), {
+        const id = requestIdleCallback(() => setShouldRender(true), {
           timeout: 150,
         });
-        return () => (window as any).cancelIdleCallback(id);
+        return () => cancelIdleCallback(id);
       }
       // Fallback for Safari: use setTimeout with small delay
       const timer = setTimeout(() => setShouldRender(true), 50);
@@ -55,7 +54,9 @@ export const LazySection = React.memo(
       <div
         ref={ref}
         className={cn("w-full", className)}
-        style={{ minHeight }}
+        style={{
+          minHeight: !shouldRender ? minHeight : undefined,
+        }}
       >
         {shouldRender ? (
           <Suspense fallback={fallback}>{children}</Suspense>

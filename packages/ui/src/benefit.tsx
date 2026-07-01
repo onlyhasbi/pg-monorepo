@@ -1,16 +1,16 @@
-import React from "react";
+import BaseLayout from "@repo/ui/layout/base";
+import { Card, CardContent } from "@repo/ui/ui/card";
 import {
-  WalletMinimal,
+  Banknote,
+  Earth,
   HandCoins,
   ShieldCheck,
-  Banknote,
   Users,
-  Earth,
+  WalletMinimal,
 } from "lucide-react";
-import BaseLayout from "@repo/ui/layout/base";
-import SectionHeader from "./ui/section_header";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent } from "@repo/ui/ui/card";
+import SectionHeader from "./ui/section_header";
 
 function Benefit() {
   const { t } = useTranslation();

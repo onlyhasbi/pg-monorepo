@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -9,9 +9,9 @@ export const extractDataFromNIK = (nik: string) => {
   if (nik.length < 12) return { validFormat: false };
 
   // DDMMYY (dari digit ke-7 sampai 12)
-  let day = parseInt(nik.substring(6, 8));
-  const month = parseInt(nik.substring(8, 10));
-  const year = parseInt(nik.substring(10, 12));
+  let day = parseInt(nik.substring(6, 8), 10);
+  const month = parseInt(nik.substring(8, 10), 10);
+  const year = parseInt(nik.substring(10, 12), 10);
 
   const gender = day > 40 ? "Perempuan" : "Laki-laki";
   if (day > 40) day -= 40;

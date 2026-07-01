@@ -1,24 +1,16 @@
+import { trackEvent } from "@repo/lib/analytics";
+import { getWhatsAppLink } from "@repo/lib/contact";
+import { agentQueryOptions } from "@repo/lib/queryOptions";
 import { cn } from "@repo/lib/utils";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import type { PgboData } from "@repo/types";
 import BaseLayout from "@repo/ui/layout/base";
-import { useTranslation } from "react-i18next";
+import { buttonVariants } from "@repo/ui/ui/button";
+import { Card, CardContent } from "@repo/ui/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import { agentQueryOptions } from "@repo/lib/queryOptions";
-import { trackEvent } from "@repo/lib/analytics";
-import { buttonVariants } from "@repo/ui/ui/button";
-import { getWhatsAppLink } from "@repo/lib/contact";
-import { Card, CardContent } from "@repo/ui/ui/card";
+import { ArrowRight, MessageCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { OptimizedImage } from "./ui/optimized-image";
-
-interface PgboData {
-  foto_profil_url?: string | null;
-  nama_lengkap?: string | null;
-  no_telpon?: string | null;
-  link_group_whatsapp?: string | null;
-  pgcode?: string | null;
-  [key: string]: any;
-}
 
 export default function CallToAction({ pgbo: propsPgbo }: { pgbo?: PgboData }) {
   const { t } = useTranslation();
@@ -58,9 +50,9 @@ export default function CallToAction({ pgbo: propsPgbo }: { pgbo?: PgboData }) {
               {/* Photo Section */}
               <div className="lg:w-1/3 flex justify-center">
                 <div className="relative w-40 h-40 md:w-48 md:h-48">
-                  {/* Pulse ripple rings (Pure CSS Deferred Animation) */}
-                  <span className="absolute inset-0 rounded-full border-[3px] border-white/60 opacity-0 animate-[pg-ripple_2s_ease-out_2s_infinite]" />
-                  <span className="absolute inset-0 rounded-full border-[3px] border-white/40 opacity-0 animate-[pg-ripple_2s_ease-out_2.8s_infinite]" />
+                  {/* Pulse ripple rings — reuse pg-ripple from CriticalCss */}
+                  <span className="absolute inset-0 rounded-full border-[3px] border-white/60 opacity-40 animate-[pg-ripple_2s_ease-out_infinite]" />
+                  <span className="absolute inset-0 rounded-full border-[3px] border-white/40 opacity-30 animate-[pg-ripple_2s_ease-out_0.8s_infinite]" />
 
                   {/* Photo */}
                   {hasPhoto ? (

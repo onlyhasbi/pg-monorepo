@@ -17,11 +17,7 @@ export function getWhatsAppLink(
   preferGroup: boolean = false,
 ): string {
   // 1. WhatsApp Group Link (ONLY if preferGroup is true)
-  if (
-    preferGroup &&
-    data?.link_group_whatsapp &&
-    data.link_group_whatsapp.trim().startsWith("http")
-  ) {
+  if (preferGroup && data?.link_group_whatsapp?.trim().startsWith("http")) {
     return data.link_group_whatsapp.trim();
   }
 

@@ -16,7 +16,7 @@ export const signupSchema = v.object({
     v.string(),
     v.nonEmpty("Page ID wajib diisi"),
     v.regex(
-      /^[a-zA-Z0-9_\-]+$/,
+      /^[a-zA-Z0-9_-]+$/,
       "Hanya alfabet, angka, underscore (_), atau strip (-) yang diperbolehkan",
     ),
   ),

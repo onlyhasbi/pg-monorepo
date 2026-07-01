@@ -4,16 +4,10 @@
 
 const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 
-export interface CloudinaryOptions {
-  width?: number;
-  priority?: boolean;
-  format?: string;
-}
+import type { CloudinaryOptions } from "@repo/types/images";
 
-export const HERO_IMAGE_CONFIG = {
-  width: 400,
-  sizes: "(max-width: 768px) 256px, 320px",
-};
+export { HERO_IMAGE_CONFIG } from "@repo/constant/images";
+export type { CloudinaryOptions };
 
 /**
  * Generates a Cloudinary URL with transformations based on the source and options.
@@ -46,9 +40,9 @@ export function getCloudinaryUrl(src: string, options: CloudinaryOptions = {}) {
     return src;
   }
 
-  // Force explicit format (default to auto for dynamic format selection based on browser)
+  // Force explicit format (default to AVIF for extreme compression if not SEO)
   // SVGs are skipped to preserve vector elasticity
-  const transformations = isSvg ? [] : [format ? `f_${format}` : "f_auto"];
+  const transformations = isSvg ? [] : [format ? `f_${format}` : "f_avif"];
 
   transformations.push(priority ? "q_auto" : "q_auto:eco");
   if (!priority) {
@@ -64,7 +58,7 @@ export function getCloudinaryUrl(src: string, options: CloudinaryOptions = {}) {
 
   // Case 1: YouTube
   const ytMatch = src.match(/(?:ytimg\.com|youtube\.com)\/vi\/([^/]+)/);
-  if (ytMatch && ytMatch[1]) {
+  if (ytMatch?.[1]) {
     return `https://res.cloudinary.com/${CLOUD_NAME}/image/youtube/${transformations.join(",")}/${ytMatch[1]}.jpg`;
   }
 
@@ -112,19 +106,9 @@ export function getCloudinarySrcSet(
 
   // If we know the target width (e.g. for a logo), generate 1x, 2x, 3x versions
   // to avoid downloading massive 1600px versions for a 200px image.
-  // Generate more granular sizes to satisfy PageSpeed Insights "Properly size images"
-  // If the browser needs 445px, providing 500w saves bandwidth compared to forcing 800w.
   const widths = maxWidth
-    ? [
-        Math.round(maxWidth * 0.5),
-        Math.round(maxWidth * 0.75),
-        maxWidth,
-        Math.round(maxWidth * 1.25),
-        Math.round(maxWidth * 1.5),
-        maxWidth * 2,
-        maxWidth * 3,
-      ].filter((w) => w <= 2000 && w >= 100)
-    : [300, 400, 500, 600, 800, 1024, 1200, 1600];
+    ? [maxWidth, maxWidth * 2, maxWidth * 3].filter((w) => w <= 2000)
+    : [400, 800, 1200, 1600];
 
   return widths
     .map((w) => `${getCloudinaryUrl(src, { ...rest, width: w })} ${w}w`)

@@ -1,12 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { OptimizedImage } from "@repo/ui/ui/optimized-image";
+import { createFileRoute } from "@tanstack/react-router";
 
 const ADMIN_PGBO_URL = import.meta.env.DEV
   ? "http://localhost:3003/signin"
-  : "https://pgbo.mypublicgold.id/signin";
+  : "https://admin.mypublicgold.id/signin";
 
 export const Route = createFileRoute("/")({
   component: LandingHomePage,
+  head: () => ({
+    meta: [{ name: "robots", content: "noindex, nofollow" }],
+  }),
 });
 
 function LandingHomePage() {
@@ -28,10 +31,10 @@ function LandingHomePage() {
             <OptimizedImage
               src="https://mypublicgold.com/5g/logo/logo_gold.png"
               alt="5G Associates"
-              width={50}
-              height={50}
+              width={72}
+              height={72}
               priority
-              className="w-16 h-16 sm:w-18 sm:h-18 object-contain"
+              className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
             />
           </div>
         </a>

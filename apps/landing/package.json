@@ -6,17 +6,18 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "vite start"
+    "start": "vite start",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^0.9.0",
+    "@repo/ui": "workspace:*",
     "@repo/config": "workspace:*",
-    "@repo/constant": "workspace:*",
-    "@repo/hooks": "workspace:*",
     "@repo/lib": "workspace:*",
+    "@repo/hooks": "workspace:*",
     "@repo/schemas": "workspace:*",
+    "@repo/constant": "workspace:*",
     "@repo/services": "workspace:*",
-    "@repo/types": "workspace:*",
-    "@repo/ui": "workspace:*"
+    "@repo/types": "workspace:*"
   }
 }

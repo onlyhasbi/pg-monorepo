@@ -11,7 +11,7 @@ interface SEOOptions {
   description?: string;
   image?: string;
   url?: string;
-  jsonLd?: Record<string, any>;
+  jsonLd?: Record<string, unknown>;
   preloadImages?: PreloadImage[];
 }
 
@@ -85,12 +85,12 @@ export function useSEO({
       preloadImages.forEach((img) => {
         const link = document.createElement("link");
         link.rel = "preload";
-        link.as = "image";
+        link.setAttribute("as", "image");
         link.href = img.src;
         link.setAttribute("fetchpriority", "high");
         link.setAttribute("data-dynamic", "true");
-        if (img.srcSet) link.imageSrcset = img.srcSet;
-        if (img.sizes) link.imageSizes = img.sizes;
+        if (img.srcSet) link.setAttribute("imagesrcset", img.srcSet);
+        if (img.sizes) link.setAttribute("imagesizes", img.sizes);
         document.head.appendChild(link);
       });
     }

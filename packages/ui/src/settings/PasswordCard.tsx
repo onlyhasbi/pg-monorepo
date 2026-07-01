@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { KeyRound, Eye, EyeOff } from "lucide-react";
+import { cn } from "@repo/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/ui/card";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
-import { cn } from "@repo/lib/utils";
+import { Eye, EyeOff, KeyRound } from "lucide-react";
+import { useState } from "react";
 import type {
-  UseFormRegister,
   FieldErrors,
+  UseFormRegister,
   UseFormWatch,
 } from "react-hook-form";
 
@@ -24,7 +24,7 @@ export function PasswordCard({ register, errors, watch }: PasswordCardProps) {
   const passwordBaru = watch("katasandi_baru");
 
   return (
-    <Card className="rounded-2xl shadow-sm border-slate-100 overflow-hidden bg-white">
+    <Card className="shadow-sm border-slate-100 overflow-hidden bg-white">
       <CardHeader className="px-5 sm:px-6 py-4 border-b border-slate-100">
         <CardTitle className="text-sm sm:text-base font-bold text-slate-800 flex items-center gap-2">
           <KeyRound className="w-4 h-4 text-red-600" />

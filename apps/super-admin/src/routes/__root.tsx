@@ -1,31 +1,29 @@
-import {
-  Outlet,
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
-} from "@tanstack/react-router";
-import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
-import { ToastProvider } from "@repo/ui/toast";
-
 import NotFound from "@repo/ui/not_found";
 import { ScrollUnlocker } from "@repo/ui/ScrollUnlocker";
-
+import { ToastProvider } from "@repo/ui/toast";
+import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  Scripts,
+} from "@tanstack/react-router";
 import i18n from "i18next";
+import React from "react";
 import appCss from "@/styles.css?url";
 
 const TanStackRouterDevtools = import.meta.env.PROD
   ? () => null
   : React.lazy(() =>
-      import("@tanstack/router-devtools").then((res) => ({
+      import("@tanstack/react-router-devtools").then((res) => ({
         default: res.TanStackRouterDevtools,
       })),
     );
 
+import { rootHeadConfig } from "@repo/constant/seo";
 import { getAuthToken } from "@repo/lib/auth";
-
-import { RootError } from "@repo/ui/root_error";
 import { CriticalCss } from "@repo/ui/CriticalCss";
+import { RootError } from "@repo/ui/root_error";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -43,18 +41,7 @@ export const Route = createRootRouteWithContext<{
   component: RootComponent,
   notFoundComponent: NotFound,
   errorComponent: RootError,
-  head: () => ({
-    meta: [
-      { charSet: "UTF-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1.0" },
-      { title: "Super Admin - Public Gold" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/svg+xml", href: "/logo.svg" },
-    ],
-  }),
+  head: () => rootHeadConfig(appCss),
 });
 
 function RootDocument({
@@ -64,6 +51,10 @@ function RootDocument({
   children: React.ReactNode;
   lang: string;
 }) {
+  if (import.meta.env.TEST) {
+    return <div id="test-root-doc">{children}</div>;
+  }
+
   return (
     <html lang={lang}>
       <head>

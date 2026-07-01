@@ -1,13 +1,11 @@
-import { queryOptions } from "@tanstack/react-query";
-import { queryClient } from "./queryClient";
 import {
   getAdminProfileFn,
   getAgentData,
-  getAgentsFn,
   getGoldPricesFn,
   getOverviewFn,
   getSettingsFn,
 } from "@repo/services/api.functions";
+import { queryOptions } from "@tanstack/react-query";
 
 /**
  * Query Options for Agent Data (PGBO)
@@ -20,20 +18,7 @@ export const agentQueryOptions = (pgcode: string) =>
       const res = await getAgentData({ data: pgcode });
       return res.data;
     },
-    staleTime: 5 * 60 * 1000,
-  });
-
-export const agentsListQueryOptions = () =>
-  queryOptions({
-    queryKey: ["agents"],
-    queryFn: async () => {
-      const res = await getAgentsFn();
-      return res.data as Array<{
-        pageid: string;
-        nama_panggilan: string | null;
-        foto_profil_url: string | null;
-      }>;
-    },
+    staleTime: 0,
   });
 
 /**
@@ -71,21 +56,33 @@ export const overviewQueryOptions = (search?: string, cookieStr?: string) =>
   });
 
 /**
- * Query Options for Dealer Profile/Settings
- * Consolidated as the Single Source of Truth for all dealer profile data.
- * Both settings and auth now share the exact same structure: { user, token }.
+ * Query Options for User Settings (Dealer)
  */
 export const settingsQueryOptions = (cookieStr?: string) =>
   queryOptions({
-    queryKey: ["dealer", "profile"],
+    queryKey: ["settings"],
     queryFn: async () => {
       const res = await getSettingsFn({ data: { cookieStr } });
-      return { user: res.data, token: null };
+      return res.data;
+    },
+  });
+
+/**
+ * AUTH PROFILE QUERIES
+ * We use staleTime: Infinity to ensure the profile is fetched once and cached.
+ * Stride: These queries store { user, token }.
+ * If the cache is empty, we only fetch the user as the token is credentials.
+ */
+
+export const authDealerQueryOptions = (cookieStr?: string) =>
+  queryOptions({
+    queryKey: ["auth", "dealer"],
+    queryFn: async () => {
+      const res = await getSettingsFn({ data: { cookieStr } });
+      return { user: res.data, token: null }; // Token is usually primed via setQueryData
     },
     staleTime: Infinity,
   });
-
-export const authDealerQueryOptions = settingsQueryOptions;
 
 export const authAdminQueryOptions = (cookieStr?: string) =>
   queryOptions({
