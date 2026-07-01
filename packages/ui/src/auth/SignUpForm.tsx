@@ -151,13 +151,13 @@ export function SignUpForm({
     },
   });
 
-  const fetchIntroducerName = async (pgcode: string) => {
+  const fetchIntroducerName = async (pgcode: string): Promise<boolean> => {
     if (isPgcodeValid || !pgcode || pgcode.length < 5) {
       if (!pgcode || pgcode.length < 5) {
         setNamaLengkap(null);
         setIsPgcodeValid(false);
       }
-      return;
+      return isPgcodeValid;
     }
     setIsVerifyingPgcode(true);
     try {
@@ -177,13 +177,16 @@ export function SignUpForm({
       if (data.success && data.name) {
         setNamaLengkap(data.name.trim());
         setIsPgcodeValid(true);
+        return true;
       } else {
         setNamaLengkap(null);
         setIsPgcodeValid(false);
+        return false;
       }
     } catch {
       setNamaLengkap(null);
       setIsPgcodeValid(false);
+      return false;
     } finally {
       setIsVerifyingPgcode(false);
     }
@@ -200,7 +203,43 @@ export function SignUpForm({
     }
   };
 
-  const onSubmit = (data: SignUpFormValues) => {
+  const onSubmit = async (data: SignUpFormValues) => {
+    if (isVerifyingPgcode || isVerifyingPageId) {
+      showToast("Sedang memverifikasi data, mohon tunggu sebentar...", "info");
+      return;
+    }
+
+    let currentPgcodeValid = isPgcodeValid;
+    if (!currentPgcodeValid && data.pgcode.length >= 5) {
+      currentPgcodeValid = await fetchIntroducerName(data.pgcode);
+    }
+
+    if (!currentPgcodeValid) {
+      showToast("PGCode tidak valid atau tidak ditemukan", "error");
+      return;
+    }
+
+    let currentPageIdValid = isPageIdValid;
+    if (!currentPageIdValid && data.pageid.length >= 3) {
+      setIsVerifyingPageId(true);
+      const isAvailable = await checkPageId(data.pageid);
+      setIsVerifyingPageId(false);
+      if (!isAvailable) {
+        setPageIdError("Taken");
+        setIsPageIdValid(false);
+        currentPageIdValid = false;
+      } else {
+        setPageIdError(null);
+        setIsPageIdValid(true);
+        currentPageIdValid = true;
+      }
+    }
+
+    if (!currentPageIdValid || !!pageIdError) {
+      showToast("Page ID tidak valid atau sudah digunakan", "error");
+      return;
+    }
+
     let finalPhone = data.no_telpon || "";
     if (data.no_telpon) {
       const cleanPhone = data.no_telpon.replace(/^0+/, "");
@@ -248,7 +287,7 @@ export function SignUpForm({
                   const value = e.target.value;
                   const sanitized = value.replace(/[^a-zA-Z0-9]/g, "");
                   if (value !== sanitized)
-                    signupForm.setValue("pgcode", sanitized);
+                    signupForm.setValue("pgcode", sanitized, { shouldValidate: true });
                   if (isPgcodeValid) {
                     setIsPgcodeValid(false);
                     setNamaLengkap(null);
@@ -304,7 +343,7 @@ export function SignUpForm({
                     const value = e.target.value;
                     const sanitized = value.replace(/[^0-9]/g, "");
                     if (value !== sanitized)
-                      signupForm.setValue("no_telpon", sanitized);
+                      signupForm.setValue("no_telpon", sanitized, { shouldValidate: true });
                   },
                 })}
                 placeholder="812..."
@@ -333,7 +372,7 @@ export function SignUpForm({
                     const value = e.target.value;
                     const sanitized = value.replace(/[^a-zA-Z0-9_-]/g, "");
                     if (value !== sanitized) {
-                      signupForm.setValue("pageid", sanitized);
+                      signupForm.setValue("pageid", sanitized, { shouldValidate: true });
                     }
                     if (isPageIdValid) setIsPageIdValid(false);
                     if (pageIdError) setPageIdError(null);
@@ -364,7 +403,6 @@ export function SignUpForm({
                 {isVerifyingPageId ? (
                   <Spinner size={16} className="text-slate-300" />
                 ) : (
-                  isPgcodeValid &&
                   isPageIdValid &&
                   !pageIdError && <Check className="w-5 h-5 text-emerald-500" />
                 )}
@@ -391,11 +429,7 @@ export function SignUpForm({
         <Button
           type="submit"
           disabled={
-            registerMutation.isPending ||
-            !signupForm.formState.isValid ||
-            !isPgcodeValid ||
-            !isPageIdValid ||
-            !!pageIdError
+            registerMutation.isPending || isVerifyingPgcode || isVerifyingPageId
           }
           className="font-bold w-full h-11 shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98] border-none"
         >

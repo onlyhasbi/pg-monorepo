@@ -187,4 +187,128 @@ describe("SignUpForm", () => {
       "success",
     );
   });
+
+  it("submits the form successfully and performs verifications if not previously blurred", async () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <SignUpForm
+          onSignupSuccess={onSignupSuccess}
+          onLoginSuccess={onLoginSuccess}
+        />
+      </QueryClientProvider>,
+    );
+
+    // Mock pgcode
+    vi.mocked(global.fetch).mockResolvedValue({
+      json: async () => ({ success: true, name: "John Doe" }),
+    } as unknown as Response);
+
+    const pgcodeInput = container.querySelector(
+      "#reg_pgcode",
+    ) as HTMLInputElement;
+    fireEvent.change(pgcodeInput, { target: { value: "PG123456" } });
+    // Intentionally omitting blur
+
+    // Mock pageid
+    mockCheckPageIdFn.mockResolvedValueOnce({ isAvailable: true });
+    const pageidInput = container.querySelector("#pageid") as HTMLInputElement;
+    fireEvent.change(pageidInput, { target: { value: "johnpage" } });
+    // Intentionally omitting blur
+
+    // Fill other fields
+    const phoneInput = screen.getByPlaceholderText("812...");
+    fireEvent.change(phoneInput, { target: { value: "812345678" } });
+
+    const passwordInput = container.querySelector(
+      "#reg_katasandi",
+    ) as HTMLInputElement;
+    if (passwordInput)
+      fireEvent.change(passwordInput, { target: { value: "password123" } });
+
+    // Mocks for submit
+    mockSignupFn.mockResolvedValueOnce({
+      success: true,
+      user: { role: "pgbo", is_active: 1 },
+    });
+
+    mockLoginFn.mockResolvedValueOnce({
+      success: true,
+      token: "dummy-token",
+      user: { role: "pgbo", is_active: 1 },
+    });
+
+    const form = container.querySelector("form");
+    if (form) {
+      await act(async () => {
+        fireEvent.submit(form);
+      });
+    }
+
+    // Since validation happens in onSubmit now, fetch and checkPageIdFn should be called
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(mockCheckPageIdFn).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(mockSignupFn).toHaveBeenCalled();
+    });
+  });
+
+  it("prevents submission and shows toast if pgcode is invalid on submit", async () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <SignUpForm
+          onSignupSuccess={onSignupSuccess}
+          onLoginSuccess={onLoginSuccess}
+        />
+      </QueryClientProvider>,
+    );
+
+    // Mock pgcode failure
+    vi.mocked(global.fetch).mockResolvedValue({
+      json: async () => ({ success: false }),
+    } as unknown as Response);
+
+    const pgcodeInput = container.querySelector(
+      "#reg_pgcode",
+    ) as HTMLInputElement;
+    fireEvent.change(pgcodeInput, { target: { value: "INVALID123" } });
+
+    // Mock pageid success
+    mockCheckPageIdFn.mockResolvedValueOnce({ isAvailable: true });
+    const pageidInput = container.querySelector("#pageid") as HTMLInputElement;
+    fireEvent.change(pageidInput, { target: { value: "johnpage" } });
+
+    const phoneInput = screen.getByPlaceholderText("812...");
+    fireEvent.change(phoneInput, { target: { value: "812345678" } });
+
+    const passwordInput = container.querySelector(
+      "#reg_katasandi",
+    ) as HTMLInputElement;
+    if (passwordInput)
+      fireEvent.change(passwordInput, { target: { value: "password123" } });
+
+    // Clear toast mock before submitting
+    mockShowToast.mockClear();
+
+    const form = container.querySelector("form");
+    if (form) {
+      await act(async () => {
+        fireEvent.submit(form);
+      });
+    }
+
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith(
+        "PGCode tidak valid atau tidak ditemukan",
+        "error"
+      );
+    });
+
+    expect(mockSignupFn).not.toHaveBeenCalled();
+  });
 });
