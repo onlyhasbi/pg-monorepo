@@ -2,8 +2,8 @@ import { OptimizedImage } from "@repo/ui/ui/optimized-image";
 import { createFileRoute } from "@tanstack/react-router";
 
 const ADMIN_PGBO_URL = import.meta.env.DEV
-  ? "http://localhost:3003/signin"
-  : "https://admin.mypublicgold.id/signin";
+  ? "http://localhost:3003/"
+  : "https://pgbo.mypublicgold.id/";
 
 export const Route = createFileRoute("/")({
   component: LandingHomePage,
