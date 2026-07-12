@@ -79,7 +79,7 @@ export const authDealerQueryOptions = (cookieStr?: string) =>
     queryKey: ["auth", "dealer"],
     queryFn: async () => {
       const res = await getSettingsFn({ data: { cookieStr } });
-      return { user: res.data, token: null }; // Token is usually primed via setQueryData
+      return { user: res.data, token: null as string | null }; // Token is usually primed via setQueryData
     },
     staleTime: Infinity,
   });
@@ -89,7 +89,7 @@ export const authAdminQueryOptions = (cookieStr?: string) =>
     queryKey: ["auth", "admin"],
     queryFn: async () => {
       const res = await getAdminProfileFn({ data: { cookieStr } });
-      return { user: res.data, token: null };
+      return { user: res.data, token: null as string | null };
     },
     staleTime: Infinity,
   });

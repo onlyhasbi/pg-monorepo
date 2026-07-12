@@ -11,13 +11,14 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
     "@repo/config": "workspace:*",
-    "@repo/lib": "workspace:*",
-    "@repo/hooks": "workspace:*",
-    "@repo/schemas": "workspace:*",
     "@repo/constant": "workspace:*",
+    "@repo/hooks": "workspace:*",
+    "@repo/lib": "workspace:*",
+    "@repo/schemas": "workspace:*",
     "@repo/services": "workspace:*",
-    "@repo/types": "workspace:*"
+    "@repo/types": "workspace:*",
+    "@repo/ui": "workspace:*",
+    "qrcode.react": "^4.2.0"
   }
 }

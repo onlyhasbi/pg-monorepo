@@ -48,6 +48,7 @@ import {
   ParentSection,
   PhoneSection,
 } from "./-components/RegisterFormSections";
+import { RegisterQRCode } from "./-components/RegisterQRCode";
 import { RightBanner } from "./-components/RightBanner";
 
 function RegisterPage() {
@@ -208,22 +209,26 @@ function RegisterPage() {
                 <ArrowLeft className="w-4 h-4" /> {t("nav.back")}
               </Link>
 
-              <CountrySelector
-                countryMode={countryMode}
-                onCountryChange={(val) => {
-                  if (val) {
-                    setCountryMode(val as "ID" | "MY" | "INTL");
-                    setTimeout(
-                      () => {
-                        if (val === "ID") i18n.changeLanguage("id");
-                        else if (val === "MY") i18n.changeLanguage("ms");
-                        else i18n.changeLanguage("en");
-                      },
-                      i18n.language === val.toLowerCase() ? 0 : 200,
-                    );
-                  }
-                }}
-              />
+              <div className="flex items-center gap-2">
+                <CountrySelector
+                  countryMode={countryMode}
+                  onCountryChange={(val) => {
+                    if (val) {
+                      setCountryMode(val as "ID" | "MY" | "INTL");
+                      setTimeout(
+                        () => {
+                          if (val === "ID") i18n.changeLanguage("id");
+                          else if (val === "MY") i18n.changeLanguage("ms");
+                          else i18n.changeLanguage("en");
+                        },
+                        i18n.language === val.toLowerCase() ? 0 : 200,
+                      );
+                    }
+                  }}
+                />
+                
+                <RegisterQRCode />
+              </div>
             </div>
 
             <CardHeader className="p-0 mb-6">
@@ -442,7 +447,7 @@ function RegisterPage() {
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label
                         htmlFor="label-dob"
                         className="after:content-['*'] after:ml-0.5 after:text-red-500"
@@ -457,6 +462,7 @@ function RegisterPage() {
                         {...register("label-dob")}
                         readOnly={isDobDisabled}
                         className={cn(
+                          "w-full block",
                           isDobDisabled &&
                             "bg-slate-100/80 text-slate-500 cursor-not-allowed opacity-90",
                           errors["label-dob"] &&
@@ -469,7 +475,7 @@ function RegisterPage() {
                         </p>
                       )}
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                       <Label
                         htmlFor="label-email"
                         className="after:content-['*'] after:ml-0.5 after:text-red-500"

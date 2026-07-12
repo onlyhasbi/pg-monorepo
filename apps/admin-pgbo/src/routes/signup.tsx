@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { MessageCircle, ShieldCheck } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import type { TargetAndTransition } from "motion/react";
 import { useEffect } from "react";
 
 const MotionCard = motion.create(Card);
@@ -62,7 +63,7 @@ function SignupPage() {
       opacity: 1,
       y: 0,
       transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
-    },
+    } as TargetAndTransition,
   };
 
   return (

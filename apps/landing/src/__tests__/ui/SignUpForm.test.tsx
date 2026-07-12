@@ -311,4 +311,69 @@ describe("SignUpForm", () => {
 
     expect(mockSignupFn).not.toHaveBeenCalled();
   });
+
+  it("handles pgcode verification 502 Bad Gateway/network error gracefully", async () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <SignUpForm
+          onSignupSuccess={onSignupSuccess}
+          onLoginSuccess={onLoginSuccess}
+        />
+      </QueryClientProvider>,
+    );
+
+    // Mock fetch throwing an error (e.g. invalid JSON from 502 HTML)
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      json: async () => {
+        throw new SyntaxError("Unexpected token < in JSON at position 0");
+      },
+    } as unknown as Response);
+
+    const pgcodeInput = container.querySelector(
+      "#reg_pgcode",
+    ) as HTMLInputElement;
+    fireEvent.change(pgcodeInput, { target: { value: "PG123456" } });
+    fireEvent.blur(pgcodeInput);
+
+    await waitFor(() => {
+      expect(screen.queryByText("John Doe")).toBeNull();
+    });
+  });
+
+  it("keeps the submit button disabled until all inputs are filled", () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <SignUpForm
+          onSignupSuccess={onSignupSuccess}
+          onLoginSuccess={onLoginSuccess}
+        />
+      </QueryClientProvider>,
+    );
+
+    const submitButton = screen.getByRole("button", { name: "Buat Akun" });
+    expect(submitButton).toBeDisabled();
+
+    // 1. Fill pgcode
+    const pgcodeInput = container.querySelector("#reg_pgcode") as HTMLInputElement;
+    fireEvent.change(pgcodeInput, { target: { value: "PG123456" } });
+    expect(submitButton).toBeDisabled();
+
+    // 2. Fill WhatsApp (no_telpon)
+    const phoneInput = screen.getByPlaceholderText("812...");
+    fireEvent.change(phoneInput, { target: { value: "812345678" } });
+    expect(submitButton).toBeDisabled();
+
+    // 3. Fill ID Halaman (pageid)
+    const pageidInput = container.querySelector("#pageid") as HTMLInputElement;
+    fireEvent.change(pageidInput, { target: { value: "johnpage" } });
+    expect(submitButton).toBeDisabled();
+
+    // 4. Fill Password (katasandi)
+    const passwordInput = container.querySelector("#reg_katasandi") as HTMLInputElement;
+    fireEvent.change(passwordInput, { target: { value: "password123" } });
+
+    // Now all inputs are filled, the button should be enabled!
+    expect(submitButton).not.toBeDisabled();
+  });
 });
+

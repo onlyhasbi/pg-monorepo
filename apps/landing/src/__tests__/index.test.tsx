@@ -14,6 +14,6 @@ describe("LandingHomePage", () => {
     const link = logo.closest("a");
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute("href");
-    expect(link?.getAttribute("href")).toContain("signin"); // Check that it links to signin page
+    expect(link?.getAttribute("href")).toBe("http://localhost:3003/"); // Check that it links to admin panel
   });
 });

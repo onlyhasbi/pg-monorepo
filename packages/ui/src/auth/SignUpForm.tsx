@@ -13,14 +13,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { Check } from "lucide-react";
 import { motion } from "motion/react";
-import type { Variants } from "motion/react";
+import type { Variants, TargetAndTransition } from "motion/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 const formVariants: Variants = {
   initial: { opacity: 0, x: 20 },
-  animate: { opacity: 1, x: 0, transition: { duration: 0.4 } },
-  exit: { opacity: 0, x: -20, transition: { duration: 0.4 } },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.4 } } as TargetAndTransition,
+  exit: { opacity: 0, x: -20, transition: { duration: 0.4 } } as TargetAndTransition,
 };
 
 type SignUpFormValues = {
@@ -70,6 +70,19 @@ export function SignUpForm({
       no_telpon: "",
     },
   });
+
+  const [watchedPgcode, watchedKatasandi, watchedPageid, watchedNoTelpon] = signupForm.watch([
+    "pgcode",
+    "katasandi",
+    "pageid",
+    "no_telpon",
+  ]);
+
+  const isFormComplete =
+    !!watchedPgcode?.trim() &&
+    !!watchedKatasandi?.trim() &&
+    !!watchedPageid?.trim() &&
+    !!watchedNoTelpon?.trim();
 
   const registerMutation = useMutation({
     mutationFn: async (data: SignupPayload) => {
@@ -199,7 +212,9 @@ export function SignUpForm({
     if (!pageid || pageid.length < 3) return true;
     try {
       // MIGRATION: Using TanStack Server Function
-      const data = await checkPageIdFn({ data: pageid });
+      const data = (await checkPageIdFn({ data: pageid })) as {
+        isAvailable: boolean;
+      };
       return data.isAvailable;
     } catch {
       return true;
@@ -432,7 +447,10 @@ export function SignUpForm({
         <Button
           type="submit"
           disabled={
-            registerMutation.isPending || isVerifyingPgcode || isVerifyingPageId
+            registerMutation.isPending ||
+            isVerifyingPgcode ||
+            isVerifyingPageId ||
+            !isFormComplete
           }
           className="font-bold w-full h-11 shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98] border-none"
         >
