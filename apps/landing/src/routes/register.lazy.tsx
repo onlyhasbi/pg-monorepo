@@ -495,9 +495,7 @@ function RegisterPage() {
                           {...register("label-dob")}
                           readOnly={isDobDisabled}
                           className={cn(
-                            "w-full max-w-full block appearance-none",
-                            "[&::-webkit-datetime-edit]:h-full [&::-webkit-datetime-edit]:flex [&::-webkit-datetime-edit]:items-center [&::-webkit-datetime-edit]:p-0",
-                            "[&::-webkit-date-and-time-value]:m-0",
+                            "w-full max-w-full block appearance-none h-auto py-[9px]",
                             !watch("label-dob") &&
                               !isDobDisabled &&
                               "[&::-webkit-datetime-edit]:text-transparent",
