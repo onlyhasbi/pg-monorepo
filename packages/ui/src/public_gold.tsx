@@ -1,4 +1,4 @@
-import { info } from "@repo/constant/baseInfo";
+import { useConfigsQuery } from "@repo/hooks/useConfigs";
 import { GROUP_LIST, MEDIA_LIST } from "@repo/constant/company";
 import BaseLayout from "@repo/ui/layout/base";
 import {
@@ -34,6 +34,15 @@ function PublicGold() {
 
   const titleText = t("publicGold.title");
 
+  const { data: configs } = useConfigsQuery();
+  const baseInfo = configs?.base_info || {
+    nasabah: 2.4,
+    cabang: { indonesia: 7, malaysia: 21, lainnya: 0 },
+    negara: 5,
+  };
+  const cabangTotal = baseInfo.cabang.indonesia + baseInfo.cabang.malaysia + (baseInfo.cabang.lainnya || 0);
+  const tahunBeroperasi = String(new Date().getFullYear() - 2008);
+
   return (
     <BaseLayout className="flex-col">
       <div className="w-full max-w-6xl mx-auto">
@@ -63,16 +72,16 @@ function PublicGold() {
               {[
                 {
                   label: t("publicGold.stats.years"),
-                  value: info.tahunBeroperasi,
+                  value: tahunBeroperasi,
                 },
-                { label: t("publicGold.stats.customers"), value: info.nasabah },
+                { label: t("publicGold.stats.customers"), value: baseInfo.nasabah },
                 {
                   label: t("publicGold.stats.branches"),
-                  value: info.cabang.total,
+                  value: cabangTotal,
                 },
                 {
                   label: t("publicGold.statsLabels.country"),
-                  value: info.negara,
+                  value: baseInfo.negara,
                 },
               ].map((item, i) => (
                 <Card

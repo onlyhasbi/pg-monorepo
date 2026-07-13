@@ -10,7 +10,7 @@ import { usePageIdCheck } from "../hooks/usePageIdCheck";
 import { usePgboMutations } from "../hooks/usePgboMutations";
 import { usePgboQuery } from "../hooks/usePgboQuery";
 import { useSecretCode } from "../hooks/useSecretCode";
-import { AdminNav } from "./AdminNav";
+import { AdminLayout } from "./AdminNav";
 import { BulkDeleteDialog } from "./BulkDeleteDialog";
 import { CreatePgboDialog } from "./CreatePgboDialog";
 import { DeleteConfirmDialog } from "./DeleteConfirmDialog";
@@ -148,13 +148,10 @@ export function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-10">
-      <AdminNav
-        onOpenSecret={() => secretCode.setIsSecretModalOpen(true)}
-        onLogout={handleLogout}
-      />
-
-      <main className="max-w-7xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <AdminLayout
+      onOpenSecret={() => secretCode.setIsSecretModalOpen(true)}
+      onLogout={handleLogout}
+    >
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
           <div className="space-y-1">
@@ -198,7 +195,7 @@ export function AdminDashboard() {
             />
           )}
         />
-      </main>
+
 
       {/* Dialogs */}
       <CreatePgboDialog
@@ -254,6 +251,6 @@ export function AdminDashboard() {
         onSave={handleSecretSave}
         isSaving={secretCode.updateSecretMutation.isPending}
       />
-    </div>
+    </AdminLayout>
   );
 }

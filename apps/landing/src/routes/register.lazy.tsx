@@ -1,5 +1,5 @@
 // import NotFound from "@repo/ui/not_found";
-import { branchOptionsId, branchOptionsMy } from "@repo/constant/branches";
+import { useConfigsQuery } from "@repo/hooks/useConfigs";
 import { useRegisterForm } from "@repo/hooks/useRegisterForm";
 import { getWhatsAppLink } from "@repo/lib/contact";
 import {
@@ -101,7 +101,39 @@ function RegisterPage() {
   const isIndonesia = countryMode === "ID";
   const [isTermsExpanded, setIsTermsExpanded] = useState(false);
 
-  const activeBranchOptions = isIndonesia ? branchOptionsId : branchOptionsMy;
+  const { data: configs } = useConfigsQuery();
+  const branchesId = configs?.branches_id?.length ? configs.branches_id : [
+    { value: "153", label: "Makassar" },
+    { value: "25", label: "Jakarta Selatan" },
+    { value: "30", label: "Bandung" },
+    { value: "31", label: "Banjarmasin" },
+    { value: "32", label: "Yogyakarta" },
+    { value: "36", label: "Surabaya" },
+    { value: "265", label: "Bekasi" },
+    { value: "268", label: "Balikpapan" },
+  ];
+  const branchesMy = configs?.branches_my?.length ? configs.branches_my : [
+    { value: "1", label: "Alor Setar, Kedah" },
+    { value: "2", label: "Ampang, Kuala Lumpur" },
+    { value: "3", label: "Bangi, Selangor" },
+    { value: "4", label: "Bdr Sunway, Selangor" },
+    { value: "6", label: "Bt Berendam, Malacca" },
+    { value: "10", label: "Ipoh, Perak" },
+    { value: "11", label: "Johor Bahru, Johor" },
+    { value: "12", label: "Kota Bharu, Kelantan" },
+    { value: "13", label: "Kuala Terengganu, Terengganu" },
+    { value: "14", label: "Kuantan, Pahang" },
+    { value: "17", label: "Relau, Penang" },
+    { value: "18", label: "Seremban, Negeri Sembilan" },
+    { value: "19", label: "Sungai Petani, Kedah" },
+    { value: "21", label: "Kota Kinabalu, Sabah" },
+    { value: "22", label: "Kuching, Sarawak" },
+    { value: "23", label: "Miri, Sarawak" },
+    { value: "34", label: "Menara Public Gold, Kuala Lumpur" },
+    { value: "135", label: "Tawau, Sabah" },
+  ];
+
+  const activeBranchOptions = isIndonesia ? branchesId : branchesMy;
   const idTypeOptions = [
     { value: "newic", label: t("registerForm.idTypeKtp") },
     { value: "passportforeign", label: t("registerForm.idTypePassport") },

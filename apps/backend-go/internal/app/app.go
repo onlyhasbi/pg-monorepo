@@ -43,6 +43,7 @@ func SetupRouter(db *sql.DB, cld *cloudinary.Cloudinary) *gin.Engine {
 			publicGroup.POST("/analytics", publicHandler.TrackAnalytics)
 			publicGroup.POST("/portal/verify", publicHandler.VerifyPortal)
 			publicGroup.POST("/register-track", publicHandler.RegisterLead)
+			publicGroup.GET("/configs", publicHandler.GetConfigs)
 		}
 
 		// Auth Module
@@ -94,6 +95,9 @@ func SetupRouter(db *sql.DB, cld *cloudinary.Cloudinary) *gin.Engine {
 			
 			adminGroup.GET("/settings/secret-code", adminHandler.GetSecretCode)
 			adminGroup.PATCH("/settings/secret-code", adminHandler.UpdateSecretCode)
+			
+			adminGroup.GET("/settings/configs", adminHandler.GetConfigs)
+			adminGroup.PATCH("/settings/configs", adminHandler.UpdateConfigs)
 		}
 	}
 

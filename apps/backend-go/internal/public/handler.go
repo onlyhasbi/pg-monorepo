@@ -2,6 +2,7 @@ package public
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -211,3 +212,20 @@ func (h *PublicHandler) VerifyPortal(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Kode rahasia tidak valid"})
 	}
 }
+
+func (h *PublicHandler) GetConfigs(c *gin.Context) {
+	branchesIdStr, _ := database.GetSetting(h.DB, "branches_id")
+	branchesMyStr, _ := database.GetSetting(h.DB, "branches_my")
+	baseInfoStr, _ := database.GetSetting(h.DB, "base_info")
+
+	c.Header("Cache-Control", "public, max-age=60")
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": map[string]interface{}{
+			"branches_id": json.RawMessage(branchesIdStr),
+			"branches_my": json.RawMessage(branchesMyStr),
+			"base_info":   json.RawMessage(baseInfoStr),
+		},
+	})
+}
+

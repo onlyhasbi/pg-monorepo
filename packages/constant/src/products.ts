@@ -34,33 +34,33 @@ export interface PrintingCostRow {
 }
 
 export const GOLDBAR_COST_TABLE: PrintingCostRow[] = [
-  { label: "0.5g", weight: "0.5g", cost: PRINTING_COSTS["0.5g"] },
-  { label: "1g", weight: "1g", cost: PRINTING_COSTS["1g"] },
-  { label: "5g", weight: "5g", cost: PRINTING_COSTS["5g"] },
-  { label: "10g", weight: "10g", cost: PRINTING_COSTS["10g"] },
-  { label: "20g", weight: "20g", cost: PRINTING_COSTS["20g"] },
-  { label: "50g", weight: "50g", cost: PRINTING_COSTS["50g"] },
-  { label: "100g", weight: "100g", cost: PRINTING_COSTS["100g"] },
+  { label: "0.5g", weight: "0.5g", cost: PRINTING_COSTS["0.5g"]! },
+  { label: "1g", weight: "1g", cost: PRINTING_COSTS["1g"]! },
+  { label: "5g", weight: "5g", cost: PRINTING_COSTS["5g"]! },
+  { label: "10g", weight: "10g", cost: PRINTING_COSTS["10g"]! },
+  { label: "20g", weight: "20g", cost: PRINTING_COSTS["20g"]! },
+  { label: "50g", weight: "50g", cost: PRINTING_COSTS["50g"]! },
+  { label: "100g", weight: "100g", cost: PRINTING_COSTS["100g"]! },
 ];
 
 export const DINAR_COST_TABLE: PrintingCostRow[] = [
   {
     label: "¼ Dinar (1.0625g)",
     weight: "1.0625g",
-    cost: PRINTING_COSTS["1.0625g"],
+    cost: PRINTING_COSTS["1.0625g"]!,
   },
   {
     label: "½ Dinar (2.125g)",
     weight: "2.125g",
-    cost: PRINTING_COSTS["2.125g"],
+    cost: PRINTING_COSTS["2.125g"]!,
   },
-  { label: "1 Dinar (4.25g)", weight: "4.25g", cost: PRINTING_COSTS["4.25g"] },
+  { label: "1 Dinar (4.25g)", weight: "4.25g", cost: PRINTING_COSTS["4.25g"]! },
   {
     label: "5 Dinar (21.25g)",
     weight: "21.25g",
-    cost: PRINTING_COSTS["21.25g"],
+    cost: PRINTING_COSTS["21.25g"]!,
   },
-  { label: "10 Dinar (42.5g)", weight: "42.5g", cost: PRINTING_COSTS["42.5g"] },
+  { label: "10 Dinar (42.5g)", weight: "42.5g", cost: PRINTING_COSTS["42.5g"]! },
 ];
 
 export const dinar: ProductItem[] = [

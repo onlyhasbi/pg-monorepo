@@ -64,6 +64,12 @@
       ]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://be-public-gold-indonesia.vercel.app/api/:path*"
+    }
+  ],
   "redirects": [
     {
       "source": "/index",

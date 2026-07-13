@@ -35,7 +35,7 @@ window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 
 // Patch global fetch to support relative URLs in Node.js (jsdom)
 const originalFetch = global.fetch;
-global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+global.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
   let url = input;
   if (typeof input === "string" && input.startsWith("/")) {
     url = `http://localhost${input}`;
@@ -43,7 +43,7 @@ global.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     // URL object is already absolute, but just in case
   }
   return originalFetch(url, init);
-};
+}) as unknown as typeof global.fetch;
 
 /**
  * Mock @tanstack/react-start so server functions call their handlers directly.

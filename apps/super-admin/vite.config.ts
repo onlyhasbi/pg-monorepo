@@ -12,7 +12,14 @@ export default defineConfig({
         enabled: false,
       },
     }),
-    nitro({ preset: "vercel" }),
+    nitro({
+      preset: "vercel",
+      routeRules: {
+        ...(process.env.NODE_ENV !== "production" && {
+          "/api/**": { proxy: "http://localhost:3001/api/**" },
+        }),
+      },
+    }),
     viteReact(),
     tailwindcss(),
   ],

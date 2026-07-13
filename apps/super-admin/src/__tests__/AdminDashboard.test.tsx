@@ -21,6 +21,12 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ pathname: "/" }),
+    Link: ({ to, children, ...props }: any) => (
+      <a href={to} {...props}>
+        {children}
+      </a>
+    ),
   };
 });
 
@@ -197,7 +203,7 @@ describe("AdminDashboard (PGBO Management)", () => {
 
     global.fetch = vi.fn().mockResolvedValue({
       json: async () => ({ success: true, name: "Fetched Name" }),
-    });
+    }) as unknown as typeof global.fetch;
   });
 
   afterEach(() => {
@@ -208,7 +214,7 @@ describe("AdminDashboard (PGBO Management)", () => {
     renderWithProviders(<AdminDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByText("Daftar Halaman")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /Daftar Halaman/i })).toBeInTheDocument();
     });
 
     expect(screen.getAllByText("Test PGBO").length).toBeGreaterThan(0);

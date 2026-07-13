@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -396,3 +397,43 @@ func (h *AdminHandler) GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "data": profile})
 }
 
+func (h *AdminHandler) GetConfigs(c *gin.Context) {
+	branchesIdStr, _ := database.GetSetting(h.DB, "branches_id")
+	branchesMyStr, _ := database.GetSetting(h.DB, "branches_my")
+	baseInfoStr, _ := database.GetSetting(h.DB, "base_info")
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data": map[string]interface{}{
+			"branches_id": json.RawMessage(branchesIdStr),
+			"branches_my": json.RawMessage(branchesMyStr),
+			"base_info":   json.RawMessage(baseInfoStr),
+		},
+	})
+}
+
+type UpdateConfigsRequest struct {
+	BranchesId json.RawMessage `json:"branches_id"`
+	BranchesMy json.RawMessage `json:"branches_my"`
+	BaseInfo   json.RawMessage `json:"base_info"`
+}
+
+func (h *AdminHandler) UpdateConfigs(c *gin.Context) {
+	var req UpdateConfigsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Data tidak valid"})
+		return
+	}
+
+	if req.BranchesId != nil {
+		database.UpdateSetting(h.DB, "branches_id", string(req.BranchesId))
+	}
+	if req.BranchesMy != nil {
+		database.UpdateSetting(h.DB, "branches_my", string(req.BranchesMy))
+	}
+	if req.BaseInfo != nil {
+		database.UpdateSetting(h.DB, "base_info", string(req.BaseInfo))
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Konfigurasi berhasil diperbarui"})
+}
