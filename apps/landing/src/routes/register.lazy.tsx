@@ -488,14 +488,14 @@ function RegisterPage() {
                           ? t("registerForm.dobLabelAnak")
                           : t("registerForm.dobLabelDewasa")}
                       </Label>
-                      <div className="relative">
+                      <div className="relative w-full min-w-0">
                         <Input
                           id="label-dob"
                           type={isDobDisabled ? "text" : "date"}
                           {...register("label-dob")}
                           readOnly={isDobDisabled}
                           className={cn(
-                            "w-full block",
+                            "w-full max-w-full block appearance-none",
                             !watch("label-dob") &&
                               !isDobDisabled &&
                               "[&::-webkit-datetime-edit]:text-transparent",
