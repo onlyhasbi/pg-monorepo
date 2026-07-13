@@ -20,8 +20,6 @@ export const Route = createFileRoute("/settings")({
 	component: SettingsPage,
 });
 
-const stripKeys = (items: UnifiedBranch[]) =>
-	items.map(({ value, label }) => ({ value, label }));
 
 function SettingsPage() {
 	const navigate = useNavigate();
