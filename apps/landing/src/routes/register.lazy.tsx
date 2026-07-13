@@ -490,8 +490,18 @@ function RegisterPage() {
                       </Label>
                       <Input
                         id="label-dob"
-                        type="date"
+                        type="text"
+                        placeholder="DD/MM/YYYY"
                         {...register("label-dob")}
+                        onFocus={(e) => {
+                          if (!isDobDisabled) e.target.type = "date";
+                        }}
+                        onBlur={(e) => {
+                          register("label-dob").onBlur(e);
+                          if (!e.target.value) {
+                            e.target.type = "text";
+                          }
+                        }}
                         readOnly={isDobDisabled}
                         className={cn(
                           "w-full block",
