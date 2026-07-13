@@ -76,6 +76,7 @@ async function baseFetch(
   const url = endpoint.startsWith("http") ? endpoint : `${API_URL}${endpoint}`;
 
   const response = await fetch(url, {
+    cache: options.method && options.method !== "GET" ? "no-store" : options.cache,
     ...options,
     headers,
   });
@@ -104,7 +105,7 @@ export const getAgentsFn = createServerFn({ method: "GET" }).handler(
   },
 );
 
-export const getAgentData = createServerFn({ method: "GET" })
+export const getAgentData = createServerFn({ method: "POST" })
   .inputValidator((d: string) => d)
   .handler(async ({ data: pgcode }) => {
     return baseFetch(`/public/pgbo/${pgcode}`);
@@ -188,7 +189,7 @@ export const verifyPortalFn = createServerFn({ method: "POST" })
       body: JSON.stringify({ code }),
     });
   });
-export const getAdminPgboFn = createServerFn({ method: "GET" })
+export const getAdminPgboFn = createServerFn({ method: "POST" })
   .inputValidator((d: { search?: string; cookieStr?: string } = {}) => d)
   .handler(async ({ data }) => {
     const query = data.search
