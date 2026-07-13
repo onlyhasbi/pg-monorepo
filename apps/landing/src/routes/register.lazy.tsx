@@ -488,29 +488,29 @@ function RegisterPage() {
                           ? t("registerForm.dobLabelAnak")
                           : t("registerForm.dobLabelDewasa")}
                       </Label>
-                      <Input
-                        id="label-dob"
-                        type="text"
-                        placeholder="DD/MM/YYYY"
-                        {...register("label-dob")}
-                        onFocus={(e) => {
-                          if (!isDobDisabled) e.target.type = "date";
-                        }}
-                        onBlur={(e) => {
-                          register("label-dob").onBlur(e);
-                          if (!e.target.value) {
-                            e.target.type = "text";
-                          }
-                        }}
-                        readOnly={isDobDisabled}
-                        className={cn(
-                          "w-full block",
-                          isDobDisabled &&
-                            "bg-slate-100/80 text-slate-500 cursor-not-allowed opacity-90",
-                          errors["label-dob"] &&
-                            "border-red-500 focus-visible:ring-red-500/30",
+                      <div className="relative">
+                        <Input
+                          id="label-dob"
+                          type={isDobDisabled ? "text" : "date"}
+                          {...register("label-dob")}
+                          readOnly={isDobDisabled}
+                          className={cn(
+                            "w-full block",
+                            !watch("label-dob") &&
+                              !isDobDisabled &&
+                              "[&::-webkit-datetime-edit]:text-transparent",
+                            isDobDisabled &&
+                              "bg-slate-100/80 text-slate-500 cursor-not-allowed opacity-90",
+                            errors["label-dob"] &&
+                              "border-red-500 focus-visible:ring-red-500/30",
+                          )}
+                        />
+                        {!watch("label-dob") && !isDobDisabled && (
+                          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-base md:text-sm">
+                            DD/MM/YYYY
+                          </div>
                         )}
-                      />
+                      </div>
                       {errors["label-dob"] && (
                         <p className="text-[11px] font-medium text-red-500">
                           {errors["label-dob"]?.message as string}
