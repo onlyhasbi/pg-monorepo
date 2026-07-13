@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "air",
-    "build": "go build -o server main.go || echo 'Go build skipped'",
+    "build": "go build -o server main.go && if [ -n \"$VERCEL_OUTPUT_FILE\" ]; then cp server \"$VERCEL_OUTPUT_FILE\"; fi",
     "start": "./server"
   }
 }
