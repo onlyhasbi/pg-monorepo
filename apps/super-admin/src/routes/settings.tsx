@@ -98,34 +98,29 @@ function SettingsPage() {
 	// Auto-save effect
 	useEffect(() => {
 		if (hasUserModified.current) {
+			hasUserModified.current = false; // Reset immediately to prevent loop if request fails
+			
 			const branches_id = debouncedUnifiedBranches.filter((b) => b.country === "id");
 			const branches_my = debouncedUnifiedBranches.filter((b) => b.country === "my");
 			const lainnya = debouncedBaseInfo.cabang.lainnya || 0;
 			const idCount = branches_id.length > 0 ? 1 : 0;
 			const myCount = branches_my.length > 0 ? 1 : 0;
 
-			updateConfigs(
-				{
-					base_info: {
-						...debouncedBaseInfo,
-						cabang: {
-							indonesia: branches_id.length,
-							malaysia: branches_my.length,
-							lainnya,
-						},
-						negara: idCount + myCount + lainnya,
+			updateConfigs({
+				base_info: {
+					...debouncedBaseInfo,
+					cabang: {
+						indonesia: branches_id.length,
+						malaysia: branches_my.length,
+						lainnya,
 					},
-					branches_id: stripKeys(branches_id),
-					branches_my: stripKeys(branches_my),
+					negara: idCount + myCount + lainnya,
 				},
-				{
-					onSuccess: () => {
-						hasUserModified.current = false;
-					},
-				},
-			);
+				branches_id: stripKeys(branches_id),
+				branches_my: stripKeys(branches_my),
+			});
 		}
-	}, [debouncedBaseInfo, debouncedUnifiedBranches, updateConfigs, stripKeys]);
+	}, [debouncedBaseInfo, debouncedUnifiedBranches, updateConfigs]);
 
 	const handleSaveBranch = (branch: UnifiedBranch) => {
 		hasUserModified.current = true;
