@@ -98,10 +98,10 @@ export function LinkPage({ pgbo }: { pgbo: any }) {
 						{displayName}
 						<VerifiedBadge />
 					</h1>
-					<p className="text-[15px] text-white/75 leading-[1.6] font-normal tracking-[0.01em] m-0 mb-5 max-w-[85%]">
-						Mulai tabungan emas Anda hari ini bersama
+					<p className="text-[15px] text-white/75 leading-[1.6] font-normal tracking-[0.01em] m-0 mb-5 max-w-[95%]">
+						Mulai tabungan emas Anda hari ini
 						<br />
-						Public Gold Indonesia, Gratis!
+						bersama Public Gold Indonesia, Gratis!
 					</p>
 
 					{socials.length > 0 && (
