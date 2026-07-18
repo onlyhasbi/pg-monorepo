@@ -23,7 +23,7 @@ const GoldParticlesComponent = () => {
 					height: `${size}px`,
 					left: `${left}%`,
 					top: `${top}%`,
-					animation: `gold-drift ${duration}s ease-in-out infinite alternate ${delay}s`,
+					animation: `gold-drift ${duration}s ease-in-out infinite alternate both ${delay}s`,
 					willChange: "transform, opacity",
 					"--tx": `${tx}px`,
 					"--ty": `${ty}px`,
