@@ -72,7 +72,7 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	sosmedIG := c.PostForm("sosmed_instagram")
 	sosmedTiktok := c.PostForm("sosmed_tiktok")
 
-	var photoURL sql.NullString
+	var photoURL string
 
 	header, err := c.FormFile("foto_profil")
 	if err == nil {
@@ -100,13 +100,13 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 			})
 			return
 		}
-		photoURL = sql.NullString{String: uploadRes.SecureURL, Valid: true}
+		photoURL = uploadRes.SecureURL
 	}
 
 	// Update DB - Gunakan data yang diambil manual
 	query := `
 		UPDATE users SET 
-			foto_profil_url = COALESCE(?, foto_profil_url),
+			foto_profil_url = CASE WHEN ? != '' THEN ? ELSE foto_profil_url END,
 			nama_lengkap = CASE WHEN ? != '' THEN ? ELSE nama_lengkap END,
 			nama_panggilan = CASE WHEN ? != '' THEN ? ELSE nama_panggilan END,
 			email = CASE WHEN ? != '' THEN ? ELSE email END,
@@ -118,7 +118,7 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 		WHERE id = ?
 	`
 	res, err := h.DB.Exec(query, 
-		photoURL, 
+		photoURL, photoURL,
 		namaLengkap, namaLengkap,
 		namaPanggilan, namaPanggilan,
 		email, email,
@@ -131,7 +131,7 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal update database"})
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal memperbarui profil: " + err.Error()})
 		return
 	}
 
@@ -142,17 +142,18 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	}
 
 	// Add cache buster to debug URL
-	finalURL := photoURL.String
-	if photoURL.Valid {
+	finalURL := photoURL
+	if photoURL != "" {
 		finalURL = fmt.Sprintf("%s?v=%d", finalURL, time.Now().Unix())
 	}
 
+	// Sukses update data & profile
 	c.JSON(http.StatusOK, gin.H{
 		"success": true, 
 		"message": "Profil berhasil diperbarui",
 		"debug": gin.H{
 			"new_url": finalURL,
-			"updated": photoURL.Valid,
+			"updated": photoURL != "",
 		},
 	})
 }
