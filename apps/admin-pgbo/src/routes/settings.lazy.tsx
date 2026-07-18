@@ -74,15 +74,7 @@ function SettingsPage() {
   const [croppedPreview, setCroppedPreview] = useState<string | null>(null);
   const [cropperSrc, setCropperSrc] = useState<string | null>(null);
 
-  const mutation = useSettingsMutation({
-    fotoFile,
-    dirtyFields,
-    setValue,
-    onSuccessCallback: () => {
-      setFotoFile(null);
-      setCroppedPreview(null);
-    },
-  });
+  const mutation = useSettingsMutation({ fotoFile, dirtyFields, setValue });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {

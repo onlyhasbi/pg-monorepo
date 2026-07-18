@@ -15,6 +15,7 @@ export default defineConfig({
     nitro({
       preset: "vercel",
       routeRules: {
+        "/api/**": { proxy: `${process.env.API_URL || "http://localhost:3001/api"}/**` },
         "/api-proxy/**": { proxy: "https://publicgold.co.id/**" },
         "/api-proxy-my/**": { proxy: "https://publicgold.com.my/**" },
       },

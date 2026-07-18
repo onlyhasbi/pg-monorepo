@@ -12,7 +12,6 @@ interface UseSettingsMutationOptions {
   fotoFile: File | null;
   dirtyFields: Partial<Record<keyof SettingsFormValues, boolean>>;
   setValue: UseFormSetValue<SettingsFormValues>;
-  onSuccessCallback?: () => void;
 }
 
 interface MutationResult {
@@ -27,7 +26,6 @@ export function useSettingsMutation({
   fotoFile,
   dirtyFields,
   setValue,
-  onSuccessCallback,
 }: UseSettingsMutationOptions) {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -127,10 +125,6 @@ export function useSettingsMutation({
           showToast("Profil berhasil diperbarui!", "success");
         } else {
           showToast("Pengaturan berhasil diperbarui!", "success");
-        }
-
-        if (onSuccessCallback) {
-          onSuccessCallback();
         }
       } else {
         showToast(data.profile.message || "Gagal menyimpan", "error");
