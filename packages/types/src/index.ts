@@ -14,6 +14,7 @@ export interface PgboData {
   no_telpon?: string;
   foto_profil_url?: string;
   link_group_whatsapp?: string;
+  link_group_edukasi?: string;
   sosmed_instagram?: string;
   sosmed_tiktok?: string;
   sosmed_facebook?: string;
@@ -31,6 +32,7 @@ export interface AgentData {
   no_telpon?: string;
   foto_profil_url?: string;
   link_group_whatsapp?: string;
+  link_group_edukasi?: string;
 }
 
 // ─── Gold Prices ──────────────────────────────────────────────────

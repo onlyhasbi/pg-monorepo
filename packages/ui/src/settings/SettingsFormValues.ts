@@ -5,6 +5,7 @@ export interface SettingsFormValues {
   country_code: string;
   no_telpon: string;
   link_group_whatsapp: string;
+  link_group_edukasi: string;
   sosmed_facebook: string;
   sosmed_instagram: string;
   sosmed_tiktok: string;

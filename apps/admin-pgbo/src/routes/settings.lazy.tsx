@@ -54,6 +54,7 @@ function SettingsPage() {
       country_code: initialCountryCode,
       no_telpon: initialPhoneRest,
       link_group_whatsapp: profileData.link_group_whatsapp || "",
+      link_group_edukasi: profileData.link_group_edukasi || "",
       sosmed_facebook: profileData.sosmed_facebook || "",
       sosmed_instagram: profileData.sosmed_instagram || "",
       sosmed_tiktok: profileData.sosmed_tiktok || "",

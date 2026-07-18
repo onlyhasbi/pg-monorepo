@@ -30,11 +30,11 @@ func (h *SettingsHandler) GetProfile(c *gin.Context) {
 	user := userClaims.(*middleware.UserClaims)
 
 	var profile models.User
-	query := `SELECT pgcode, pageid, foto_profil_url, nama_lengkap, nama_panggilan, email, no_telpon, link_group_whatsapp, sosmed_facebook, sosmed_instagram, sosmed_tiktok FROM users WHERE id = ?`
+	query := `SELECT pgcode, pageid, foto_profil_url, nama_lengkap, nama_panggilan, email, no_telpon, link_group_whatsapp, link_group_edukasi, sosmed_facebook, sosmed_instagram, sosmed_tiktok FROM users WHERE id = ?`
 	
 	err := h.DB.QueryRow(query, user.ID).Scan(
 		&profile.PGCode, &profile.PageID, &profile.FotoProfilURL, &profile.NamaLengkap,
-		&profile.NamaPanggilan, &profile.Email, &profile.NoTelpon, &profile.LinkGroupWhatsApp,
+		&profile.NamaPanggilan, &profile.Email, &profile.NoTelpon, &profile.LinkGroupWhatsApp, &profile.LinkGroupEdukasi,
 		&profile.SosmedFacebook, &profile.SosmedInstagram, &profile.SosmedTiktok,
 	)
 
@@ -52,6 +52,7 @@ type UpdateProfileRequest struct {
 	Email             *string `form:"email"`
 	NoTelpon          *string `form:"no_telpon"`
 	LinkGroupWhatsApp *string `form:"link_group_whatsapp"`
+	LinkGroupEdukasi  *string `form:"link_group_edukasi"`
 	SosmedFacebook    *string `form:"sosmed_facebook"`
 	SosmedInstagram   *string `form:"sosmed_instagram"`
 	SosmedTiktok      *string `form:"sosmed_tiktok"`
@@ -68,6 +69,7 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 	email := c.PostForm("email")
 	noTelpon := c.PostForm("no_telpon")
 	linkWA := c.PostForm("link_group_whatsapp")
+	linkEdukasi := c.PostForm("link_group_edukasi")
 	sosmedFB := c.PostForm("sosmed_facebook")
 	sosmedIG := c.PostForm("sosmed_instagram")
 	sosmedTiktok := c.PostForm("sosmed_tiktok")
@@ -108,25 +110,27 @@ func (h *SettingsHandler) UpdateProfile(c *gin.Context) {
 		UPDATE users SET 
 			foto_profil_url = COALESCE(?, foto_profil_url),
 			nama_lengkap = CASE WHEN ? != '' THEN ? ELSE nama_lengkap END,
-			nama_panggilan = CASE WHEN ? != '' THEN ? ELSE nama_panggilan END,
+			nama_panggilan = ?,
 			email = CASE WHEN ? != '' THEN ? ELSE email END,
 			no_telpon = CASE WHEN ? != '' THEN ? ELSE no_telpon END,
-			link_group_whatsapp = CASE WHEN ? != '' THEN ? ELSE link_group_whatsapp END,
-			sosmed_facebook = CASE WHEN ? != '' THEN ? ELSE sosmed_facebook END,
-			sosmed_instagram = CASE WHEN ? != '' THEN ? ELSE sosmed_instagram END,
-			sosmed_tiktok = CASE WHEN ? != '' THEN ? ELSE sosmed_tiktok END
+			link_group_whatsapp = ?,
+			link_group_edukasi = ?,
+			sosmed_facebook = ?,
+			sosmed_instagram = ?,
+			sosmed_tiktok = ?
 		WHERE id = ?
 	`
 	res, err := h.DB.Exec(query, 
 		photoURL, 
 		namaLengkap, namaLengkap,
-		namaPanggilan, namaPanggilan,
+		namaPanggilan,
 		email, email,
 		noTelpon, noTelpon,
-		linkWA, linkWA,
-		sosmedFB, sosmedFB,
-		sosmedIG, sosmedIG,
-		sosmedTiktok, sosmedTiktok,
+		linkWA,
+		linkEdukasi,
+		sosmedFB,
+		sosmedIG,
+		sosmedTiktok,
 		user.ID,
 	)
 

@@ -128,11 +128,27 @@ export function BasicInfoCard({
             className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600"
           >
             <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-            Link Grup WhatsApp
+            Link Grup WhatsApp (Member)
           </Label>
           <Input
             id="link_group_whatsapp"
             {...register("link_group_whatsapp")}
+            type="text"
+            placeholder="https://chat.whatsapp.com/..."
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label
+            htmlFor="link_group_edukasi"
+            className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600"
+          >
+            <Link2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
+            Link Grup Edukasi (Calon Prospek)
+          </Label>
+          <Input
+            id="link_group_edukasi"
+            {...register("link_group_edukasi")}
             type="text"
             placeholder="https://chat.whatsapp.com/..."
           />

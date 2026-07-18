@@ -35,13 +35,21 @@ import { RootError } from "@repo/ui/root_error";
 import GradientHighlight from "@repo/ui/ui/gradient_highlight";
 import { LazySection } from "@repo/ui/ui/lazy-section";
 
+import { LinkPage } from "../components/LinkPage";
+
 function App() {
-  const { pgcode } = Route.useParams();
+  const { pgcode: rawPgcode } = Route.useParams();
+  const { isLinkPage } = Route.useLoaderData();
 
   // If we're transitioning out, pgcode might be undefined
-  if (!pgcode) return null;
+  if (!rawPgcode) return null;
+  
+  const cleanPgcode = isLinkPage ? rawPgcode.slice(1) : rawPgcode;
+  const { data: pgbo } = useSuspenseQuery(agentQueryOptions(cleanPgcode));
 
-  const { data: pgbo } = useSuspenseQuery(agentQueryOptions(pgcode));
+  if (isLinkPage) {
+    return <LinkPage pgcode={cleanPgcode} pgbo={pgbo} />;
+  }
 
   // LAZY FETCH: Trigger gold prices only after human interaction for LCP Optimization
   const shouldFetchPrices = useLazyInteraction();
@@ -221,11 +229,16 @@ function App() {
 export const Route = createFileRoute("/$pgcode")({
   component: App,
   loader: async ({ params, context }) => {
+    let rawPgcode = params.pgcode;
+    const isLinkPage = rawPgcode.startsWith("@");
+    if (isLinkPage) {
+      rawPgcode = rawPgcode.slice(1);
+    }
     try {
       const data = await context.queryClient.ensureQueryData(
-        agentQueryOptions(params.pgcode),
+        agentQueryOptions(rawPgcode),
       );
-      return { pgbo: data };
+      return { pgbo: data, isLinkPage };
     } catch (err: unknown) {
       const error = err as { status?: number; response?: { status?: number } };
       if (error.status === 404 || error.response?.status === 404) {
@@ -236,11 +249,19 @@ export const Route = createFileRoute("/$pgcode")({
   },
   head: ({ loaderData }) => {
     const pgbo = (loaderData as any)?.pgbo;
+    const isLinkPage = (loaderData as any)?.isLinkPage;
     if (!pgbo) return {};
 
-    const displayName = pgbo.nama_panggilan || "Authorized Dealer";
-    const title = `${displayName} - Konsultan Emas Public Gold Indonesia`;
-    const description = `Amankan masa depan keluarga dengan tabungan emas bersama Public Gold Indonesia`;
+    const displayName = pgbo.nama_panggilan || pgbo.nama_lengkap || "Authorized Dealer";
+    
+    let title = `${displayName} - Konsultan Emas Public Gold Indonesia`;
+    let description = `Amankan masa depan keluarga dengan tabungan emas bersama Public Gold Indonesia`;
+
+    if (isLinkPage) {
+      title = `${displayName} | Public Gold Indonesia`;
+      description = `Bergabung bersama ${displayName} sebagai Authorized Dealer Public Gold Indonesia.`;
+    }
+    
     // Use JPG format explicitly for WhatsApp/SEO Compatibility
     const image = getCloudinaryUrl(pgbo.foto_profil_url, {
       width: 800,

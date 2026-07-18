@@ -66,7 +66,7 @@ function RegisterPage() {
       if (storedPageId) {
         navigate({
           to: "/register",
-          search: { ref: storedPageId },
+          search: (prev) => ({ ...prev, ref: storedPageId }),
           replace: true,
         });
       } else {

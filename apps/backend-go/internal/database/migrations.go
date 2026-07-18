@@ -8,6 +8,9 @@ import (
 )
 
 func SetupDatabase(db *sql.DB) error {
+	// Migrate existing database to add new columns if they don't exist
+	_, _ = db.Exec(`ALTER TABLE users ADD COLUMN link_group_edukasi TEXT;`)
+
 	// 1. Create Users table
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
@@ -22,6 +25,7 @@ func SetupDatabase(db *sql.DB) error {
 			nama_panggilan TEXT,
 			no_telpon TEXT,
 			link_group_whatsapp TEXT,
+			link_group_edukasi TEXT,
 			sosmed_facebook TEXT,
 			sosmed_instagram TEXT,
 			sosmed_tiktok TEXT,

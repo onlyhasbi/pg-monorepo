@@ -14,6 +14,7 @@ type User struct {
 	NamaPanggilan     *string   `json:"nama_panggilan" db:"nama_panggilan"`
 	NoTelpon          *string   `json:"no_telpon" db:"no_telpon"`
 	LinkGroupWhatsApp *string   `json:"link_group_whatsapp" db:"link_group_whatsapp"`
+	LinkGroupEdukasi  *string   `json:"link_group_edukasi" db:"link_group_edukasi"`
 	SosmedFacebook    *string   `json:"sosmed_facebook" db:"sosmed_facebook"`
 	SosmedInstagram   *string   `json:"sosmed_instagram" db:"sosmed_instagram"`
 	SosmedTiktok      *string   `json:"sosmed_tiktok" db:"sosmed_tiktok"`

@@ -151,10 +151,10 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var user models.User
 	var katasandiHash string
 	
-	query := `SELECT id, role, pgcode, email, pageid, katasandi_hash, is_active, foto_profil_url, nama_lengkap, nama_panggilan, no_telpon, link_group_whatsapp, sosmed_facebook, sosmed_instagram, sosmed_tiktok FROM users WHERE email = ? OR UPPER(pgcode) = UPPER(?) LIMIT 1`
+	query := `SELECT id, role, pgcode, email, pageid, katasandi_hash, is_active, foto_profil_url, nama_lengkap, nama_panggilan, no_telpon, link_group_whatsapp, link_group_edukasi, sosmed_facebook, sosmed_instagram, sosmed_tiktok FROM users WHERE email = ? OR UPPER(pgcode) = UPPER(?) LIMIT 1`
 	err := h.DB.QueryRow(query, identifier, identifier).Scan(
 		&user.ID, &user.Role, &user.PGCode, &user.Email, &user.PageID, &katasandiHash, &user.IsActive,
-		&user.FotoProfilURL, &user.NamaLengkap, &user.NamaPanggilan, &user.NoTelpon, &user.LinkGroupWhatsApp, &user.SosmedFacebook, &user.SosmedInstagram, &user.SosmedTiktok,
+		&user.FotoProfilURL, &user.NamaLengkap, &user.NamaPanggilan, &user.NoTelpon, &user.LinkGroupWhatsApp, &user.LinkGroupEdukasi, &user.SosmedFacebook, &user.SosmedInstagram, &user.SosmedTiktok,
 	)
 
 	if err != nil {

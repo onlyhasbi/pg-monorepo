@@ -32,15 +32,15 @@ func (h *PublicHandler) GetAgentProfile(c *gin.Context) {
 	query := `
 		SELECT 
 			pgcode, pageid, nama_lengkap, nama_panggilan, email, 
-			no_telpon, link_group_whatsapp, 
+			no_telpon, link_group_whatsapp, link_group_edukasi, 
 			sosmed_facebook, sosmed_instagram, sosmed_tiktok, 
 			foto_profil_url 
 		FROM users 
-		WHERE role = 'pgbo' AND pageid = ? AND is_active = 1
+		WHERE role = 'pgbo' AND (pageid = ? OR pgcode = ?) AND is_active = 1
 	`
-	err := h.DB.QueryRow(query, pageid).Scan(
+	err := h.DB.QueryRow(query, pageid, pageid).Scan(
 		&profile.PGCode, &profile.PageID, &profile.NamaLengkap, &profile.NamaPanggilan, &profile.Email,
-		&profile.NoTelpon, &profile.LinkGroupWhatsApp,
+		&profile.NoTelpon, &profile.LinkGroupWhatsApp, &profile.LinkGroupEdukasi,
 		&profile.SosmedFacebook, &profile.SosmedInstagram, &profile.SosmedTiktok,
 		&profile.FotoProfilURL,
 	)
@@ -57,8 +57,8 @@ func (h *PublicHandler) GetAgentVCard(c *gin.Context) {
 	pageid := c.Param("pageid")
 
 	var nama, branch, noTelpon string
-	query := `SELECT nama_lengkap, pgcode, no_telpon FROM users WHERE pageid = ? AND is_active = 1`
-	err := h.DB.QueryRow(query, pageid).Scan(&nama, &branch, &noTelpon)
+	query := `SELECT nama_lengkap, pgcode, no_telpon FROM users WHERE (pageid = ? OR pgcode = ?) AND is_active = 1`
+	err := h.DB.QueryRow(query, pageid, pageid).Scan(&nama, &branch, &noTelpon)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Agent tidak ditemukan"})
 		return

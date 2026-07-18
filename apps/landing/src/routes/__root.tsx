@@ -89,13 +89,18 @@ function RootComponent() {
 
   React.useEffect(() => {
     if (langParam && i18n.language !== langParam) {
-      i18n.changeLanguage(langParam);
+      if (i18n.isInitialized) {
+        i18n.changeLanguage(langParam);
+      } else {
+        i18n.on("initialized", () => i18n.changeLanguage(langParam));
+      }
     }
   }, [langParam]);
 
   const dashboardPaths = ["/register", "/petunjuk", "/legal"];
   const isStandalone =
     dashboardPaths.some((p) => location.pathname.startsWith(p)) ||
+    location.pathname.startsWith("/@") ||
     location.pathname === "/";
   const isNotFound =
     ((matches?.length || 0) === 1 && location.pathname !== "/") ||
