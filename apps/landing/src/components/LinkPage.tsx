@@ -2,12 +2,12 @@ import { getCloudinaryUrl } from "@repo/lib/images";
 import { goldPricesQueryOptions } from "@repo/lib/queryOptions";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { BookOpen, ChevronDown, MessageCircle } from "lucide-react";
+import { BookOpen, ChevronDown, Globe, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { SOCIAL_DOMAINS } from "../constants";
 import { FacebookIcon, InstagramIcon, TiktokIcon, VerifiedBadge } from "./icons";
 
-export function LinkPage({ pgbo }: { pgbo: any }) {
+export function LinkPage({ pgcode, pgbo }: { pgcode: string; pgbo: any }) {
 	const navigate = useNavigate();
 	const [linksOpen, setLinksOpen] = useState(false);
 
@@ -17,6 +17,11 @@ export function LinkPage({ pgbo }: { pgbo: any }) {
 		: null;
 
 	const socials = [
+		{
+			label: "Website",
+			href: `/${pgcode}`,
+			icon: <Globe size={18} />,
+		},
 		pgbo?.sosmed_facebook && {
 			label: "Facebook",
 			href: pgbo.sosmed_facebook.startsWith("http")
