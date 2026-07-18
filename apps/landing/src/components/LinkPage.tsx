@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { BookOpen, ChevronDown, Globe, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { SOCIAL_DOMAINS } from "../constants";
+import { GoldParticles } from "./GoldParticles";
 import { FacebookIcon, InstagramIcon, TiktokIcon, VerifiedBadge } from "./icons";
 
 export function LinkPage({ pgcode, pgbo }: { pgcode: string; pgbo: any }) {
@@ -78,6 +79,7 @@ export function LinkPage({ pgcode, pgbo }: { pgcode: string; pgbo: any }) {
 	return (
 		<div className="min-h-[100dvh] bg-black flex flex-col p-6 relative font-sans text-white overflow-x-hidden">
 			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-screen h-screen bg-[radial-gradient(circle_at_50%_15%,_rgba(30,30,30,0.8)_0%,_#000000_60%)] pointer-events-none z-0" />
+			<GoldParticles />
 
 			<main className="relative z-10 w-full max-w-[420px] mx-auto flex-1 flex flex-col items-center justify-center">
 				<div className="flex flex-col items-center text-center mt-8 mb-8 w-full">
