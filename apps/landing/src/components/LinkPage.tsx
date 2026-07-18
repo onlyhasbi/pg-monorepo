@@ -17,8 +17,12 @@ export function LinkPage({ pgcode, pgbo }: { pgcode: string; pgbo: any }) {
 		? getCloudinaryUrl(pgbo.foto_profil_url, { width: 200 })
 		: null;
 
+	const hasAnySosmed = Boolean(
+		pgbo?.sosmed_facebook || pgbo?.sosmed_instagram || pgbo?.sosmed_tiktok
+	);
+
 	const socials = [
-		{
+		hasAnySosmed && {
 			label: "Website",
 			href: `/${pgcode}`,
 			icon: <Globe size={18} />,
