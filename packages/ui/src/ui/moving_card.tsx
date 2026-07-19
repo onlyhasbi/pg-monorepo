@@ -94,11 +94,12 @@ export const MovingCards = ({
           start && "animate-scroll",
           !inView && "[animation-play-state:paused]",
           pauseOnHover && "hover:[animation-play-state:paused]",
+          "[will-change:transform]",
         )}
       >
         {items.map((item) => (
           <li
-            className="relative w-[340px] max-w-full shrink-0 rounded-2xl bg-white/40 px-8 py-12 backdrop-blur-xl md:w-[460px] flex flex-col items-center justify-center text-center min-h-[200px]"
+            className="relative w-[340px] max-w-full shrink-0 rounded-2xl bg-white/90 px-8 py-12 md:w-[460px] flex flex-col items-center justify-center text-center min-h-[200px]"
             key={item.name}
           >
             {/* Soft decorative background quote icon */}

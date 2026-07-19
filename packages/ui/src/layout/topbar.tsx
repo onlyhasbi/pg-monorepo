@@ -61,7 +61,7 @@ function Topbar() {
     <>
       <header
         className={cn(
-          "fixed top-0 z-50 w-full h-20 transition-[background-color,box-shadow,border-color,backdrop-filter] duration-300",
+          "fixed top-0 z-50 w-full h-20 transition-[background-color,box-shadow,border-color] duration-300",
           scrolled
             ? "bg-white/95 md:bg-white/80 md:backdrop-blur-lg border-b border-slate-200/50 shadow-sm"
             : "bg-transparent border-b border-transparent shadow-none",

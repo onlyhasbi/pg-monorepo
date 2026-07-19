@@ -38,7 +38,7 @@ export const id: TranslationKeys = {
     headline:
       "Halo, Saya <span class='bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent drop-shadow-sm'>{{name}}.</span>",
     mission:
-      "Emas telah terbukti menjaga nilai dari inflasi dan krisis sejak ribuan tahun. Saya siap membantu Anda memulai investasi emas sesuai kebutuhan Anda bersama Public Gold Indonesia.",
+      "Emas telah terbukti menjaga nilai dari inflasi dan krisis sejak ribuan tahun. Mulai tabungan emas anda hari ini bersama Public Gold Indonesia.",
     cta: "Konsultasi Sekarang",
   },
   publicGold: {

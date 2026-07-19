@@ -2,7 +2,7 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
 
-import { lazy, useEffect, useMemo, useRef } from "react";
+import { lazy, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const Benefit = lazy(() => import("@repo/ui/benefit"));
@@ -20,6 +20,7 @@ const MovingCards = lazy(() =>
 
 import { useLazyInteraction } from "@repo/hooks/useLazyInteraction";
 import { trackEvent } from "@repo/lib/analytics";
+import { cn } from "@repo/lib/utils";
 import {
   getCloudinarySrcSet,
   getCloudinaryUrl,
@@ -59,7 +60,8 @@ function App() {
   });
 
   const { t } = useTranslation();
-  const scrollBtnRef = useRef<HTMLButtonElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
 
   // Memoize heavy arrays to prevent <MovingCards> from unnecessary re-renders
   const testimonialItems = useMemo(
@@ -101,40 +103,25 @@ function App() {
   }, [pgbo]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
 
-    let ticking = false;
-    let isVisible = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Sentinel is at top-[1000px]. When it leaves viewport upward, user scrolled past 1000px.
+        setShowScrollBtn(!entry.isIntersecting);
+      },
+      { threshold: 0 },
+    );
 
-    const updateScrollTopVisibility = () => {
-      const next = window.scrollY > 1000;
-      if (next !== isVisible) {
-        isVisible = next;
-        const btn = scrollBtnRef.current;
-        if (btn) {
-          btn.style.opacity = next ? "1" : "0";
-          btn.style.transform = next ? "translateY(0)" : "translateY(1rem)";
-          btn.style.pointerEvents = next ? "auto" : "none";
-        }
-      }
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateScrollTopVisibility);
-    };
-
-    // Set initial state without waiting for first scroll event
-    updateScrollTopVisibility();
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div className="relative">
+      {/* Invisible sentinel — when it scrolls out of viewport, show scroll-to-top button */}
+      <div ref={sentinelRef} className="absolute top-[1000px] left-0 w-px h-px pointer-events-none" />
       <section id="about" className="scroll-mt-20">
         <Header pgbo={pgbo} />
       </section>
@@ -206,18 +193,17 @@ function App() {
 
       {/* Scroll To Top - Hanya Mobile */}
       <button
-        ref={scrollBtnRef}
         onClick={() => {
           if (typeof window !== "undefined") {
             window.scrollTo({ top: 0, behavior: "smooth" });
           }
         }}
-        className="md:hidden fixed right-6 bottom-8 w-12 h-12 bg-white/90 backdrop-blur-xl text-slate-800 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-50 transition-all duration-500 border border-slate-200/50 active:scale-95"
-        style={{
-          opacity: 0,
-          transform: "translateY(1rem)",
-          pointerEvents: "none",
-        }}
+        className={cn(
+          "md:hidden fixed right-6 bottom-8 w-12 h-12 bg-white text-slate-800 rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] z-50 transition-[opacity,transform] duration-300 border border-slate-200/50 active:scale-95",
+          showScrollBtn
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 translate-y-4 pointer-events-none",
+        )}
         aria-label="Scroll to top"
       >
         <ArrowUp className="w-5 h-5 stroke-[2.5]" />

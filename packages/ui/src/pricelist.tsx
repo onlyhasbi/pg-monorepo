@@ -297,8 +297,7 @@ function PriceList({ price, pgbo }: Props) {
                         }}
                         preload="intent"
                         className={cn(
-                          "group relative flex w-full flex-col items-center overflow-hidden rounded-[2.5rem] bg-white/70 backdrop-blur-xl p-5 md:py-8 md:px-8 text-center shadow-[0_20px_50px_-15px_rgba(0,0,0,0.06)] transition-all duration-500 no-underline border border-white/40",
-                          "backdrop-blur-none md:backdrop-blur-xl",
+                          "group relative flex w-full flex-col items-center overflow-hidden rounded-[2.5rem] bg-white p-5 md:py-8 md:px-8 text-center shadow-[0_20px_50px_-15px_rgba(0,0,0,0.06)] transition-all duration-500 no-underline border border-slate-100",
                           "h-[380px] sm:h-[420px] md:h-[500px]",
                         )}
                       >
