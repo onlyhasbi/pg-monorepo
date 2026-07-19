@@ -265,7 +265,7 @@ export function EditPgboDialog({
                 </p>
               )}
             </div>
-            
+
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-sm font-bold text-slate-800">
@@ -292,26 +292,26 @@ export function EditPgboDialog({
               </Button>
             </div>
 
-            <DialogFooter className="pt-4 gap-3 sm:gap-0">
+            <DialogFooter className="pt-4 gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                className="h-11 font-bold text-slate-600 order-2 sm:order-1"
+                className="h-11 font-bold text-slate-600"
               >
                 Batal
               </Button>
               <Button
                 type="submit"
                 disabled={isPending || !isValid || !!pageIdError}
-                className="h-11 px-8 font-bold shadow-lg shadow-red-200 flex-1 sm:flex-none order-1 sm:order-2"
+                className="h-11 px-8 font-bold shadow-lg shadow-red-200 flex-1 sm:flex-none"
               >
                 {isPending ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
                   <Save className="w-4 h-4 mr-2" />
                 )}
-                {isPending ? "Menyimpan..." : "Simpan Perubahan"}
+                {isPending ? "Menyimpan..." : "Simpan"}
               </Button>
             </DialogFooter>
           </fieldset>

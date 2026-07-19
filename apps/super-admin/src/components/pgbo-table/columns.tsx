@@ -98,21 +98,16 @@ export function usePgboColumns({
         cell: (info) => {
           const isActive = !!info.row.original.is_active;
           return (
-            <Button
-              data-testid={`toggle-btn-${info.row.original.id}`}
-              size="xs"
-              variant="ghost"
-              onClick={() => onToggle(info.row.original.id)}
-              disabled={isToggling}
+            <span
               className={cn(
-                "rounded-full px-2.5 h-6 text-[10px] font-bold uppercase tracking-wider",
+                "inline-flex items-center justify-center rounded-full px-2.5 h-6 text-[10px] font-bold uppercase tracking-wider",
                 isActive
-                  ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800"
-                  : "bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600",
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-slate-100 text-slate-500",
               )}
             >
-              {isToggling ? "Updating..." : isActive ? "Aktif" : "Nonaktif"}
-            </Button>
+              {isActive ? "Aktif" : "Nonaktif"}
+            </span>
           );
         },
       }),

@@ -152,49 +152,49 @@ export function AdminDashboard() {
       onOpenSecret={() => secretCode.setIsSecretModalOpen(true)}
       onLogout={handleLogout}
     >
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-          <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Daftar Halaman
-            </h1>
-            <p className="text-sm sm:text-base text-slate-500 font-medium">
-              Manajemen Landing Page
-              <span className="mx-2 text-slate-300 font-light">|</span>
-              <span className="text-red-500 font-bold">
-                {pgboQuery.data?.length || 0} Akun Aktif
-              </span>
-            </p>
-          </div>
-          <Button
-            onClick={() => setIsCreateOpen(true)}
-            className="w-full md:w-auto font-bold shadow-lg shadow-red-200 hover:shadow-xl hover:shadow-red-200 transition-all active:scale-[0.98]"
-          >
-            Buat Page Baru
-          </Button>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Daftar Halaman
+          </h1>
+          <p className="text-sm sm:text-base text-slate-500 font-medium">
+            Manajemen Landing Page
+            <span className="mx-2 text-slate-300 font-light">|</span>
+            <span className="text-red-500 font-bold">
+              {pgboQuery.data?.length || 0} Akun Aktif
+            </span>
+          </p>
         </div>
+        <Button
+          onClick={() => setIsCreateOpen(true)}
+          className="w-full md:w-auto font-bold shadow-lg shadow-red-200 hover:shadow-xl hover:shadow-red-200 transition-all active:scale-[0.98]"
+        >
+          Buat Page Baru
+        </Button>
+      </div>
 
-        {/* DataTable */}
-        <DataTable
-          columns={columns}
-          data={(pgboQuery.data as PgboData[]) || []}
-          enableSearch
-          enablePagination
-          serverSearchValue={pgboQuery.serverSearch}
-          onServerSearchChange={pgboQuery.setServerSearch}
-          searchPlaceholder="Cari"
-          enableRowSelection
-          renderBulkActions={(count, selectedRows, clearSelection) => (
-            <BulkActions
-              count={count}
-              selectedRows={selectedRows}
-              clearSelection={clearSelection}
-              onBulkToggle={handleBulkToggle}
-              onBulkDelete={(ids) => setBulkDeleteIds(ids)}
-              isBulkToggling={mutations.bulkToggleMutation.isPending}
-            />
-          )}
-        />
+      {/* DataTable */}
+      <DataTable
+        columns={columns}
+        data={(pgboQuery.data as PgboData[]) || []}
+        enableSearch
+        enablePagination
+        serverSearchValue={pgboQuery.serverSearch}
+        onServerSearchChange={pgboQuery.setServerSearch}
+        searchPlaceholder="Cari"
+        enableRowSelection
+        renderBulkActions={(count, selectedRows, clearSelection) => (
+          <BulkActions
+            count={count}
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            onBulkToggle={handleBulkToggle}
+            onBulkDelete={(ids) => setBulkDeleteIds(ids)}
+            isBulkToggling={mutations.bulkToggleMutation.isPending}
+          />
+        )}
+      />
 
 
       {/* Dialogs */}

@@ -1,13 +1,12 @@
 import type { PgboData } from "@repo/types";
 import { Button } from "@repo/ui/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@repo/ui/ui/select";
-import { Trash2 } from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@repo/ui/ui/dropdown-menu";
+import { Trash2, ChevronDown } from "lucide-react";
 
 interface BulkActionsProps {
   count: number;
@@ -31,30 +30,40 @@ export function BulkActions({
 }: BulkActionsProps) {
   return (
     <div className="flex items-center gap-2">
-      <Select
-        disabled={count === 0 || isBulkToggling}
-        onValueChange={(val: string | null) => {
-          if (!val) return;
-          const ids = selectedRows.map((r) => r.id);
-          onBulkToggle(ids, val === "active", clearSelection);
-        }}
-      >
-        <SelectTrigger
-          data-testid="bulk-status-select"
-          size="sm"
-          className="w-[140px] text-[11px] font-bold h-9 bg-white focus:ring-0"
-        >
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="active" className="text-xs font-medium">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={count === 0 || isBulkToggling}
+            data-testid="bulk-status-dropdown"
+            className="w-[140px] text-[11px] font-bold h-9 bg-white justify-between px-3"
+          >
+            Status
+            <ChevronDown className="w-4 h-4 opacity-50" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-[140px]">
+          <DropdownMenuItem
+            className="text-xs font-medium cursor-pointer"
+            onClick={() => {
+              const ids = selectedRows.map((r) => r.id);
+              onBulkToggle(ids, true, clearSelection);
+            }}
+          >
             Aktifkan
-          </SelectItem>
-          <SelectItem value="inactive" className="text-xs font-medium">
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="text-xs font-medium cursor-pointer"
+            onClick={() => {
+              const ids = selectedRows.map((r) => r.id);
+              onBulkToggle(ids, false, clearSelection);
+            }}
+          >
             Nonaktifkan
-          </SelectItem>
-        </SelectContent>
-      </Select>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Button
         data-testid="bulk-delete-btn"
         variant="outline"

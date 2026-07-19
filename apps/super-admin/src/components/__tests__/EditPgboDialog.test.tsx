@@ -5,9 +5,9 @@ import { EditPgboDialog } from "../EditPgboDialog";
 
 // Setup ResizeObserver mock (used by radix ui dialog)
 class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 }
 window.ResizeObserver = ResizeObserver;
 

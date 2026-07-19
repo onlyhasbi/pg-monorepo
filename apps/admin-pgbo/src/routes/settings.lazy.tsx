@@ -213,7 +213,7 @@ function SettingsPage() {
             className="px-6 sm:px-8 h-auto py-2.5 sm:py-3 shadow-lg shadow-red-600/25 bg-red-600 hover:bg-red-700 transition-all text-white"
           >
             <Save className="w-4 h-4 mr-2" />
-            {mutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+            {mutation.isPending ? "Menyimpan..." : "Simpan"}
           </Button>
         </div>
       </div>
