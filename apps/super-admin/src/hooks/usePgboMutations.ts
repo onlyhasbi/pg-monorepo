@@ -153,6 +153,28 @@ export function usePgboMutations() {
     },
   });
 
+  // --- RESET PASSWORD ---
+  const resetPasswordMutation = useMutation<ApiMessageResponse, Error, string>({
+    mutationFn: async (id) => {
+      const res = await api.patch<ApiMessageResponse>(
+        `/admin/pgbo/${id}/reset-password`,
+        null,
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      showToast(data.message, "success");
+    },
+    onError: (
+      error: Error & { response?: { data?: { message?: string } } },
+    ) => {
+      showToast(
+        error.response?.data?.message || "Gagal mereset katasandi",
+        "error",
+      );
+    },
+  });
+
   return {
     deleteMutation,
     toggleMutation,
@@ -160,5 +182,6 @@ export function usePgboMutations() {
     bulkToggleMutation,
     createMutation,
     editMutation,
+    resetPasswordMutation,
   };
 }

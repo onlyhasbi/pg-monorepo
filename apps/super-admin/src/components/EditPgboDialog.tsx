@@ -22,7 +22,7 @@ import {
 } from "@repo/ui/ui/dialog";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
-import { Loader2, Phone, Save, User } from "lucide-react";
+import { Loader2, Phone, Save, User, KeyRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { type EditFormData, editSchema } from "../schemas/pgbo.schema";
@@ -37,6 +37,8 @@ interface EditPgboDialogProps {
   onCheckPageId: (pageid: string, excludeId?: string) => Promise<boolean>;
   onSetPageIdError: (error: string | null) => void;
   onFetchIntroducerName: (pgcode: string, isEdit: boolean) => void;
+  onResetPassword: (id: string) => void;
+  isResettingPassword?: boolean;
 }
 
 /**
@@ -51,6 +53,8 @@ export function EditPgboDialog({
   onCheckPageId,
   onSetPageIdError,
   onFetchIntroducerName,
+  onResetPassword,
+  isResettingPassword,
 }: EditPgboDialogProps) {
   const [dialCodeSearch, setDialCodeSearch] = useState("");
 
@@ -260,6 +264,32 @@ export function EditPgboDialog({
                   {errors.no_telpon.message}
                 </p>
               )}
+            </div>
+            
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-sm font-bold text-slate-800">
+                  Reset Katasandi
+                </Label>
+                <p className="text-xs text-slate-500 font-medium">
+                  Mengubah katasandi kembali ke 12345678
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={isResettingPassword || !pgbo}
+                onClick={() => pgbo && onResetPassword(pgbo.id)}
+                className="h-9 px-4 font-bold text-orange-600 border-orange-200 bg-orange-50 hover:bg-orange-100 hover:text-orange-700 shadow-sm"
+              >
+                {isResettingPassword ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <KeyRound className="w-4 h-4 mr-2" />
+                )}
+                Reset Password
+              </Button>
             </div>
 
             <DialogFooter className="pt-4 gap-3 sm:gap-0">

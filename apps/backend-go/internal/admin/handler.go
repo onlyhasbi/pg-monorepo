@@ -147,6 +147,34 @@ func (h *AdminHandler) TogglePGBO(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": message, "data": gin.H{"is_active": newStatus}})
 }
 
+func (h *AdminHandler) ResetPasswordPGBO(c *gin.Context) {
+	id := c.Param("id")
+
+	const defaultPassword = "12345678"
+	hashedPassword, err := utils.HashPassword(defaultPassword)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal memproses katasandi"})
+		return
+	}
+
+	res, err := h.DB.Exec(
+		"UPDATE users SET katasandi_hash = ? WHERE id = ? AND role = 'pgbo'",
+		hashedPassword, id,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Gagal mereset katasandi"})
+		return
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Data PGBO tidak ditemukan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Katasandi berhasil direset ke default"})
+}
+
 type UpdatePGBORequest struct {
 	NamaLengkap *string `form:"nama_lengkap"`
 	PGCode      *string `form:"pgcode"`

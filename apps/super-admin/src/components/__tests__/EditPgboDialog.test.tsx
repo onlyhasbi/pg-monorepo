@@ -17,6 +17,7 @@ describe("EditPgboDialog", () => {
   const mockOnCheckPageId = vi.fn().mockResolvedValue(true);
   const mockOnSetPageIdError = vi.fn();
   const mockOnFetchIntroducerName = vi.fn();
+  const mockOnResetPassword = vi.fn();
 
   const mockPgbo = {
     id: "doc-1",
@@ -39,6 +40,7 @@ describe("EditPgboDialog", () => {
     onCheckPageId: mockOnCheckPageId,
     onSetPageIdError: mockOnSetPageIdError,
     onFetchIntroducerName: mockOnFetchIntroducerName,
+    onResetPassword: mockOnResetPassword,
   };
 
   beforeEach(() => {

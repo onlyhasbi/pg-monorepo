@@ -218,6 +218,8 @@ export function AdminDashboard() {
         onCheckPageId={pageIdCheck.checkPageId}
         onSetPageIdError={pageIdCheck.setPageIdErrorEdit}
         onFetchIntroducerName={fetchIntroducerName}
+        onResetPassword={(id) => mutations.resetPasswordMutation.mutate(id)}
+        isResettingPassword={mutations.resetPasswordMutation.isPending}
       />
 
       <DeleteConfirmDialog

@@ -88,6 +88,7 @@ func SetupRouter(db *sql.DB, cld *cloudinary.Cloudinary) *gin.Engine {
 			adminGroup.GET("/pgbo/check-pageid", adminHandler.CheckPageID)
 			adminGroup.POST("/pgbo", adminHandler.CreatePGBO)
 			adminGroup.PATCH("/pgbo/:id/toggle", adminHandler.TogglePGBO)
+			adminGroup.PATCH("/pgbo/:id/reset-password", adminHandler.ResetPasswordPGBO)
 			adminGroup.PUT("/pgbo/:id", adminHandler.UpdatePGBO)
 			adminGroup.DELETE("/pgbo/:id", adminHandler.DeletePGBO)
 			adminGroup.POST("/pgbo/bulk-delete", adminHandler.BulkDeletePGBO)
