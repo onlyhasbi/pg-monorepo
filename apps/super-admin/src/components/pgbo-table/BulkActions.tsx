@@ -31,18 +31,20 @@ export function BulkActions({
   return (
     <div className="flex items-center gap-2">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={count === 0 || isBulkToggling}
-            data-testid="bulk-status-dropdown"
-            className="w-[140px] text-[11px] font-bold h-9 bg-white justify-between px-3"
-          >
-            Status
-            <ChevronDown className="w-4 h-4 opacity-50" />
-          </Button>
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={count === 0 || isBulkToggling}
+              data-testid="bulk-status-dropdown"
+              className="w-[140px] text-[11px] font-bold h-9 bg-white justify-between px-3"
+            >
+              Status
+              <ChevronDown className="w-4 h-4 opacity-50" />
+            </Button>
+          }
+        />
         <DropdownMenuContent align="start" className="w-[140px]">
           <DropdownMenuItem
             className="text-xs font-medium cursor-pointer"
